@@ -4,11 +4,13 @@ function obj_r = train(obj, x, y, w)
 %
 % SYNTAX:
 %
-% obj_r = train(obj, x, y)
+% obj_r = train(obj, x, y, w)
 % obj_r = train(obj, dataset, w)
 %
 % Performs supervised training on the classifier using either the dataset
-% {x, y} or the dataset DATASET.
+% {x, y} or the dataset DATASET.  If specified, the weight vector W is
+% used to determine the relative importance of each training sample in
+% the dataset.
 %
 % RETURNS:
 %
@@ -18,17 +20,7 @@ function obj_r = train(obj, x, y, w)
 % Jeremy Barnes, 4/4/1999
 % $Id$
 
-% PRECONDITIONS
-% none
-
 warning('train: abstract method called');
 
 
 obj_r = obj;
-
-
-% POSTCONDITIONS
-check_invariants(obj);
-
-return;
-
