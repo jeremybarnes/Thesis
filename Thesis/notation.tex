@@ -12,10 +12,10 @@
 \begin{tabular}{l l c}
 \bf{Symbols}		& \bf{Meaning}		& \bf{Section} \\
 \hline \hline
-$\bfx \in \calI$	& Sample
+$\bfx \in \calI$	& $\bfx$ is a sample
 			& fig \ref{fig:supervised learning} \\
 
-$y \in \calO$		& Label
+$y \in \calO$		& $y$ is a label
 			& " \\
 
 $X = ((\bfx_1, y_1), \ldots))$
@@ -23,36 +23,39 @@ $X = ((\bfx_1, y_1), \ldots))$
 			& \ref{sec:formulation} \\
 
 \notspace
-$\calI, \calO$		& Domain and range (usually $\{\pm 1\}$) of problem
+$\calI, \calO$		& \longexp{Domain and range (input and output space;
+                          usually $\calO \in \{\pm 1\}$)}
 			& \ref{sec:domain and range} \\
-$h(\cdot) \in \calH : \calI \mapsto \calO$
+$h(\cdot) \in \calH : \calI \rightarrow \calO$
 			& A hypothesis (classifier)
 			& \ref{sec:formulation} \\
 
-$\calH$			& A set of possible hypotheses $h$
+$\calH$			& A set of hypotheses $h$
 			& \ref{sec:representation of learning machines} \\
 
-$f(\cdot) \in \calF : \calI \mapsto \bbR$
+$f(\cdot) \in \calF : \calI \rightarrow \bbR$
 			& \longexp{A non-thresholded hypothesis; usually 
 			  $h(\cdot) = \sign(f(\cdot))$}
 			& \ref{sec:margin formulation} \\
 
-$\calF$			& A set of possible hypotheses $f$ 
-			  ($\calH = \sign(\calF)$)
+$\calF$			& A set of hypotheses $f$ 
+			  (also $\calH = \sign(\calF)$)
 			& " \\
 
 \notspace
-$\bbW : \calI^m \mapsto (\calI \mapsto \calO)$
+$\bbW : \calI^m \rightarrow (\calI \rightarrow \calO)$
  			& Learning machine ($\bbW(X) = h$)
 			& " \\
-$q = Q(\bfx, y, \hat{y})$
+$q = Q(y, \hat{y})$
 			& Loss function
 			& \ref{sec:loss function} \\
 
-$R(h)$			& True risk
+$R(h)$			& True or expected risk
 			& \ref{sec:true risk} \\
 
-$R_{\emp}(h)$		& Empirical risk
+$\underset{X}{R_{\emp}}(h)$
+			& \longexp{Empirical risk (samples $X$ implicit if 
+			  not specified)}
 			& \ref{sec:empirical risk} \\
 
 $R_{\emp}^w(h)$		& Weighted empirical risk (training error)
@@ -65,16 +68,17 @@ $R_{\emp}^{\gamma}(h)$	& Margin risk
 $\VCdim(\cdot)$		& VC dimension
 			& \ref{sec:vcdim} \\
 
-$\covert{\calX}{\epsilon}{d(\cdot, \cdot)}$ &
+$\covert{\calX}{\epsilon}{d}$ &
 			\longexp{Covering number at scale $\epsilon$ of $\calX$
 			using norm $d$ (usually $d_{\infty}$; assumed if not
 			specified)}
 			& \ref{sec:covering numbers} \\
 
+
 $\covert{\calX}{\epsilon}{k}$ &
 			\longexp{
 			Uniform covering number of $\calX$ at scale $\epsilon$
-			over length $k$}
+			over $k$ points}
 			& " \\
 
 \notspace
@@ -83,16 +87,16 @@ $\co_{p}(\calX)$, $\co(\calX)$
 			 assumed if not specified}
 			& \ref{sec:p-convex} \\
 $\bbB$, $\trainboost$	& AdaBoost, action of AdaBoost
-			& \\
+			& fig \ref{fig:boosting algorithm} \\
 $F(\bfx)$, $H(\bfx)$	& \longexp{Boosting hypothesis, nonthresholded
 			\& thresholded, $H(\cdot) = \sign(F(\cdot))$}
-			& \\
+			& " \\
 
 $b_1, \ldots, b_t$	& AdaBoost classifier weights
-			& \\
+			& " \\
 
-$w_1|_t, \ldots, w_m|_t$ & AdaBoost sample weights
-			& \\
+$w_{t,1}, \ldots, w_{t,m}$ & AdaBoost sample weights
+			& " \\
 
 \hline
 \end{tabular}
@@ -102,6 +106,7 @@ A hat ($\hat{\ \ }$) means ``estimate''.  An asterisk ($\ \ ^{\ast}$) means
 
 
 \section*{Acronyms}
+\label{acronyms}
 
 \begin{tabular}{l l l}
 

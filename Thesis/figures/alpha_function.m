@@ -58,7 +58,7 @@ for i=1:length(allp)
 end
 
 
-set(1, 'paperposition', [0 0 7 2.5]);
+set(1, 'paperposition', [0 0 8 2.5]);
 
 print(EPSFILENAME, '-f1','-deps2');
 

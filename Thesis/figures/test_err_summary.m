@@ -11,4 +11,4 @@ display_meta_summary('error');
 
 set(1, 'paperposition', [0 0 7 3]);
 
-print(EPSFILENAME, '-f1','-deps');
+print(EPSFILENAME, '-f1','-deps2c', '-adobecset');

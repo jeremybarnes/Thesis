@@ -21,9 +21,9 @@ and its applications to practical problems.
 The next three chapters rapidly narrow the focus.  Chapter
 \ref{chapter:slt} describes the field of \emph{Statistical learning
 theory} (SLT)\footnote{A table of acronyms is provided in the
-preface.}, which provides much of the theoretical
-foundation of (but by no means encompasses) the field of machine
-learning.  Assumptions of \emph{binary problems} and
+preface (p. \pageref{acronyms}).}, which provides much of the
+theoretical foundation of (but by no means encompasses) the field of
+machine learning.  Assumptions of \emph{binary problems} and
 \emph{classification problems} further restrict the scope of the
 investigation.
 
@@ -48,7 +48,7 @@ Chapter \ref{chapter:method} describes how these algorithms were
 tested.  Chapter \ref{chapter:results} details the main results of the
 project, and discusses their significance and relation to the theory.
 A conclusion (chapter \ref{chapter:conclusion}) completes the thesis, 
-evaulating the results obtained in the context of the project and in
+evaluating the results obtained in the context of the project and in
 the broader scope of the field of machine learning.  Suggestions of
 avenues further enquiry which may prove fruitful are also made.
 
@@ -61,11 +61,11 @@ background.
 
 \subsection{Artificial intelligence}
 
-The broadest possible subject area in which this work is contained is
-often described as \emph{artificial intelligence}.  This field
+The broad subject area in which this work is contained is often
+described as \emph{artificial intelligence}.  This field 
 essentially contains our efforts to make computers act in a similar
 manner to humans, encompassing a large body of history, philosophy and
-knowledge (see, for example \cite{Penrose89}).  We will ignore much
+knowledge (see, for example \cite{Penrose89}).  We will ignore most
 of this, and concentrate on efforts to make computers ``learn''.
 
 Early work in this field (from the 1950s to the 1980s) was based on
@@ -75,8 +75,8 @@ were huge databases of human-generated rules that were meant to
 represent the complete knowledge of a human expert over a particular
 problem domain.  These systems were reasonably successful at first,
 but became unwieldy as the number of rules increased (a large amount
-of effort is required to generate even the 1000 rules that were used
-in large expert systems in 1980). 
+of effort is required to generate even the 1000 rules that were
+typically used in large expert systems circa 1980). 
 
 The problem was more practical than theoretical: systems with large
 numbers of rules can theoretically learn any learnable problem to a
@@ -119,15 +119,15 @@ manner by combining many ``weak''%
 only; we call any non-voting method weak.  However, it is usually true
 that these weak algorithms perform significantly worse than voting
 methods.}
-hypotheses to generate a composite ``strong'' hypothesis.  Their success
-algorithms has been remarkable; as a result of these algorithms the
+hypotheses to generate a composite ``strong'' hypothesis.  Their
+success has been remarkable; as a result of these algorithms the
 focus of machine learning research in recent years has shifted from
 the classical algorithms (all of which are more or less equal when
 boosted) to developments in voting methods.
 
-These algorithms were initially observed to be immune to many of the
-problems of overfitting.  Recent results have indicated that this is
-unfortunately not the case.
+These algorithms were initially observed to be almost immune to many
+of the problems of overfitting.  Recent results have indicated that
+this is unfortunately not the case.
 
 \subsection{A real-world application}
 \label{sec:churn example}
@@ -140,14 +140,14 @@ usage, number of service calls, etc.  This data can be used to train a
 learning machine.   The resultant learning machine can then be used to
 predict whether current customers are likely to churn (classify
 customers into ``churn'' and ``not churn'' categories).  The company
-can then target these likely customers with special offers or improved
+can target these likely customers with special offers or improved
 service, thereby retaining their custom.
 
 \section{Issues in machine learning}
 
 Machine learning is a mathematically hard (ill-posed) problem, and
-there are many issues involved.  A real-world example of many of these
-problems%
+there are many difficult issues involved.  A real-world example of
+many of these problems%
 \footnote{Part of machine learning folklore.}
 concerns efforts by the US army to construct a learning machine to
 detect tanks from photographs.  The training data was two sets of
@@ -162,25 +162,29 @@ Overfitting, simply put, is learning the specifics of a process too
 well to be able to apply the knowledge to a more general problem.  In
 the context of machine learning, overfitting occurs when the learning
 machine adapts to peculiarities or noise in the input data, to the
-detriment of generalisation ability.
+detriment of generalisation ability.  (There are also issues
+concerning what is ``good'' training data--in this thesis, it is
+assumed that the training data is given and thus uncontrollable).
 
 Statistical learning theory gives us a theoretical reason for
 overfitting, and also an insight into how it may be avoided.  In
 particular, by limiting the complexity of the \emph{set} of hypotheses
 that the learning machine may generate we can avoid overfitting (this
-technique is known as \emph{capacity control}.
+technique is known as \emph{capacity control}).
 
 
 \section{Original work}
 
-We consider one method of 
-
-The original work of this project is motivated by observations of a
-theoretical bound on overfitting; and in particular on a method of
-reducing overfitting in the boosting algorithm.  This theory is first
-developed into several practical algorithms; these algorithms are then
-tested against the original AdaBoost algorithm and for compliance with
-the theory behind them.
+The original work of this project (first considered in
+\cite{Williamson99}) is contained in chapters \ref{chapter:pboosting}
+through \ref{chapter:conclusion}.  The motivation behind this work is
+an observation on a theoretical bound on generalisation ability; in
+particular on a method of reducing overfitting in the boosting
+algorithm by using $p$-convex hulls.  This concept is first developed
+into several practical algorithms (chapter \ref{chapter:pboosting});
+these algorithms are then tested against the original AdaBoost
+algorithm and for compliance with the theory (chapters
+\ref{chapter:method} through \ref{chapter:conclusion}). 
 
 
 

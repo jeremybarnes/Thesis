@@ -29,7 +29,7 @@ fit10 = polyval(p10, fitx);
 
 % Draw graphs
 subplot(1, 2, 1);  setup_axis;
-plot(x, ynoise, 'kx');  hold on;
+plot(x, ynoise, 'k.','markersize', 15);  hold on;
 plot([0 10], [yint yint+10*slope], 'k--');
 plot(fitx, fit2, 'k-');
 title('(a)');
@@ -40,7 +40,7 @@ set(gca, 'xtick', [], 'ytick', []);
 
 
 subplot(1, 2, 2);  setup_axis;
-plot(x, ynoise, 'kx');  hold on;
+plot(x, ynoise, 'k.', 'markersize', 15);  hold on;
 plot([0 10], [yint yint+10*slope], 'k--');
 plot(fitx, fit10, 'k-');
 title('(b)');

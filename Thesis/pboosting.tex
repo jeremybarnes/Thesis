@@ -7,8 +7,8 @@
 
 This chapter describes the concepts behind and a theoretical
 justification of \emph{$p$-boosting}, a generalisation of the boosting
-algorithm.  The treatment is somewhat abstract; further chapters will
-be more concrete as practical issues are considered.
+algorithm.  The treatment is somewhat abstract to begin with; further
+sections become more concrete as practical issues are considered.
 
 \section{Avoiding overfitting of boosting algorithms}
 
@@ -37,9 +37,9 @@ chosen by a boosting algorithm  with probability of at least $1 - \delta$,
 where the function $b(\delta, |\calH|, m)$ has the following
 properties:
 \begin{enumerate}
-\item	$b(\delta, \cdot, \cdot)$ is nonincreasing with $\delta$;
+\item	$b(\delta, \cdot, \cdot)$ is non-increasing with $\delta$;
 \item	$b(\cdot, |\calH|, \cdot)$ is nondecreasing with $|\calH|$;
-\item	$b(\cdot, \cdot, m)$ is nonincreasing with $m$.
+\item	$b(\cdot, \cdot, m)$ is non-increasing with $m$.
 \end{enumerate}
 \caption{Form of generalisation performance bounds for boosting (after
 figure \ref{fig:generalisation bound form})}
@@ -53,10 +53,13 @@ $\calX$.  One obvious way, therefore, to avoid overfitting is to limit
 the complexity of the class of hypotheses that our learning algorithm
 can choose.  This process is known as \emph{capacity control}.
 Specifically, instead of choosing $\calX = \co (\calH)$ as AdaBoost
-does, we choose $\calX = \co_p(\calH)$ for some $p > 0$.%
+does, we choose $\calX = \co_p(\calH)$ (definition \ref{def:p-convex
+hull}) for some $p > 0$.%
 \footnote{For $p=1$, the hypothesis space matches that of Boosting.}
-Then, for $p < 1$, we have $|\co_p (\calH)| < |\co (\calH)|$.  In
-effect, we have added a parameter $p$ to our algorithm which can be
+Then, for $p < 1$, we have $|\co_p (\calH)| < |\co (\calH)|$ (where,
+as in section \ref{sec:theoretical overfitting}, we choose $|\cdot|$ to
+be an appropriate measure of complexity, such as covering numbers).
+In effect, we have added a parameter $p$ to our algorithm which can be
 adjusted to tune the capacity of $\calX$.  Using the language of
 section \ref{sec:theoretical overfitting}, the $p$ parameter allows us
 to define a structure on $\calX$.
@@ -90,15 +93,17 @@ performance of classifiers over $p$-convex hulls.
 
 \begin{theorem}[Generalisation performance over $p$-convex hulls]
 \label{thm:p convex generalisation}
-Consider a a hypothesis $F \in \co_p(\calH)$ where the covering
-numbers of $\calH$ grow as $\cover{\calH}{\epsilon} \approx \left
-( \frac{1}{\epsilon} \right) ^d$.% 
-\footnote{See theorem \ref{thm:p-convex bound}.}
-Then the generalisation error over a set of $m$ independent training
-samples with probability at least $1 - \delta$ can be approximated by 
+Consider a set of hypotheses where the covering numbers of $\calH$
+grow as $\cover{\calH}{\epsilon} \approx \left ( \frac{1}{\epsilon}
+\right) ^d$.%
+\footnote{See theorem \ref{thm:p-convex bound}, page
+\pageref{thm:p-convex bound}.}
+Then for any $H \in \co_p(\calH)$, where $H = \sign(F)$, the
+generalisation error over a set of $m$ independent training samples
+with probability at least $1 - \delta$ can be approximated by 
 %
 \begin{equation}
-R(F) \lesssim R_{\emp}^{\gamma}(F) + \sqrt{ \frac{8}{m} \left[ \log 2
+R(H) \lesssim R_{\emp}^{\gamma}(F) + \sqrt{ \frac{8}{m} \left[ \log 2
 + c(p) \: d \: \left( \frac{2}{\gamma} \right)^{\frac{2p}{2-p}} \log
 \left( \frac{2}{\gamma} \right) - \log \delta \right]}
 \end{equation}
@@ -107,31 +112,31 @@ where $c(p)$ is a constant that depends upon $p$.
 \end{theorem}
 
 This result is necessarily an approximation, due to the approximate
-nature of the theorems it is based upon.  However, it is clear from
-the formulation that the confidence interval will decrease as $p
-\rightarrow 0$; and thus we can use the $p$ parameter as an explicit
+nature of the theorems it is based upon and the loose nature of such
+generalisation bounds.  However, it is clear that the confidence
+interval should decrease as $p \rightarrow 0$ (again assuming a nearly
+constant $c(p)$; and thus we can use the $p$ parameter as an explicit
 parameter for capacity control.
 
 
 \section{Development of algorithms}
 
 Having established that boosting algorithms which operate on
-$p$-convex hulls have desireable property of a tunable capacity via
-the $p$ parameter, we turn to
-questions of how to modify AdaBoost to operate on a $p$-convex hull.
-We first descrive a ``naive $p$-boosting'' algorithm, which attempts
-to directly modify the classifier weights to produce this effect.
-After considering shortcomings of the naive algorithm, we derive a	
-gradient descent algorithm ``strict $p$-boosting'', using a restricted
-domain $\calX = \co_p (\calH)$.  Unfortunately, the cost space
-optimised by this algorithm has undesirable properties which leads to
-the algorithm getting ``stuck'' for $p < 1$.  As a result, we develop
-the ``sloppy $p$-boosting'' algorithm which sacrifices theoretical
-integrity for practical viability.  Finally, we briefly consider a
-different type of $p$-boosting algorithm (still based on gradient
-descent) that uses regularisation to achieve $\calX \approx
-\co_p(\calH)$.  This algorithm is called the ``gravity $p$-boosting
-algorithm''.
+$p$-convex hulls theoretically have the desirable property of a
+tunable capacity via the $p$ parameter, we turn to questions of how to
+modify AdaBoost to operate on a $p$-convex hull.  We first describe a
+``naive $p$-boosting'' algorithm, which attempts to directly modify
+the classifier weights to produce this effect.  After considering
+shortcomings of the na\"{\i}ve algorithm, we derive a gradient descent
+algorithm ``strict $p$-boosting'', using a restricted domain $\calX =
+\co_p (\calH)$.  Unfortunately, the cost functional optimised by this
+algorithm has undesirable properties which leads to the algorithm
+getting ``stuck'' for $p < 1$.  As a result, we develop the ``sloppy
+$p$-boosting'' algorithm which sacrifices theoretical integrity for
+practical viability.  Finally, we briefly consider a different type of
+$p$-boosting algorithm (still based on gradient descent) that uses
+regularisation to achieve $\calX \approx \co_p(\calH)$.  This
+algorithm is called the ``gravity $p$-boosting'' algorithm.
 
 
 \subsection{Na\"{\i}ve algorithm}
@@ -145,8 +150,8 @@ weights $b$.  Denoting the classifier weight that AdaBoost would have
 used as $b'_t$, we use the formula
 %
 \begin{equation}
-b_t = (b'_t)^{\frac{1}{p}} = \left[ - 1/2 \log \left( \frac{\epsilon_t}{1
-- \epsilon_t} \right) \right]^\frac{1}{p}
+b_t = (b'_t)^{\frac{1}{p}} = \left[ - \frac{1}{2} \log \left
+( \frac{\epsilon_t}{1 - \epsilon_t} \right) \right]^\frac{1}{p}
 \end{equation}
 %
 Thus, for $p < 1$ the hypotheses with low training error (and hence
@@ -159,7 +164,7 @@ effect of $p$ is plotted figure \ref{fig:naive b values}.
 \end{center}
 \begin{capt}{Effect of $p$ on classifier weights for naive algorithm}{fig:naive b values}
 The three lines show $b_t$ against $\epsilon_t$ for $p \in \{ 0.5,
-0.7. 1.0 \}$.
+0.7, 1.0 \}$.
 \end{capt}
 \end{linefigure}
 
@@ -179,10 +184,10 @@ w_i|_{t+1} = \left\{
 %
 When using this first option, the $1/p$ power (which is
 greater than one for $p < 1$) is inside an exponential; and could
-(and does) lead to the exponential function getting extremely large
-(outside the limits of IEEE floating point numbers).  Thus the sample
-weights are updated based upon $b'_t$; they are identical to those
-chosen by the boosting algorithm.
+(and does) lead to the value of the exponential getting extremely
+large (outside the limits of IEEE floating point numbers).  Thus the
+sample weights are updated based upon $b'_t$ (second option); they are
+identical to those chosen by the AdaBoost algorithm.
 
 The na\"{\i}vity of the algorithm becomes apparent when considered in
 the gradient descent framework.  The sample weights are calculated
@@ -209,7 +214,8 @@ combined hypothesis $F_{t}$).  This idea is illustrated in figure
 \begin{center}
 \includegraphics{figures/strict_search.epsg}
 \end{center}
-\begin{capt}{Line search for strict $p$-boosting algorithm}{fig:strict line search}
+\begin{capt}{Line search for strict $p$-boosting algorithm}{fig:strict
+line search}
 The strict $p$-boosting algorithm confines its line search to the
 $p$-convex hull of points, whereas AdaBoost searches orthogonal to the
 current combined hypothesis.
@@ -219,8 +225,8 @@ current combined hypothesis.
 \subsection{Classifier weights}
 
 We derive an expression for the classifier weights, using the gradient
-descent framework of chapter \ref{chapter:boosting}.  Algebraicaly, we
-are seeking a minimum of the expression 
+descent framework of chapter \ref{chapter:boosting}.  Algebraically, we
+are seeking a minimum for the expression 
 %
 \begin{equation}
 \label{eqn:classifier weight cost function approximation}
@@ -234,11 +240,13 @@ subject to the constraint that
 \end{equation}
 
 Substituting in the constraint, and performing some manipulations, we
-are looking for
-\todo{Emphasise that \emph{all} weights are updated, not just $b_{t+1}$.}
+are looking for%
+\footnote{Note that here (unlike AdaBoost) \emph{all} $b$ values are updated
+(normalised) at each time iteration.}
 %
 \begin{equation}
-b_{t+1} = \frac{\alpha}{\left( 1 + \alpha^p \right) ^ {1/p}}
+F_{t+1} = \frac{b_1 f_1 + \cdots + \alpha f_{t+1}}{\left( 1 + \alpha^p
+\right) ^ {1/p}}
 \end{equation}
 %
 where
@@ -250,14 +258,14 @@ where
 \label{eqn:strict minimise function}
 \end{equation}
 
-Unfortunately, it is not possible to minimise this algeberically as
-for AdaBoost; we instead have to be content with a numerical
-optimisation.  The method chosen is Newton-Raphson iteration, which
-searches for $\partial C(F) / \partial \alpha = 0$ by repeatedly
-approximating it with a parabola until a tolerance is reached.
-Several technical points concerned with making the Netwon-Raphson
-method robust are addressed in appendix \ref{appendix:newton-raphson}
-and \cite{Heath97}.
+Unfortunately, it is not possible to find a closed form solution for
+this expression as for AdaBoost; we instead have to be content with a
+numerical optimisation.  The method chosen is Newton-Raphson
+iteration, which searches for $\partial C(F) / \partial \alpha = 0$ by
+repeatedly approximating it with a parabola until a tolerance is
+reached.  Several technical points concerned with making the
+Newton-Raphson method robust are addressed in appendix
+\ref{appendix:newton-raphson} and \cite{Heath97}.
 
 \subsection{Sample weights}
 
@@ -266,47 +274,50 @@ weights are calculated using the results from theorem
 \ref{thm:gradient descent weights and direction}:
 %
 \begin{equation}
-w_{t,i} = \frac{C'(y_i F_t (\bfx_i))}{\sum_{j=1}^{m} C'(y_j
+w_{t,i} = \frac{c'(y_i F_t (\bfx_i))}{\sum_{j=1}^{m} c'(y_j
 F(\bfx_j))} = \frac{- \exp \{ y_i F_t (\bfx_i)\}}{\sum_{j=1}^{m} -
 \exp \{y_j F(\bfx_j)\}}
 \end{equation}
 
-\subsection{Existance of an optimal $b_{t+1}$ for $p < 1$}
+\subsection{Existence of an optimal $b_{t+1}$ for $p < 1$}
 
 As we shall see in chapter \ref{chapter:results}, when $p < 1$ the
 strict $p$-boosting algorithm suffers from a cost surface that is in
 many cases strictly increasing along the $p$-convex hull after a
-handfull of iterations.  The problem with a strictly increasing cost
+handful of iterations.  The problem with a strictly increasing cost
 function is that it results in $F_{t+1} = F_t$, and the algorithm must
 be aborted (or continue in steady state endlessly).
 
-In order to determine the mechanism through this phenomenon occurs,
-some very simple simulations were performed.  These simulations
-trained the strict algorithm with $p = \frac{1}{2}$ on a simple
-(random) dataset in $\bbR^2$ containing 10 samples.  It was observed
-that sometimes there was no optimal solution at $t=2$ (that is, 
-\emph{no} $p$-convex combination of the first two weaklearners produced a
-smaller cost than the first weaklearner only.  It was furthermore
-observed that a sufficient condition for there to be no solution was:
+In order to determine the mechanism through which this phenomenon
+occurs, a simple experiment was performed.  This experiment trained
+the strict algorithm with $p = \frac{1}{2}$ on a simple dataset in
+$\bbR^2$ (randomly generated from the \ds{ring} distribution; see
+appendix \ref{appendix:datasets}) containing 10 samples. 
+It was observed that sometimes there was no optimal solution 
+at $t=2$ (that is,  \emph{no} $p$-convex combination of the first two
+weak-learners produced a smaller cost than the first weak-learner
+only.  It was furthermore observed that a sufficient condition for
+there to be no solution was: 
 %
 \begin{enumerate}
-\item	The weaklearner $h_1$ classified 9 out of 10 training samples
+\item	The weak-learner $h_1$ classified 9 out of 10 training samples
 	correctly; 
-\item	The weaklearner $h_2$ classified 8 out of 10 training samples
+\item	The weak-learner $h_2$ classified 8 out of 10 training samples
 	correctly, including the sample it classified
 	\emph{incorrectly} on the first round.
 \end{enumerate}
 %
-Furthermore, adjusting the $p$ parameter revealed that this behaviour
+Adjusting the $p$ parameter revealed that this behaviour always
 occurred for $p \leq 0.6695$, and did \emph{not} occur for $p \geq
-0.6698$.  Thus, there appears to be a threshold value of $p$ above
-which this behaviour is not observed.
+0.6698$.  Thus under the conditions considered above, there appears to
+be a threshold value of $p$ above which this behaviour is not
+observed.
 
 Recalling that the cost functional $C(F)$ is the sum over the $m$
 training samples of the cost function approximation
 (\ref{eqn:classifier weight cost function approximation}), it is
 useful to look at the contribution of each \emph{sample} $S = (\bfx,
-y)$ to the total cost, as a function of $\alpha$:
+y)$ to the total cost $C$, as a function of $\alpha$:
 %
 \begin{equation}
 \label{eqn:sample cost function}
@@ -324,32 +335,34 @@ It is useful to consider the meaning behind each part of
 (\ref{eqn:sample cost function}).  The term $y F_t(\bfx)$ is simply
 the margin of the sample $S$ at iteration $t$.  We write this $m_{S,
 t}$.  The term $y \alpha f_{t+1}(\bfx)$ is equal to $\alpha$ if the
-weaklearner $h_{t+1}$ classifies $S$ correctly, or $-\alpha$
+weak-learner $h_{t+1}$ classifies $S$ correctly, or $-\alpha$
 otherwise.  The denominator $(1 + \alpha^p)^{\frac{1}{p}}$ is equal to
 $1$ at $\alpha=0$ and approaches $\alpha$ as $\alpha \rightarrow
 \infty$.
 
 When applied to our simple example, this analysis yields some
 insight into the processes that are occurring.  Of the ten samples,
-seven were classified correctly by both weaklearning hypotheses; one
+seven were classified correctly by both weak-learning hypotheses; one
 was classified wrongly on the first iteration but correctly on the
 second; and two were classified correctly at first but wrongly on the
 second.
 
-When performing the Netwon-Raphson search for $t=2$, the margin
-$m_{(\bfx_i, y_i), 1}$ will evaluate to one of two values: $+1$ if 
-$h_1(\bfx_i) = y_i$ and $-1$ otherwise.  Likewise, the margin of the
-weaklearning hypothesis $h_2$ will be $\pm 1$ depending upon whether
-it classified the sample correctly or not.  As a result, there are
-four possibilities for the sample cost function, depending upon the
-history of the first two weak learning hypotheses:
+When performing the line search for $t=2$, the margin $m_{(\bfx_i,
+y_i), 1}$ will evaluate to one of two values: $+1$ if  $h_1(\bfx_i) =
+y_i$ and $-1$ otherwise.  Likewise, the margin of the weak-learning
+hypothesis $h_2$ will be $\pm 1$ depending upon whether it classified
+the sample correctly or not.  As a result, there are four
+possibilities for the sample cost function, depending upon the history
+of the first two weak learning hypotheses: 
 %
 \providecommand{\ra}{\Rightarrow}
 \providecommand{\Pn}{(1 + \alpha^p)^{\frac{1}{p}}}
 \begin{equation}
 \begin{array}{rclrcl}
 c_{(-1 \ra -1),i}(p,\alpha) & = & \exp \left\{ \frac{ 1 + \alpha}{\Pn} \right\} &
-c_{(-1 \ra +1),i}(p,\alpha) & = & \exp \left\{ \frac{ 1 - \alpha}{\Pn} \right\} \\
+c_{(-1 \ra +1),i}(p,\alpha) & = & \exp \left\{ \frac{ 1 - \alpha}{\Pn}
+\right\} \\
+& & & & & \\ % This bit here to add space to the formula
 c_{(+1 \ra -1),i}(p,\alpha) & = & \exp \left\{ \frac{-1 + \alpha}{\Pn} \right\} &
 c_{(+1 \ra +1),i}(p,\alpha) & = & \exp \left\{ \frac{-1 - \alpha}{\Pn} \right\}
 \end{array}
@@ -357,9 +370,9 @@ c_{(+1 \ra +1),i}(p,\alpha) & = & \exp \left\{ \frac{-1 - \alpha}{\Pn} \right\}
 %
 where the subscript to $c$ gives the history: $(u \ra v)$ means that
 hypothesis $H_1 = \sign(F_1)$ had margin $yF_1(\bfx) = u$, and that
-the weak learning hypothesis $h_{2}$ had margin $yh_2(\bfx) = v$. These
-functions are plotted against alpha in figure \ref{fig:alpha
-function}.
+the weak learning hypothesis $h_{2}$ had margin $yh_2(\bfx) =
+v$. These functions are plotted against alpha in figure \ref{fig:alpha
+function}. 
 
 \begin{linefigure}
 \begin{center}
@@ -367,7 +380,7 @@ function}.
 \end{center}
 \begin{capt}{Sample cost contributions}{fig:alpha function}
 Parts (a) through (d) show the sample cost at iteration $t=2$ as a
-function of the history of the margins through weaklearners $h_1$ and
+function of the history of the margins through weak-learners $h_1$ and
 $h_2$.  The dashed line indicates $p=0.5$, the thick line $p=1$, and
 the thin solid line $p=2$.  Part (e) plots the cost \emph{functional}
 for the examples (10 samples) described in the text (in the example,
@@ -382,18 +395,18 @@ samples which were right and are now wrong.  The main qualitative
 difference between $p=0.5$ and $p=1$ is the shape of the $(-1 \ra -1)$
 and $(+1 \ra +1)$ curves: these are flat for $p=1$ (indicating that
 the algorithm is indifferent to samples which do not change their
-margin), but form a hill for $p < 1$.
+margin), but form a hill for $p < 1$.  These hills are obviously not
+conducive to minima.
 
-* $(+1 \ra -1)$ has $\frac{\partial c(\alpha)}{\partial \alpha} > 0$
-  always.
-
-Part (d) of figure \ref{fig:alpha function} displays the cost
+Part (e) of figure \ref{fig:alpha function} displays the cost
 functional 
+%
 \begin{equation}
 C(\alpha,p) = \sum_{i=1}^{10} c_{(\bfx, y)}(\alpha, p) 
 = 7c_{(1 \ra 1)} + 2c_{(1 \ra -1)} + c_{(-1 \ra 1)}
 \end{equation}
-for different values of $p$.  Note that a well-defined minimum exists
+%
+for the same values of $p$.  Note that a well-defined minimum exists
 for $p \geq 1$, but the cost function is monotonic increasing for $p =
 0.5$.  It is clear that the contribution of $2c_{(+1 \ra -1)}$
 prevents a minima from occurring.
@@ -421,15 +434,16 @@ early.
 \section{Sloppy algorithm}
 
 Given the problems with the strict boost algorithm, it is reasonable
-to consider using an algorithm with a similar effect but a simpler
-form for the cost function (in particular, one for which a minimum is
-guaranteed to exist).
+to consider using an algorithm with a similar effect but a more
+desirable form for the cost function (in particular, one for which a
+minimum of the line search at $\alpha \neq 0$ is guaranteed to
+exist).
 
 The \emph{sloppy $p$-boosting algorithm} is one such algorithm.  The
 simplification involves searching along the same line as AdaBoost, and
 then normalising to the $p$-convex hull \emph{after} a suitable point
 has been found.  In this way, the hypothesis $F_t$ returned after
-round $t$ is still $F_t \in \co_P(\calH)$, and the strictly increasing
+round $t$ is still $F_t \in \co_p(\calH)$, and the strictly increasing
 cost functions that affect the strict algorithm are avoided.  Figure
 \ref{fig:sloppy line search} illustrates the differences in the line
 search between the sloppy and strict algorithms.
@@ -440,7 +454,7 @@ search between the sloppy and strict algorithms.
 \end{center}
 \begin{capt}{Line search for sloppy $p$-boosting algorithm}{fig:sloppy line search}
 Comparison between the line search for the sloppy and strict
-algorithms.  The strict alrogithm searches directly along the
+algorithms.  The strict algorithm searches directly along the
 $p$-convex hull.  The sloppy algorithm searches along the same line as
 AdaBoost, and then normalises to put the point back onto the
 $p$-convex hull.

@@ -5,51 +5,50 @@
 \chapter{Conclusion}
 \label{chapter:conclusion}
 
-In this thesis we have considered variants of the AdaBoost machine
-learning algorithm, with the desireable property of explicit capacity
-control.  Capacity control is implemented by confining the class of
-allowable combined hypotheses to lie on the $p$-convex hull of the
-underlying hypotheses, and is adjustable via the $p$ parameter.
+This thesis has considered variants of the AdaBoost machine learning
+algorithm, with the desirable property of explicit capacity control,
+implemented by confining the combined hypotheses to a $p$-convex hull
+of underlying hypotheses.  Theoretical results indicate that these
+algorithms should outperform AdaBoost on noisy datasets.
 
-Theoretical results indicate that the performance of these adjustable
-algorithms for the optimal $p$ value may be superior to AdaBoost,
-especially in the presence of large amounts of label noise (where
-AdaBoost is prone to overfitting).  The approximate and bounded-above
-form of these theoretical results prevent stronger statements being
-made.
+Several ``$p$-boosting'' algorithms were developed: a na\"{\i}ve
+approach (which showed no noticeable improvement over AdaBoost), a
+``strict'' algorithm confined strictly to the $p$-convex hull at all
+times, and a ``sloppy'' variant less restricted during the line
+search.
 
-Several variants of a ``$p$-boosting'' algorithm were developed.  The
-first variant used a na\"{\i}ve approach, and its performance was not
-significantly different from that of the AdaBoost algorithm.  The
-second variant (``strict'') was confined strictly along the $p$-convex
-hull at all times, but proved to be prone to early stopping for $p <
-1$.  The third variant (``sloppy'') was less restricted during the
-line search phase (searching along the same line as AdaBoost).
+The strict algorithm showed a small improvement over AdaBoost over the
+difficult \ds{acacia} dataset, but in general performed poorly
+(particularly for $p < 1$).  The poor performance was caused by the
+cost functional proving to be strictly increasing, or to have a
+minimum very close to the previous hypothesis (in effect the gradient
+descent algorithm did not move significantly from its starting point).
+Analysis of the features of the cost functional showed that ``easy''
+samples produced hill-shaped sample cost functions that would
+contribute to a strictly a increasing cost functional.
 
-The strict algorithm performed poorly as compared to AdaBoost and the
-sloppy algorithm, both in terms of generalisation performance and
-training time.  This was a disappointing result as the strict
-algorithm was the most direct implementation of the restriction to a
-$p$-convex hull.  It is hypothesised that the observed behaviour is a 
-result of the gradient descent optimisation not finding the global
-minimum.  The sloppy algorithm performed well on noisy datasets, with
-the shape of the capacity-vs-generalisation error curve matching the
-theoretical prediction, and the generalisation error at the optimal
-$p$ value significantly (up to 25\%) improved on AdaBoost--which
-already performs \emph{very} well.  However, both the strict and the
-sloppy algorithms required approximately an order of magnitude more
-training iterations than AdaBoost to reach the optimal solution.  An
-accelerated version is proposed that may improve this situation.
+The sloppy algorithm performed well on noisy datasets, with the shape
+of the capacity-vs-gener\-alis\-ation error curve matching the theoretical
+prediction, and the generalisation error at the optimal
+$p$ value significantly (up to 25\%) improved on AdaBoost (which
+already performs \emph{very} well).  While it appears that this
+algorithm did find a good solution, which was sparse as predicted by
+the theory, it did so in a very inefficient manner (particularly for
+$p < 1.2$), with up to several thousand iterations spent adding
+hypotheses with weights several hundred orders of magnitude below a
+significant level.  A form of the cost function designed to
+accelerate the training process is proposed as a potential solution;
+alternatively a different optimisation strategy could be used.
 
-No quantitative comparisons between the $p$-boosting algorithm and
+It can be concluded that the \emph{concept} of using a $p$-convex hull
+has merit as a method of increasing the noise-tolerance of the already
+very strong AdaBoost algorithm, but the algorithms that were developed
+to \emph{implement} the idea were lacking.
+
+No quantitative comparisons between $p$-boosting algorithms and
 other AdaBoost derivatives with similar goals (soft margins
 \cite{Ratsch98}, DOOM I/II \cite{Mason99, Mason99a}) were made.
 However, these approaches do not appear incompatible with the $p$-convex
-hull approach; it is likely that a combined combined approach would be
-able to improve on both.
+hull approach; it is likely that a combined approach would be superior
+to both.
 
-In conclusion, the capacity controlled ``$p$-boosting'' algorithms
-considered in this project have been shown to be a modest improvement
-on the already excellent AdaBoost algorithm in some situations.  More
-extensive testing is required before stronger conclusions can be
-drawn.

@@ -4,43 +4,33 @@
 
 \chapter{Abstract}
 
-A machine learning algorithm attempts to infer a general relationship
-from a limited number of observations of a process.  Boosting
-algorithms are a class of machine learning algorithms that improve the
-performance of a so-called ``weak'' machine learning algorithm by
-combining many ``weak'' hypotheses in a \emph{combined hypothesis}.
-This combined hypothesis is constructed in a manner that forces
-difficult-to-learn examples to be emphasised in the learning process.
-The first such boosting algorithm was called ``AdaBoost''.
+AdaBoost is a machine learning algorithm that generates a hypothesis
+by combining a series of so-called weak hypotheses from another
+algorithm.  The performance of AdaBoost is good to exceptional,
+particularly on low-noise data.  However it has been observed that
+AdaBoost can generate overly complex hypotheses that overfit noisy
+data.
 
-The performance of boosting algorithms is good to exceptional,
-especially on low-noise data.  However it has recently been observed
-that boosting algorithms overfit (fit the measurement noise of the
-observations rather than the underlying data) on datasets containing
-noisy observations, which degrades the performance.  One way of
-avoiding overfitting is to limit the complexity of the combined
-hypothesis (conceptually, impose a smoothness constraint) so that it
-is not possible for the boosting algorithm to generate an overfitted
-hypothesis.  This process is known as \emph{capacity control}.
+We consider modifying AdaBoost to allow the complexity of its combined
+hypotheses to be explicitly controlled via a ``$p$'' parameter. 
+The resulting ``$p$-boosting'' algorithm is constrained to generate
+only combinations of weak hypotheses that lie on the $p$-convex hull
+of its weak hypotheses.
 
-We consider a modification to the boosting algorithm to allow the
-capacity to be explicitly controlled via a $p$ parameter.  The details
-of the implementation involve constraining the boosting algorithm to
-generate only hypotheses that lie within a $p$-convex combination of
-the weak hypotheses.  Several alternative algorithms based upon this
-idea are developed; these are collectively called ``$p$-boosting
-algorithms''.
+Several algorithms based upon this concept are developed.  Simulations
+indicate that the best algorithm outperforms AdaBoost by a modest
+amount (at best 18\% test error vs 25\% for AdaBoost) on a
+low-dimensional noisy dataset.  The generalisation ability over other
+noisy datasets was slightly improved on AdaBoost; AdaBoost performed
+better on low-noise datasets.  A number of operational difficulties
+were observed, including very long training times.  These difficulties
+appear to be due to details of the gradient descent optimisation
+technique used internally, and solutions are proposed for those where
+the cause was apparent. 
 
-A number of simulations were performed, which indicate that the best
-of these algorithms outperforms AdaBoost by a modest amount (at best
-18\% test error vs 25\%) on low-dimensional, noisy datasets (at the
-cost of significantly increased training time).  The generalisation
-ability over other datasets was not significantly different from
-AdaBoost; more extensive testing is required to draw firm conclusions
-on the merit of these $p$-boosting algorithms.
-
-The $p$-convex hull approach is complementary to other AdaBoost
-variants also designed to improve performance on noisy datasets (soft
-margins \cite{Ratsch98}, DOOM I/II \cite{Mason99}), allowing the
-possibility a combined approach superior to either.
+The $p$-convex hull approach appears to be a useful improvement to the
+already excellent AdaBoost algorithm.  This approach is complementary
+to other AdaBoost variants also designed to improve performance on
+noisy datasets, allowing the possibility of a combined approach
+superior to either.
 
