@@ -62,6 +62,10 @@ obj.trainmethod = 'stochastic'; % or 'pure' to use the pure versino
 obj.samplenumber = 1; % which sample we are up to for stochastic
 obj.progressinterval = 100; % How often to print out training progress
 
+% This data is required to implement momentum
+obj.last_update_o = zeros(size(obj.w_out));
+obj.last_update_h = zeros(size(obj.w_hidden));
+
 % construct class and define superior/inferior relationship
 obj = class(obj, 'neural_net', parent);
 superiorto('double', 'classifier');

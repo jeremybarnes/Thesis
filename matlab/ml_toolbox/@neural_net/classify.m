@@ -43,8 +43,8 @@ o_out = node_transfer_function(obj, o_in);
 % category value.  This loop is _real_ slow in MATLAB; it may be that
 % using C is worthwile.
 
-
 m = max(o_out, [], 2);
+y = zeros(numsamples, 1);
 for i=1:numsamples
    max_index = find(o_out(i, :) == m(i));
    if (length(max_index) > 1)

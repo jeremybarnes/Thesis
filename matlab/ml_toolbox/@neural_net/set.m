@@ -29,8 +29,8 @@ end
 
 for i=1:length(varargin)./2
    
-   propname = varargin{i};
-   propvalue = varargin{i+1};
+   propname = varargin{i*2-1};
+   propvalue = varargin{i*2};
    
    switch propname
       case 'trainmethod'
@@ -45,14 +45,14 @@ for i=1:length(varargin)./2
 	    error('set: learningrate is a real > 0');
 	 end
 	 
-	 obj.learningrate = propvalue;
+	 obj.eta = propvalue;
 	 
       case 'momentum'
 	 if (~isa(propvalue, 'double') | (propvalue < 0))
 	    error('set: momentum is a real > 0');
 	 end
 	 
-	 obj.momentum = propvalue;
+	 obj.alpha = propvalue;
 	 
       case 'progressinterval'
 	 if (~isa(propvalue, 'double') | (propvalue < 0))
