@@ -160,7 +160,11 @@ figure(1);  clf;
 
 % Graphs of p vs best error
 for i=1:length(test_info.noise)
-   subplot(length(test_info.noise), 2, i*2-1);
+   if (length(test_info.noise == 1))
+      subplot(2, 1, i*2-1);
+   else
+      subplot(length(test_info.noise), 2, i*2-1);
+   end
    plot(pvalues, err_results(i, :), 'rx');  hold on;
    plot(test_info.p, err_means(i, :), 'b-');
    plot(test_info.p, err_means(i, :) + err_stdevs(i, :), 'b:');
@@ -198,7 +202,12 @@ end
 
 % Graphs of p vs best iteration
 for i=1:length(test_info.noise)
-   subplot(length(test_info.noise), 2, i*2);
+   if (length(test_info.noise == 1))
+      subplot(2, 1, i*2);
+   else
+      subplot(length(test_info.noise), 2, i*2);
+   end
+   
    semilogy(pvalues, iter_results(i, :), 'rx');  hold on;
    plot(test_info.p, iter_means(i, :), 'b-');
    plot(test_info.p, iter_means(i, :) + iter_stdevs(i, :), 'b:');

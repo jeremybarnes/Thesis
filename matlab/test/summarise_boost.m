@@ -6,7 +6,7 @@ function [avg_err, std_err, avg_iter, std_iter] = summarise_boost
 % Jeremy Barnes, 12/10/1999
 % $Id$
 
-tests_to_summarise = {'boost-50samples', 'boost-100samples'};
+tests_to_summarise = {'boost-50samples', 'boost-100samples', 'boost-sonar'};
 
 global DATA_SAVE_PATH;
 

@@ -92,11 +92,13 @@ while (noisevalue <= length(noise))
 	 
 	 % Test the sucker
 	 if (strcmp(option, 'nosave'))
-	    [train_alg, traine, teste] = ...
-		test(alg, train_d, test_d, numiterations, 'nosave');
+	    [train_alg, traine, teste, best_weights, best_margins, ...
+	     end_weights, end_margins] = ...
+		  test(alg, train_d, test_d, numiterations, 'nosave');
 	 else
-	    [train_alg, traine, teste] = ...
-		test(alg, train_d, test_d, numiterations);
+	    [train_alg, traine, teste, best_weights, best_margins, ...
+	     end_weights, end_margins] = ...
+		  test(alg, train_d, test_d, numiterations);
 	 end
 	 
 	 % Save the results
@@ -105,7 +107,8 @@ while (noisevalue <= length(noise))
 			  '-noisevalue'  int2str(noisevalue)];
 	 
 	 save(save_filename, 'train_d', 'test_d', 'train_alg', 'teste', ...
-	      'traine');
+	      'traine', 'best_weights', 'best_margins', 'end_weights', ...
+	      'end_margins');
 	 trial = trial + 1;
       end
       
