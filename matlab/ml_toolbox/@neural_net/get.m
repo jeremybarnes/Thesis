@@ -20,7 +20,7 @@ if (nargout ~= nargin-1)
 end
 
 if (length(varargin) == 0) % Display all options
-   varargin = {'trainmethod', 'learningrate', 'momentum'};
+   varargin = {'trainmethod', 'learningrate', 'momentum', 'progressinterval'};
    printonly = 1;
    disp('neural_net options:');
 else
@@ -43,6 +43,10 @@ for i=1:length(varargin)
 	 
       case 'momentum'
 	 propvalue = obj.alpha;
+	 proptext = num2str(propvalue);
+	 
+      case 'progressinterval'
+	 propvalue = obj.progressinterval;
 	 proptext = num2str(propvalue);
       
       otherwise,

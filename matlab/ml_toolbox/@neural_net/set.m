@@ -54,6 +54,13 @@ for i=1:length(varargin)./2
 	 
 	 obj.momentum = propvalue;
 	 
+      case 'progressinterval'
+	 if (~isa(propvalue, 'double') | (propvalue < 0))
+	    error('set: progressinterval is an integer > 0');
+	 end
+	 
+	 obj.progressinterval = propvalue;
+	 
       otherwise,
 	 error(['set: invalid property name ' propname]');
    end

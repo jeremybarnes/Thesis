@@ -43,6 +43,12 @@ else
    obj_r = trainagain_guts(obj, x_data, y_data);
 end
 
+% Print out how we are going, if it is time
+pri = obj_r.progressinterval;
+if ((pri > 0) & (mod(obj_r.iterations, pri) == 0))
+   disp(['Iteration ' num2str(obj_r.iterations)]);
+end
+
 % Return context info; nothing really useful here yet...
 context.samplenumber = obj.samplenumber;
 
@@ -96,4 +102,5 @@ obj.w_out = obj.w_out + update_o;
 obj.w_hidden = obj.w_hidden + update_h;
 
 % Finished!
+obj.iterations = obj.iterations + 1;
 obj_r = obj;

@@ -60,6 +60,7 @@ obj.y = [];  % labels (y)
 
 obj.trainmethod = 'stochastic'; % or 'pure' to use the pure versino
 obj.samplenumber = 1; % which sample we are up to for stochastic
+obj.progressinterval = 100; % How often to print out training progress
 
 % construct class and define superior/inferior relationship
 obj = class(obj, 'neural_net', parent);
