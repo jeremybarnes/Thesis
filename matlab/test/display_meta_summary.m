@@ -102,12 +102,13 @@ switch graph
 	    baseline = baseline_results{j};
 	    alg_results = test_results{j, i};
 	    if (~isempty(alg_results))
+	       err_means = alg_results.err_means;
 	       means = alg_results.iter_means;
 	       stdevs = alg_results.iter_stdevs;
 	       s = size(means);
 	       numnoisevalues = s(1);
 	       for k=1:numnoisevalues
-		  best_index = find(means(k, :) == min(means(k, :)));
+		  best_index = find(err_means(k, :) == min(err_means(k, :)));
 		  best_index = best_index(1);
 		  
 		  best_mean = means(k, best_index);
