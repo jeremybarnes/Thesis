@@ -1,30 +1,28 @@
-function cat = categories(obj)
+function y = y_values(obj)
 
-% CATEGORIES return the CATEGORY_LIST object of a DATASET
+% Y_VALUES return y (dependent category) values of dataset
 %
 % SYNTAX:
 %
-% cat = categories(obj)
+% y = y_values(obj)
 %
 % RETURNS:
 %
-% An object of type CATEGORY_LIST which contains the names and number of
-% categories that can appear in the dataset.
-%
+% An array of size (NUMSAMPLES x 1) is returned, which contains
+% all of the dependent (y) values of the data, one sample per row.
 
-% labels.m
+% @dataset/y_values.m
 % Jeremy Barnes, 3/4/1999
 % $Id$
-
 
 % PRECONDITIONS:
 % none
 
-
-cat = obj.categories;
-
+y = obj.y_values;
 
 % POSTCONDITIONS:
 check_invariants(obj);
+
+return;
 
 
