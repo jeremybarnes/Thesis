@@ -39,6 +39,40 @@ cat = numcategories(obj.categories);
 s = size(x);
 dimensions = s(2);
 
+[var, val, leftcat, rightcat] = train_guts(x, y, w, dimensions, ...
+						  cat);
+
+% We now know which variable to split on
+obj.splitvar = var;
+obj.splitval = val;
+
+obj.leftcategory = leftcat;
+obj.rightcategory = rightcat;
+
+% Calculate the training error
+trainy = classify(obj, x);
+trainerrs = (trainy ~= y);
+train_err = trainerrs' * w;
+
+obj.trainingerror = train_err;
+
+
+obj_r = obj;
+
+% POSTCONDITIONS
+check_invariants(obj_r);
+
+
+
+
+function [var, val, leftcat, rightcat] = train_guts(x, y, w, ...
+						  dimensions, cat);
+
+
+% TRAIN_GUTS the "guts" of the train procedure, separated from all the
+% object oriented stuff.  This is designed to be replaced by higher
+% efficiency C code.
+
 var = 0; val = 0.0;
 
 best_Q = Inf; % anything can beat this impurity!
@@ -66,8 +100,20 @@ for i=1:dimensions
 
       % Calculate the probability of samples being in each
       % category.
-      left_dens = category_weight(left_y, left_w, cat) ./ sum(left_w);
-      right_dens = category_weight(right_y, right_w, cat) ./ sum(right_w);
+      left_sum = sum(left_w);
+      if (left_sum > eps)
+	 left_dens = category_weight(left_y, left_w, cat) ./ left_sum;
+      else
+	 left_dens = 0.0;
+      end
+
+      right_sum = sum(right_w);
+      if (right_sum > eps)
+	 right_dens = category_weight(right_y, right_w, cat) ./ ...
+	     right_sum;
+      else
+	 right_dens = 0.0;
+      end
 
       % Calculate our left and right Q functions
       Qleft  = misclassification(left_dens);
@@ -88,10 +134,6 @@ for i=1:dimensions
       end
    end
 end
-
-% We now know which variable to split on
-obj.splitvar = var;
-obj.splitval = val;
 
 % Now, in each half of the data find the category with the greatest
 % weight, as this category is the one that we choose.
@@ -115,18 +157,9 @@ if (length(right_max_cat) > 1)
    right_max_cat = right_max_cat(1);
 end
 
-obj.leftcategory = left_max_cat - 1;
-obj.rightcategory = right_max_cat - 1;
+leftcat = left_max_cat - 1;
+rightcat = right_max_cat - 1;
 
-% Calculate the training error
-trainy = classify(obj, x);
-trainerrs = (trainy ~= y);
-obj.trainingerror = trainerrs' * w;
-
-obj_r = obj;
-
-% POSTCONDITIONS
-check_invariants(obj_r);
 
 
 
