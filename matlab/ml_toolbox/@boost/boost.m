@@ -35,15 +35,12 @@ obj.weaklearner = weaklearner;
 % boosting parameters
 obj.iterations = 0;
 
-% Classifiers are stored as a cell array of structures.
-% The fields are:
-% obj.classifiers{i}.classifier = classifier class
-% obj.classifiers{i}.error = classification error for this classifier
-% obj.classifiers{i}.w = weights for this classifier
+% Classifiers are stored as an array of objects.  The untrained
+% weaklearner is initially put into the first one as a placeholder
+% (overwritten on the first training iteration).
+obj.classifiers = weaklearner;
 
-obj.classifiers = cell(1, 0);
-
-% These are the weights to use for the NEXT iteration
+% These are the sample weights to use for the NEXT iteration
 obj.w = [];
 
 % Once we try to train, these will contain the data to be used in training
@@ -53,10 +50,9 @@ obj.y = [];
 % If the training error is zero for a particular classifier, or if it is
 % unlikely that it will ever approach zero, then we can abort the
 % training.  This condition is handled by this flag.
-
 obj.aborted = 0;
 
-% The b value is a measure of how good each classifier is
+% The classifier weights
 obj.b = zeros(1, 0);
 
 % construct class and define superior/inferior relationship
