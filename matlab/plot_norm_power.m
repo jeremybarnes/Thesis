@@ -24,7 +24,7 @@ for i=1:length(all_p)
 end
 
 xlabel('gamma');
-ylabel('norm_power');
+ylabel('norm power');
 grid on;
 legend('p=0.5', 'p=1.0', 'p=2.0', 0);
    
@@ -33,5 +33,6 @@ legend('p=0.5', 'p=1.0', 'p=2.0', 0);
 
 function norm_power = calc_norm_power(gamma, p)
 
-norm_power = 1 ./ (1 + gamma.^p).^(1/p);
+norm_power = (1 + gamma.^p).^(-1./p);
+
 
