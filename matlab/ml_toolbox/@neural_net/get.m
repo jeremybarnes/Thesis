@@ -1,4 +1,4 @@
-function varargout = get(obj, varargin)
+function [varargout] = get(obj, varargin)
 
 % GET property values for an object
 %
@@ -15,7 +15,7 @@ function varargout = get(obj, varargin)
 % Jeremy Barnes, 2/10/1999
 % $Id$
 
-if (length(varargout) ~= length(varargin)-1)
+if (nargout ~= nargin-1)
    error('get: invalid number of output arguments');
 end
 
@@ -31,7 +31,6 @@ end
 for i=1:length(varargin)
    
    propname = varargin{i};
-   propvalue = varargin{i+1};
    
    switch propname
       case 'trainmethod'
@@ -39,11 +38,11 @@ for i=1:length(varargin)
 	 proptext = propvalue;
 	 
       case 'learningrate'
-	 propvalue = obj.learningrate;
+	 propvalue = obj.eta;
 	 proptext = num2str(propvalue);
 	 
       case 'momentum'
-	 propvalue = obj.momentum;
+	 propvalue = obj.alpha;
 	 proptext = num2str(propvalue);
       
       otherwise,

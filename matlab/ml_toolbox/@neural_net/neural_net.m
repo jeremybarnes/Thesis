@@ -1,4 +1,4 @@
-function obj = neural_net(hidden, dimensions, categories)
+function obj = neural_net(hidden, dimensions, numcategories)
 
 % NEURAL_NET classifier based upon a neural network
 %
@@ -26,17 +26,17 @@ if ((nargin == 1) & (isa(hidden, 'neural_net')))
    obj = hidden;
    return
 elseif (nargin == 2)
-   categories = category_list('binary');
+   numcategories = 2;
 elseif (nargin == 1)
-   categories = category_list('binary');
+   numcategories = 2;
    dimensions = 2;
 elseif (nargin == 0)
    hidden = 10;
-   categories = category_list('binary');
+   categories = 2;
    dimensions = 2;
 end
 
-parent = classifier(categories, dimensions);
+parent = classifier(numcategories, dimensions);
 
 % Save our parameters
 obj.hidden_units = hidden; 
@@ -45,7 +45,7 @@ obj.hidden_units = hidden;
 obj.w_hidden = rand(dimensions+1, hidden) * 0.05;
 
 % Output weights: row = hidden unit, col = output, start off random
-obj.w_out = rand(hidden+1, numcategories(parent)) * 0.05;
+obj.w_out = rand(hidden+1, numcategories) * 0.05;
 
 % Options and parameters
 obj.eta = 0.3;        % Learning rate

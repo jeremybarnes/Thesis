@@ -58,3 +58,5 @@ for i=1:length(varargin)./2
 	 error(['set: invalid property name ' propname]');
    end
 end
+
+obj_r = obj;

@@ -4,13 +4,11 @@ function obj_r = train(obj, iter, varargin)
 %
 % SYNTAX:
 %
-% obj_r = train(obj, iter, x, y, w)
-% obj_r = train(obj, iter, dataset, w)
+% obj_r = train(obj, iter, x, y)
+% obj_r = train(obj, iter, dataset)
 %
 % Performs supervised training on the classifier using either the dataset
-% {x, y} or the dataset DATASET.  If specified, the weight vector W is
-% used to determine the relative importance of each training sample in
-% the dataset.
+% {x, y} or the dataset DATASET.  Weighted training is _not_ supported.
 %
 % RETURNS:
 %

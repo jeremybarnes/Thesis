@@ -30,15 +30,14 @@ x0 = ones(numsamples, 1); % dummy "x0" input always one for bias
 h_in = [x0 x] * obj.w_hidden;
 
 % Run the sigmoid function
-h_out = node_transfer_function(h_in);
+h_out = node_transfer_function(obj, h_in);
 
 % We now have a matrix... rows are outputs of hidden units, columns are
 % different samples.  We proceed to feed this forward into our output
-% network.
-c = numcategories(obj);
-o_in = [ones(1, c); h_out] * obj.w_out;
+% network.  We also add ones again for the hidden units.
+o_in = [ones(numsamples, 1) h_out] * obj.w_out;
 
-o_out = node_transfer_function(o_in);
+o_out = node_transfer_function(obj, o_in);
 
 % Finally, we select the output unit with the highest output as our
 % category value.  This loop is _real_ slow in MATLAB; it may be that
