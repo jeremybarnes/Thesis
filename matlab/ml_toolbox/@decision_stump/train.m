@@ -121,7 +121,7 @@ for i=1:dimensions
 
       % Calculate our new impurity
       this_Q = (Qleft .* sum(left_w) + Qright .* sum(right_w)) ./ ...
-	       sum(w);
+	       sum(w); % 5% of time on this line
 
       % If our new impurity is better, then we can be happy and joyous,
       % and record this fact for the calling routine.
@@ -208,7 +208,7 @@ function cats = category_weight(y, w, cat)
 cats = zeros(1, cat);
 
 for i=0:cat-1
-   cats(i+1) = sum((y == i) .* w);
+   cats(i+1) = sum((y == i) .* w); % 30% of time on this line
 end
 
 
@@ -233,15 +233,15 @@ function [left_x, left_y, right_x, right_y, left_w, right_w] = ...
 % index vector which shows which data points are to the left and the
 % right of the split point.
 
-left_index  = find(x(:, splitvar) <= splitval);
-right_index = find(x(:, splitvar) >  splitval);
+left_index  = find(x(:, splitvar) <= splitval); % 14% of time on this line
+right_index = find(x(:, splitvar) >  splitval); % 13% of time on this line
 
-left_x  = x(left_index,  :);
-left_y  = y(left_index,  :);
-left_w  = w(left_index,  :);
+left_x  = x(left_index,  :); % 4% of time on this line
+left_y  = y(left_index,  :); % 4% of time on this line
+left_w  = w(left_index,  :); % 4% of time on this line
 
-right_x = x(right_index, :);
-right_y = y(right_index, :);
-right_w = w(right_index, :);
+right_x = x(right_index, :); % 4% of time on this line
+right_y = y(right_index, :); % 4% of time on this line
+right_w = w(right_index, :); % 4% of time on this line
 
 
