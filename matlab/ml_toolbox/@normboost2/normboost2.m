@@ -1,40 +1,37 @@
-function obj = normboost(weaklearner, norm)
+function obj = normboost2(weaklearner, norm)
 
-% NORMBOOST normed boosting algorithm
+% NORMBOOST2 normed boosting algorithm (version 2)
 %
-% This is the constructor for the NORMBOOST type.
+% This is the constructor for the NORMBOOST2 type.
 %
 % SYNTAX:
 %
-% obj = normboost(weaklearner, norm, value)
+% obj = normboost2(weaklearner, norm, value)
 %
-% NORMBOOST is a boosting algorithm that searches through a subset
+% NORMBOOST2 is a boosting algorithm that searches through a subset
 % of the function space where the functional norm is equal to 1.
-% In performing its line searches, it sticks to this line.
+%
+% The difference between it and normboost is that the line searches are
+% allowed over an area where the norm is not equal to one, and then
+% normalised back onto this line later.
 %
 % RETURNS:
 %
 % OBJ is the new normboost object.
 %
 
-% @normboost/normboost.m
+% @normboost2/normboost2.m
 % Jeremy Barnes, 15/8/1999
 % $Id$
 
-                    if (nargin == 1)
+if (nargin == 1)
    % One parameter --> make a copy
    obj = weaklearner;
    return
 end
 
-parent = boost(weaklearner);
-
-obj.p = norm;
-
-% Here we store the "margins" of the samples, ie y_i F(x_i) for efficient
-% computation of the cost function stuff
-obj.margins = [];
+parent = normboost(weaklearner, norm);
 
 % construct class and define superior/inferior relationship
-obj = class(obj, 'normboost', parent);
-superiorto('double', 'classifier', 'boost');
+obj = class(obj, 'normboost2', parent);
+superiorto('double', 'classifier', 'boost', 'normboost');
