@@ -26,13 +26,10 @@ function obj = boost(weaklearner)
 % $Id$
 
 % Boosting algorithm as first argument --> just return a copy
-if (isa(weaklearner, 'boost'))
+if ((nargin == 1) & (isa(weaklearner, 'boost')))
    obj = weaklearner;
    return
-end
-
-% 0 args --> default boost algorithm
-if (nargin == 0)
+elseif (nargin == 0)
    weaklearner = decision_stump;
 end
 
