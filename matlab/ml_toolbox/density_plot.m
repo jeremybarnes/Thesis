@@ -24,6 +24,9 @@ function density_plot(cat, x, y, w)
 % FIXME: add these
 % x should have 2 columns
 % y should have a maximum of cat categories
+if (cat ~= 2)
+   error('density_plot: currently only works for two categories');
+end
 
 % calculate the data ranges
 x1 = x(:, 1);
@@ -42,62 +45,33 @@ end
 % OK, now to transform our x values into index values into our weight
 % categories.  The transformation is x1min -> 1, x1max -> 128
 
-x1 = 128 - floor((x1 - x1min) .* 127 ./ x1range);
-x2 = floor((x2 - x2min) .* 127 ./ x2range) + 1;
+x1 = floor((x1 - x1min) .* 127 ./ x1range) + 1;
+x2 = 128 - floor((x2 - x2min) .* 127 ./ x2range);
 
 % For each category, add the weight into the appropriate weightmap
 % (indexed by the y value)
 
 for i=1:length(y)
-   weightmaps{y(i)+1}(x1(i), x2(i)) = weightmaps{y(i)+1}(x1(i), x2(i)) + ...
+   weightmaps{y(i)+1}(x2(i), x1(i)) = weightmaps{y(i)+1}(x2(i), x1(i)) + ...
        w(i);
 end
 
 % Take the log, to give a better colour distrubution and stop
 % concentrations from stopping all points from showing up.
 
+%for i=1:cat
+%   weightmaps{i} = log(weightmaps{i} + 0.000001);
+%end
+
 for i=1:cat
-   weightmaps{i} = log(weightmaps{i} + 0.000001);
+   weightmaps{i} = sqrt(weightmaps{i});
 end
 
-% Find out the number of bits (and therefore colours) to use, based on
-% the number of categories.
-switch cat
-   case 1
-      bits = 6;
-      colors = 64;
-   case 2
-      bits = 3;
-      colors = 8;
-   case 3
-      bits = 2;
-      colors = 4;
-end
+image_data = twoclass_density_to_color(weightmaps{2}, weightmaps{1});
 
-% Now we have our weightmaps, we need to scale them, then put them into a
-% form that can be used for a colormap.
-for i=1:cat
-   weightmin = min(min(weightmaps{i}));
-   weightmax = max(max(weightmaps{i}));
-   weightrange = weightmax - weightmin;
-   weightmaps{i} = round((weightmaps{i} - weightmin) .* (colors-1) ./ ...
-			 weightrange) .* (colors^(cat-i));
-end
-
-% Create our final bitmap, by adding together the weights of our
-% weightmaps
-
-finalweight = ones(128);
-
-for i = 1:cat
-   finalweight = finalweight + weightmaps{i};
-end
 
 colormap(twoclass_colormap('white'));
 
-image(finalweight);
-
-% pcolor(finalweight);
-
+image(image_data);
 
 
