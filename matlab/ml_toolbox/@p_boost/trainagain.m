@@ -19,9 +19,9 @@ function [obj_r, context] = trainagain(obj)
 % Jeremy Barnes, 25/4/1999
 % $Id$
 
-% Use the boost method to do most of the work
-boost_obj = as_boost(obj);
+% Use the boost's trainagain method to do most of the work
 
+boost_obj = as_boost(obj);
 [boost_obj, context] = trainagain(boost_obj);
 
 p = get_p(obj);
@@ -35,6 +35,6 @@ context.b(length(context.b)) = bt;
 context.bt = bt;
 
 % Update everything for our next cycle
-obj = add_iteration(obj, context.wl_instance, context.bt, context.w);
+obj = add_iteration(obj, context.wl_instance, context.b, context.w);
 
 obj_r = obj;
