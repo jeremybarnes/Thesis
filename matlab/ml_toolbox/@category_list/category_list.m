@@ -56,7 +56,7 @@ superiorto('double');
 
 
 % POSTCONDITIONS
-global_postconditions(obj);
+check_invariants(obj);
 
 return;
 

@@ -19,7 +19,7 @@ function n = numlabels(obj)
 n = obj.numlabels;
 
 % POSTCONDITIONS
-global_postconditions(obj);
+check_invariants(obj);
 
 return;
 

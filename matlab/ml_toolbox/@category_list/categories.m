@@ -19,6 +19,6 @@ function arr = labels(obj)
 arr = obj.labels;
 
 % POSTCONDITIONS:
-global_postconditions(obj)
+check_invariants(obj)
 
 return;

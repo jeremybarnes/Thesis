@@ -25,6 +25,6 @@ end
 label = obj.labels{n+1};
 
 % POSTCONDITIONS
-global_postconditions(obj);
+check_invariants(obj);
 
 return;
