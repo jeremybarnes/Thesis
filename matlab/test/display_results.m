@@ -81,6 +81,7 @@ opt.errorbars = 0;
 opt.display_counts = 0;
 opt.showminimum = 0;
 opt.squareaxis = 0;
+opt.startletter = 'a';
 
 % Parse our options
 for i=1:length(varargin)./2
@@ -132,6 +133,8 @@ for i=1:length(varargin)./2
 	 opt.showminimum = opt_value;
       case 'squareaxis'
 	 opt.squareaxis = opt_value;
+      case 'startletter'
+	 opt.startletter = opt_value;
       otherwise,
 	 error(['Unknown option ''' opt_name '''.']);
    end
@@ -140,6 +143,7 @@ end
 % default status values
 status.current_fig = 0;
 status.current_subplot = 1000000;
+status.current_letter = opt.startletter;
 status.axis_h = [];
 
 % Generic stuff goes here
@@ -223,7 +227,7 @@ switch type
 	    min_error = test_d(min_iter);
 	    
 	    graphtitle = parse_title(opt.title_format, current_noise, ...
-				     current_p, status.current_subplot);
+				     current_p, status);
 
 	    % Get rid of samples that are -1 (training stopped)
 	    minus1 = find(test_d < 0);
@@ -501,12 +505,12 @@ if (nargout == 1)
 end
 
 
-function title = parse_title(format, noise, p, subplot)
+function title = parse_title(format, noise, p, status)
 
 % Doesn't handle multiple %s properly.
 
 keywords = {'%%', '%', '%n', num2str(noise), '%p', num2str(p), ...
-	    '%l', 96 + subplot, '%N', [num2str(100*noise) '%']};
+	    '%l', status.current_letter, '%N', [num2str(100*noise) '%']};
 
 % Find any keywords that match and replace them with the replacement
 % string
@@ -550,6 +554,8 @@ if (status.current_subplot > opt.plot_rows*opt.plot_cols)
 else
    status.current_subplot = status.current_subplot + 1;
 end
+
+status.current_letter = status.current_letter + 1;
 
 subplot(opt.plot_rows, opt.plot_cols, status.current_subplot);
 eval(opt.axis_function);
