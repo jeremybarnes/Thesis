@@ -31,6 +31,8 @@ end
 testfile = [DATA_SAVE_PATH '/' test '.mat'];
 progfile = [DATA_SAVE_PATH '/' test '-progress.mat'];
 
+dist = 'frog';
+
 % Load in our test
 load_error = 0;
 eval('load(testfile);', 'load_error = 1;');
