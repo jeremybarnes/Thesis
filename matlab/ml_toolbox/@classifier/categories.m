@@ -15,4 +15,5 @@ function n = categories(obj)
 % Jeremy Barnes, 4/4/1999
 % $Id$
 
+obj = classifier(obj);
 n = obj.categories;
