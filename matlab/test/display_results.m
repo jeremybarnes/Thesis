@@ -151,10 +151,13 @@ if (~isa(opt.test_err_style, 'cell'))
    opt.test_err_style = {opt.test_err_style};
 end
 
-
 % default status values
 if (strcmp(opt.startletter, 'default'))
-   opt.startletter = opt.startplot + 'a' - 1;
+   if (strcmp(opt.startplot, 'default'))
+      opt.startletter = 'a'-1;
+   else
+      opt.startletter = opt.startplot + 'a' - 2;
+   end
 end
 
 if (strcmp(opt.startplot, 'default'))
@@ -164,10 +167,11 @@ if (strcmp(opt.startplot, 'default'))
    status.axis_h = [];
 else
    status.current_fig = 1;
-   status.current_subplot = opt.startplot;
+   status.current_subplot = opt.startplot-1;
    status.current_letter = opt.startletter;
    status.axis_h = [];
 end
+
 
 % Generic stuff goes here
 
