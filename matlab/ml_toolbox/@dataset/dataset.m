@@ -28,6 +28,7 @@ end
 % Default values
 if (nargin == 0)
    categories = category_list('binary');
+   dimensions = 2;
 elseif (nargin == 1)
    dimensions = 2;
 end
