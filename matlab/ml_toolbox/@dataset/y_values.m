@@ -15,14 +15,6 @@ function y = y_values(obj)
 % Jeremy Barnes, 3/4/1999
 % $Id$
 
-% PRECONDITIONS:
-% none
-
 y = obj.y_values;
-
-% POSTCONDITIONS:
-check_invariants(obj);
-
-return;
 
 
