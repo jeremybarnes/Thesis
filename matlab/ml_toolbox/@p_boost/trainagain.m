@@ -1,4 +1,4 @@
-function obj_r = trainagain(obj)
+function [obj_r, context] = trainagain(obj)
 
 % TRAINAGAIN perform another training iteration of the p-boosting algorithm
 %
@@ -19,88 +19,20 @@ function obj_r = trainagain(obj)
 % Jeremy Barnes, 25/4/1999
 % $Id$
 
-% PRECONDITIONS
-% none
+% Use the boost method to do most of the work
+[boost_obj, boost_context] = trainagain(boost(obj));
 
-if (obj.iterations > obj.maxiterations)
-   obj_r = obj;
-   warning('trainagain: training past MAXITERATIONS');
-end
+p = get_p(obj);
 
-if (obj.aborted)
-   obj_r = obj;
-   warning('trainagain: attempt to train when training is aborted');
-   return;
-end
+% Update the bt value based on p
+bt = boost_context.bt;
+bt = bt^(1/p);
 
-
-% create and train a new classifier
-
-new_c = train(obj.weaklearner, obj.x, obj.y, obj.w);
-
-% find the training error
-new_error = training_error(new_c);
-
-% see what this algorithm does to our data
-new_y = classify(new_c, obj.x);
-
-% find if we need to abort
-if ((new_error == 0) | (new_error > 0.49))
-   obj.maxiterations = obj.iterations;
-   obj.aborted = 1;
-   obj_r = obj;
-   return;
-end
-
-
-% This section updates the weights.
-
-phi = 0.5; % phi is here in case we want to use "soft margins".
-
-% beta_t is one if new_error is 0.5, and drops down towards zero as
-% new_error approaches zero.
-beta_t =(new_error * (1 - phi)) / (phi * (1 - new_error));
-
-% bt is zero if new_error is 0.5, and drops down towards minus infinity
-% as new_error approaches zero.
-bt = log(beta_t);
-
-
-new_w = obj.w .* exp(bt .* (new_y == obj.y));
-sum_new_w = sum(new_w);
-
-if (sum(new_w) == Inf)
-   obj.maxiterations = obj.iterations;
-   obj.aborted = 1;
-   obj_r = obj;
-   disp('Aborted due to infinite weight vector');
-   return;
-end
-
-new_w = new_w ./ sum_new_w;
-
-% This is where we use our p parameter.  This has the effect of rewarding
-% the classifiers that do well more and more as p increases.
-bt = sign(bt) * abs(bt)^(1/obj.p);
-
-% create a structure for our new classifier
-s.w = obj.w;
-s.classifier = new_c;
-s.error = new_error;
+% Add our iteration on
+context.b(length(context.b)) = bt;
+context.bt = bt;
 
 % Update everything for our next cycle
-obj.classifiers{obj.iterations+1} = s;
-obj.b(obj.iterations+1) = bt;
-obj.w = new_w;
-obj.iterations = obj.iterations + 1;
+obj = add_iteration(obj, context.wl_instance, context.bt, context.w);
 
 obj_r = obj;
-
-% POSTCONDITIONS
-check_invariants(obj_r);
-
-return;
-
-
-
-

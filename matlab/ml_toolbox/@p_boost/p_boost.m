@@ -1,4 +1,4 @@
-function obj = p_boost(weaklearner, maxiterations, p)
+function obj = p_boost(weaklearner, p)
 
 % P_BOOST tunable version of the BOOST classifier
 %
@@ -31,22 +31,21 @@ function obj = p_boost(weaklearner, maxiterations, p)
 % Jeremy Barnes, 27/4/1999
 % $Id$
 
+if (nargin == 0)
+   weaklearner = decision_stump;
+   p = 1;
+end
 
-% PRECONDITIONS
-% handled by
+if ((nargin == 1) & (isa(weaklearner, 'p_boost')))
+   obj = weaklearner;
+   return;
+end
 
-parent = boost(weaklearner, maxiterations);
+parent = boost(weaklearner);
 
-obj = struct(parent);
 obj.p = p;
 
 % construct class and define superior/inferior relationship
 
 obj = class(obj, 'p_boost', parent);
-superiorto('double');
-
-
-% POSTCONDITIONS
-check_invariants(obj);
-
-return;
+superiorto('double', 'boost');
