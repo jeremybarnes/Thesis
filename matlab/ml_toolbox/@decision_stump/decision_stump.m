@@ -34,6 +34,12 @@ function obj = decision_stump(categories, dimensions)
 % Jeremy Barnes, 4/4/1999
 % $Id$
 
+% One argument --> make a copy of ourself
+if (nargin == 1)
+   obj = categories;
+   return
+end
+
 % ancestor relationship
 parent = classifier(categories, dimensions);
 
