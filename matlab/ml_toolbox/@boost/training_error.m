@@ -1,6 +1,6 @@
 function e = training_error(obj)
 
-% TRAINING_ERROR return the training error of a DECISION_STUMP object
+% TRAINING_ERROR return the training error of a BOOST object
 %
 % SYNTAX:
 %
@@ -15,11 +15,7 @@ function e = training_error(obj)
 % Jeremy Barnes 22/4/1999
 % $Id$
 
-% PRECONDITIONS:
-% none
+x_data = x(obj);
+y_data = y(obj);
 
-e = empirical_risk(obj, obj.x, obj.y);
-
-
-% POSTCONDITIONS:
-check_invariants(obj);
+e = empirical_risk(obj, x_data, y_data);
