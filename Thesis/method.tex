@@ -89,18 +89,105 @@ noise added artificially.  Two other datasets (\ds{sonar} and
 \footnote{Wisconsin Prognostic Breast Cancer.}
 ) were obtained from the UCI repository \cite{UCI}, and the
 final dataset (\ds{acacia}) was used in a PhD thesis.\todo{Get the
-reference to Karen's thesis}.
+reference to Karen's thesis, or some other reference to the dataset}.
 
 A summary of the features of each dataset appears in table
-\ref{tbl:dataset features}.  Appendix \ref{appendix:datasets}
-describes these datasets in more detail.
+\ref{tbl:datasets} (Appendix \ref{appendix:datasets} describes them
+datasets in more detail.)  This group was selected to cover a broad
+range of situations.  The four \ds{ring} datasets allow the effect of
+noise to be isolated and contain a very high sample-to-attribute
+ratio.  The sonar dataset is a low-noise (generated from precise
+measurements ) but contains a low sample-to-attribute ratio.  The
+\ds{wpbc} and \ds{acacia} datasets are examples of difficult and very
+difficult%
+\footnote{Difficult and very difficult in that previous applications
+of machine learning algorithms to these datasets produce indifferent
+to poor results.}%
+real-world data.
 
+\begin{table}
+\label{tbl:datasets}
+\begin{center}
+\begin{tabular}{l c c r r r r}\hline
+{\bf Dataset} & $\calI$ & $\calO$ & {\bf Artificial noise} & {\bf
+Size} & {\bf Training samples} & {\bf Test samples} \\
+\hline \hline
+\ds{ring0} & $[0,1]^2$ & $\{\pm 1\}$ & 0\% & $\infty$ & 50 & 5000 \\
+\ds{ring10} & $[0,1]^2$ & $\{\pm 1\}$ & 10\% & $\infty$ & 50 & 5000 \\
+\ds{ring20} & $[0,1]^2$ & $\{\pm 1\}$ & 20\% & $\infty$ & 50 & 5000 \\
+\ds{ring30} & $[0,1]^2$ & $\{\pm 1\}$ & 30\% & $\infty$ & 50 & 5000 \\
+\hline
+\ds{sonar} & $[0,1]^60$ & $\{\pm 1\}$ & 0\% & 208 & 70 & 138 \\
+\ds{wpbc} & $\subset \bbR^32$ & $\{\pm 1\}$ & 0\% & 194 & 97 & 97 \\
+\ds{acacia} & $\subset \bbR^16$ & $\{\pm 1\}$ & 0\% & 204 & 102 & 102 \\
+\hline
+\end{tabular}
+
+Note that samples with missing attribute values were excluded from
+each dataset.
+\end{center}
+\caption{Summary of dataset attributes}
+\end{table}
+
+\section{Testing}
+
+In this section we detail the aims of our experiments, the testing
+procedure that was followed, and how the results were summarised and
+analysed.
+
+\subsection{Aims}
+The aims of the experiments were three-fold.  Firstly, we want to know
+about the generalisation performance of the $p$-boosting algorithms,
+and how it compares with the generalisation performance of AdaBoost.
+We expect that our algorithms will outperform AdaBoost on noisy
+datasets.  We are also interested in the training efficiency of the
+$p$ boosting algorithms compared to AdaBoost.
+
+The second aim is to verify that the qualitative behaviour (and
+quantitative behaviour wherever possible) of the $p$-boosting
+algorithms matches the theory developed in chapters \ref{chapter:slt},
+\ref{chapter:boosting} and \ref{chapter:pboosting}.  In particular,
+the theory predicts the following features:
+\begin{itemize}
+\item	The $p$ parameter controls the capacity of the function
+	class.  Thus, a generalisation error vs $p$ plot should have a
+	minimum at some optimal value $p^{\ast}$ (see figure
+	\ref{fig:optimal p value}).
+
+\item	The confidence interval in theorem \ref{thm:p convex
+	generalisation} decreases as $p \rightarrow 0$.  As a result,
+	we expect that the true risk (test error) and empirical risk
+	(training error) curves should match closely as $p \rightarrow
+	0$.
+\end{itemize}
+
+The third aim of these tests is to verify that the algorithms are
+working as designed.  We expect that the margins on the training
+samples produced by algorithms with a low $p$ value should be much
+more  uniformly distributed than those of AdaBoost.  We also expect
+that a distribution of classifier weights will show that most of the
+weight is given to fewer and fewer classifiers for low $p$ values.
+
+
+\subsection{Method}
+
+A total of 31 tests were run, as detailed in table
+\ref{tbl:experiments}.  Each test involved training a particular
+algorithm on a dataset (up to a maximum of \emph{Iterations} training
+iterations).  The test was repeated for \emph{Trials} independent
+trials, each time with a newly generated (\ds{ring*}) or randomly
+permuted and partitioned (\ds{sonar}, \ds{wpbc}, \ds{acacia})
+test and training dataset%
+\footnote{Note that noise was added to the training \ds{ring*}
+datasets but \emph{not} the test \ds{ring*} datasets}%
+, and this whole procedure repeated for each $p$ value.
+
+\newcommand{\allp}{$\frac{1}{2} \leq p \leq 2; 10p \in \bbN$}
+\newcommand{\lowp}{$\frac{1}{2} \leq p \leq 1; 10p \in \bbN$}
 \begin{table}
 \label{tbl:experiments}
 \begin{center}
 \begin{tabular}{r l l r r c}\hline
-\newcommand{\allp}{$\frac{1}{2} \leq p \leq 2; 10p \in \bbN$}
-\newcommand{\lowp}{$\frac{1}{2} \leq p \leq 1; 10p \in \bbN$}
 {\bf Number} & {\bf Algorithm} & {\bf Dataset} & {\bf Trials} &
 {\bf Iterations} & {\bf $p$ values} \\
 \hline\hline
@@ -128,103 +215,34 @@ describes these datasets in more detail.
 \caption{Summary of experiments conducted}
 \end{table}
 
-\section{Testing}
+\noindent The following data was recorded for each trial:
 
-\subsection{Aims}
-
-\subsubsection{Generalisation performance}
-
-* Which ones perform the best for which datasets?
-* Do they all reach the best value quickly?  What effect on overall generalisation performance does $p$ have?
-
-\subsubsection{Resistance to overfitting}
-
-* As we train for ridiculously long times, does $p < 1$ reduce overfitting?
-
-\subsubsection{Optimal $p$ values}
-
-* Do we get the same optimal $p$ value for different algorithms?
-* What is the effect of too low or too high?
-
-\subsubsection{Margin distributions}
-
-* How do these compare to normal boosting?
-* Are we getting a few important classifiers or lots of small ones?
-
-\subsubsection{Training time}
-
-* Which algorithms terminate early; why?
-* Which ones reach the optimal value earliest?
-
-\subsection{Method}
+\begin{itemize}
+\item	All test parameters;
+\item	Test and training datasets;
+\item	Training and test error (unweighted) at each iteration;
+\item	Margins of the training samples at both the iteration with the
+	minimum \emph{test} error and the final iteration;
+\item	Classifier weights at the final iteration.
+\end{itemize}
 
 
-\begin{table}
-\label{tbl:testing}
-\begin{center}
-\begin{tabular}{l c c r r r r}\hline
-{\bf Dataset} & $\calI$ & $\calO$ & {\bf Artificial noise} & {\bf
-Size} & {\bf Training samples} & {\bf Test samples} \\
-\hline \hline
-\ds{ring0} & $[0,1]^2$ & $\{\pm 1\}$ & 0\% & $\infty$ & 50 & 5000 \\
-\ds{ring10} & $[0,1]^2$ & $\{\pm 1\}$ & 10\% & $\infty$ & 50 & 5000 \\
-\ds{ring20} & $[0,1]^2$ & $\{\pm 1\}$ & 20\% & $\infty$ & 50 & 5000 \\
-\ds{ring30} & $[0,1]^2$ & $\{\pm 1\}$ & 30\% & $\infty$ & 50 & 5000 \\
-\hline
-\ds{sonar} & $[0,1]^60$ & $\{\pm 1\}$ & 0\% & 208 & 70 & 138 \\
-\ds{wpbc} & $\subset \bbR^32$ & $\{\pm 1\}$ & 0\% & 194 & 97 & 97 \\
-\ds{acacia} & $\subset \bbR^16$ & $\{\pm 1\}$ & 0\% & 204 & 102 & 102 \\
-\hline
-\end{tabular}
-\end{center}
-\caption{Summary of dataset attributes}
-\end{table}
+\subsection{Analysis}
 
-Each \emph{trial} consisted of running a specified number of
-iterations on 
+More than two gigabytes of data were generated in the course of
+testing.  This data was summarised across all trials for each (test,
+p-value) combination, and a summary file created.  The summary file
+contained the following information:
 
-Each dataset was tested with each algorithm a total of thir
-
-Testing was performed by an automated system running on up to three
-computers in parallel.
-
-\section{Analysis}
-
-
-
-
-Several tests were run.  These were each given a character string
-identifier within the \MATLAB system, and are identified in this
-document by the same identifier.
-
-To repeat one of the experiments, one may use the matlab command
-\begin{alltt}
-runtest {\it identifier}
-\end{alltt}
-
-\subsection{Generalisation performance}
-
-* Which ones perform the best for which datasets?
-* Do they all reach the best value quickly?  What effect on overall generalisation performance does $p$ have?
-
-\subsection{Resistance to overfitting}
-
-* As we train for ridiculously long times, does $p < 1$ reduce overfitting?
-
-\subsection{Optimal $p$ values}
-
-* Do we get the same optimal $p$ value for different algorithms?
-* What is the effect of too low or too high?
-
-\subsection{Margin distributions}
-
-* How do these compare to normal boosting?
-* Are we getting a few important classifiers or lots of small ones?
-
-\subsection{Training time}
-
-* Which algorithms terminate early; why?
-* Which ones reach the optimal value earliest?
+\begin{itemize}
+\item	Mean and standard deviation of test and training error curves
+	at each iteration;
+\item	Number of trials that had not aborted before each iteration;
+\item	The value of the lowest test error for each trial, and the
+	number of the iteration at which this lowest error occurred;
+\item	A margin distribution, averaged over all margin distributions
+	at each best test error point.
+\end{itemize}
 
 
 

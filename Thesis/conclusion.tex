@@ -4,3 +4,42 @@
 
 \chapter{Conclusion}
 \label{chapter:conclusion}
+
+In this thesis we have considered variants of the AdaBoost machine
+learning algorithm, with the desireable property of explicit capacity
+control.  Capacity control is implemented by confining the class of
+allowable combined hypotheses to lie on the $p$-convex hull of the
+underlying hypotheses, and is adjustable via the $p$ parameter.
+
+Theoretical results indicate that the performance of these adjustable
+algorithms for the optimal $p$ value may be superior to AdaBoost,
+especially in the presence of large amounts of label noise (where
+AdaBoost is prone to overfitting).  The approximate and bounded-above
+form of these theoretical results prevent stronger statements being
+made.
+
+Several variants of a ``$p$-boosting'' algorithm were developed.  The
+first variant used a na\"{\i}ve approach, and its performance was not
+significantly different from that of the AdaBoost algorithm.  The
+second variant (``strict'') was confined strictly along the $p$-convex
+hull at all times, but proved to be prone to early stopping for $p <
+1$.  The third variant (``sloppy'') was less restricted during the
+line search phase (searching along the same line as AdaBoost).
+
+The strict algorithm performed poorly as compared to AdaBoost and the
+sloppy algorithm, both in terms of generalisation performance and
+training time.  It is hypothesised that the observed behaviour is a
+result of the gradient descent optimisation not finding the global
+minimum.  The sloppy algorithm performed well on noisy datasets, with
+the shape of the capacity-vs-generalisation error curve matching the
+theoretical prediction, and the generalisation error at the optimal
+$p$ value significantly up to 25\% improved on AdaBoost.  However,
+both the strict and the sloppy algorithms required approximately an
+order of magnitude more training iterations than AdaBoost to reach the
+optimal solution.  An accelerated version is proposed that may improve
+on this situation.
+
+In conclusion, the capacity controlled ``$p$-boosting'' algorithms
+considered in this project have been shown to be an improvement on
+AdaBoost in some situations.  More extensive testing is required
+before further conclusions can be drawn.

@@ -39,7 +39,9 @@ all:		b_func.epsg regression_problem.epsg \
 		p_convex.epsg sample_weights.epsg \
 		classifier_weights.epsg cost_approx.epsg \
 		naive.epsg strict_search.epsg sloppy_search.epsg \
-		optimal_p_value.epsg boost_overfitting.epsg
+		optimal_p_value.epsg boost_overfitting.epsg \
+		test_err_summary.epsg test_iter_summary.epsg \
+		effect_of_p.epsg margin_distribution.epsg
 
 clean:		
 		-rm *.epsg *.mscript *~

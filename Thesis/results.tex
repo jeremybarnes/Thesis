@@ -7,10 +7,89 @@
 
 \section{Generalisation performance}
 
+\begin{linefigure}
+\begin{center}
+\includegraphics{figures/test_err_summary.epsg}
+\end{center}
+\begin{capt}{Comparison of AdaBoost and $p$-boosting test
+generalisation performance}{fig:test err summary}
+Each part plots the \emph{average test error value} of AdaBoost
+against the \emph{average test error value} of the specified algorithm
+\emph{at the point of minimum training error}.  The shape of the
+marker indicates the dataset: $\bullet$ \ds{ring0}, $\times$
+\ds{ring10}, $\circ$ \ds{ring20}, $\ast$ \ds{ring30}, $\Box$
+\ds{sonar}, $\bigtriangleup$ \ds{wpbc}, $\Diamond$ \ds{acacia}.  The
+bars indicate one standard deviation each side of each datapoint.
+
+Points above the line indicate that the algorithm generalises performs
+better than AdaBoost on that particular dataset.
+\end{capt}
+\end{linefigure}
+
+
+\section{Effect of $p$ value on generalisation performance}
+
+\begin{linefigure}
+\begin{center}
+\includegraphics{figures/effect_of_p.epsg}
+\end{center}
+\begin{capt}{Effect of $p$ on generalisation error}{fig:effect of p}
+Average test error of each algorithm: AdaBoost (thick line), strict
+(thin solid), sloppy (dash-dot) and na\"{\i}ve (dotted) is shown for
+each dataset.  The bullets $\bullet$ indicate the best value of $p$
+which is used in figure \ref{fig:test err summary}.
+\end{capt}
+\end{linefigure}
+
+\section{Training time}
+
+Figure \ref{fig:test iter summary} details how the training times
+compare with AdaBoost.  We can see that the...
+
+\begin{linefigure}
+\begin{center}
+\includegraphics{figures/test_iter_summary.epsg}
+\end{center}
+\begin{capt}{Comparison of AdaBoost and $p$-boosting training
+times}{fig:test iter summary} 
+Both axes measure numbers of iterations.  The $y$ axis measures the
+average number of iterations required for AdaBoost to reach the
+minimum of the test error; the $y$ axis is the same statistic for the
+$p$-boosting variant \emph{at the optimal value of $p$}.  Points above
+the line indicate that AdaBoost requires more iterations to train than
+the other algorithm.  Marker symbols indicate datasets; see figure
+\ref{fig:test err summary} for a legend.
+\end{capt}
+\end{linefigure}
+
+\subsection{Possible remedy to inefficient training}
+
+It may be possible to accelerate the training of the sloppy algorithm
+by choosing a more aggressive cost function.  We modify the cost
+function to be of the form
+%
+\begin{equation}
+c(\alpha) = e^{-\alpha t^\lambda}
+\end{equation}
+%
+where $t$ is the iteration number, and $\lambda$ a constant parameter
+that controls how accelerated the learning process should be.  This
+cost function gets steeper as the number of iterations increases.
+Insufficient time was available to perform experiments using this cost
+function, however.
+
 
 \section{Margin distributions}
 
-\section{Training time}
+
+\begin{linefigure}
+\begin{center}
+\includegraphics{figures/margin_distribution.epsg}
+\end{center}
+\begin{capt}{Margin distribution of algorithms}{fig:margin distribution}
+\end{capt}
+\end{linefigure}
+
 
 \section{Other observations}
 
@@ -20,17 +99,9 @@
 
 ..blah...
 
-Thus, we observe that the actual distribution of \emph{classifier} weights has little influence on the generalisation ability of the AdaBoost algorithm, and therefore it is the \emph{sample} weights that cause the success of the algorithm.  This phenomena has also been observed by Breiman \cite{Breiman96}.
-
-
-\subsection{Strict $p$-boost}
-
-\subsection{Sloppy $p$-boost}
-
-
-
-
-
-\section{Naive boosting algorithm}
-
+Thus, we observe that the actual distribution of \emph{classifier}
+weights has little influence on the generalisation ability of the
+AdaBoost algorithm, and therefore it is the \emph{sample} weights that
+cause the success of the algorithm.  This phenomena has also been
+observed by Breiman \cite{Breiman96}.
 
