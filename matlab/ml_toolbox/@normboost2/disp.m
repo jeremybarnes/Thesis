@@ -7,7 +7,7 @@ function disp(obj)
 % $Id$
 
 disp(['  normboost2 object:']);
-disp_info(obj.boost, 'inherited');
+disp_info(obj.normboost, 'inherited');
 disp(['    --- normboost2 fields:']);
 disp_info(obj);
 
