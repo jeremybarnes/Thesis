@@ -1,4 +1,4 @@
-function [trained, test_err, train_err] = test(obj, traind, testd, iterations,option)
+function [trained, train_err, test_err] = test(obj, traind, testd, iterations,option)
 
 % TEST test a BOOST object
 %
