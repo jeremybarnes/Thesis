@@ -190,7 +190,7 @@ void main(int argc, char **argv)
     int rows, cols;
     mxArray_t *x, *y, *dimensions, *numcategories;
 
-    printf("Text file to MAT file converter version $Version$.\n");
+    printf("Text file to MAT file converter version $Revision$.\n");
     printf("Copyright Jeremy Barnes, 24/8/1999\n");
 
     argv0 = argv[0];
