@@ -55,12 +55,12 @@ end
 
 % ancestor relationship
 parent = classifier(categories, dimensions);
+obj = struct(parent);
+
 
 % initialisation of variables in obj
 obj.cost_fn = cost_fn;
 obj.maxdepth = maxdepth;
-obj.dimensions = dimensions;
-obj.categories = categories;
 
 % Our default tree, which arbitrarily classifies all samples into the
 % first category.
