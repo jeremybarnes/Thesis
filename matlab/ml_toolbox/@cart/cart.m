@@ -40,8 +40,13 @@ function obj = cart(categories, dimensions, cost_fn, maxdepth)
 % Jeremy Barnes, 4/4/1999
 % $Id$
 
+% One arg --> make a copy
+if (nargin == 1)
+   obj = categories;
+   return
+end
 
-% PRECONDITIONS
+% More than one arg --> construct a new one
 switch cost_fn
    case {'misclassification', 'gini', 'entropy'}
    otherwise,
@@ -52,11 +57,8 @@ if (maxdepth < 1)
    error('cart: MAXDEPTH must be >= 1');
 end
 
-
 % ancestor relationship
 parent = classifier(categories, dimensions);
-obj = struct(parent);
-
 
 % initialisation of variables in obj
 obj.cost_fn = cost_fn;
@@ -79,5 +81,6 @@ obj.tree.incorrectweight = 0;
 
 
 % construct class and use superior/inferior relationship
-obj = class(obj, 'cart');
+obj = class(obj, 'cart', parent);
 superiorto('double', 'classifier');
+
