@@ -20,22 +20,10 @@ function obj = category_list(categories)
 % RETURNS:
 %
 % A CATEGORY_LIST object with the specified labels.
-%
-% METHODS:
-%
-% numcategories(obj)
-%    - returns the number of categories
-%
-% categories(obj)
-%    - returns a cell array of the category labels
-%
-% categorynum(obj, i)
-%    - returns the label for category number i
 
 % @category_list/category_list.m
 % Jeremy Barnes, 3/4/1999
 % $Id$
-
 
 % PRECONDITIONS
 if (length(categories) == 0)
@@ -52,18 +40,9 @@ if (isa(categories, 'double') | isa(categories, 'char'))
 end
 
 % initialisation of variables in obj
-obj.initialised = 1;
 obj.numcategories = length(categories);
 obj.categories = categories;
-
 
 % construct class and define superior/inferior relationship
 obj = class(obj, 'category_list');
 superiorto('double');
-
-
-
-% POSTCONDITIONS
-check_invariants(obj);
-
-
