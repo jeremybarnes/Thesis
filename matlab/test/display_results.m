@@ -1,4 +1,4 @@
-function display_results(test, varargin)
+function h = display_results(test, varargin)
 
 % DISPLAY_RESULTS display collated test results
 %
@@ -13,54 +13,165 @@ function display_results(test, varargin)
 %
 % OPTIONS will allow various things to be specified, such as which graphs
 % to draw... currently, it does SFA.
+%
+% RETURNS:
+%
+% H is a vector of axis handles, one for each axis created.
 
 % display_results.m
 % Jeremy Barnes, 23/9/1999
 % $Id$
 
-% How to lay out our pages
+% Default values
 plot_cols = 4;
 plot_rows = 4;
+x_range = 'tight';
+y_range = 'tight';
+equal_y = 1;
+equal_x = 1;
+axis_function = 'default_setup_axis';
+figure_function = 'default_setup_figure';
+test_err_style = 'r-';
+train_err_style = 'b-';
+title_format = 'default';
+pvalues = 'all';
+noisevalues = 'all';
+
+% Parse our options
+for i=1:length(varargin)./2
+   opt_name = varargin{i*2-1};
+   opt_value = varargin{i*2};
+   
+   switch opt_name
+      case 'cols'
+	 plot_cols = opt_value;
+      case 'rows'
+	 plot_rows = opt_value;
+      case 'x_range'
+	 x_range = opt_value;
+      case 'y_range'
+	 y_range = opt_value;
+      case 'equal_x'
+	 equal_x = read_boolean(opt_value);
+      case 'equal_y'
+	 equal_y = read_boolean(opt_value);
+      case 'axis_function'
+	 axis_function = opt_value;
+      case 'figure_function'
+	 figure_function = opt_value;
+      case 'test_err_style'
+	 test_err_style = opt_value;
+      case 'train_err_style'
+	 train_err_style = opt_value;
+      case 'title'
+	 title_format = opt_value;
+      case 'pvalues'
+	 pvalues = opt_value;
+      case 'noisevalues'
+	 noisevalues = opt_value;
+      otherwise,
+	 error(['Unknown option ''' opt_name '''.']);
+   end
+end
 
 % The counter variables
-current_fig = 0;
-current_subplot = plot_cols*plot_rows+1;
+current_fig = 1;
+current_subplot = 1;
+figure(1);  clf;
+eval(figure_function);
+
+axis_h = [];
 
 % Find out about the test that we are plotting
 test_info = get_test_info(test);
 
+% Get the actual values we are looking at
+if (strcmp(noisevalues, 'all'))
+   noisevalues = test_info.noise;
+else
+   noisevalues = intersect(test_info.noise, noisevalues)
+end
+
+if (strcmp(pvalues, 'all'))
+   pvalues = test_info.p;
+else
+   pvalues = intersect(test_info.p, pvalues);
+end
+
 % Go through and load all of our files
-train_mean = get_test_results(test, 'train_mean', 'all', 'all');
-train_std  = get_test_results(test, 'train_std',  'all', 'all');
+train_mean = get_test_results(test, 'train_mean', noisevalues, pvalues);
+train_std  = get_test_results(test, 'train_std',  noisevalues, pvalues);
 
-test_mean = get_test_results(test, 'test_mean', 'all', 'all');
-test_std  = get_test_results(test, 'test_std',  'all', 'all');
+test_mean = get_test_results(test, 'test_mean', noisevalues, pvalues);
+test_std  = get_test_results(test, 'test_std',  noisevalues, pvalues);
 
+% Sort out the title
+if (strcmp(title_format, 'default'))
+   ln = length(test_info.noise);
+   lp = length(test_info.p);
+   
+   if ((ln == 1) & (lp == 1))
+      title_format = 'Test/training error';
+   elseif ((ln == 1) & (lp > 1))
+      title_format = 'p = %p';
+   elseif ((ln > 1) & (lp == 1))
+      title_format = 'noise = %n';
+   else
+      title_format = 'noise = %n  p = %p';
+   end
+end
 
-for noisevalue=1:length(test_info.noise)
-   current_noise = test_info.noise(noisevalue);
-   for pvalue=1:length(test_info.p)
-      current_p = test_info.p(pvalue);
+for noisevalue=1:length(noisevalues)
+   current_noise = noisevalues(noisevalue);
+   for pvalue=1:length(pvalues)
+      current_p = pvalues(pvalue);
       
       if (current_subplot > plot_rows*plot_cols)
 	 current_subplot = 1;
 	 current_fig = current_fig + 1;
 	 figure(current_fig);  clf;
+	 eval(figure_function);
       end
       
       subplot(plot_rows, plot_cols, current_subplot);
-      current_subplot = current_subplot + 1;
+      eval(axis_function);
+      axis_h = [axis_h; gca];
       
       train_d = permute(train_mean(noisevalue, pvalue, :), [3 1 2]);
       test_d =  permute(test_mean (noisevalue, pvalue, :), [3 1 2]);
-      graphtitle = ['noise=' num2str(current_noise) ...
-		    ' p = ' num2str(current_p)];
-      draw_training_profile(test_d, train_d, graphtitle);
+      graphtitle = parse_title(title_format, current_noise, current_p, ...
+			       current_subplot);
+
+      draw_training_profile(test_d, train_d, graphtitle, ...
+			    test_err_style, train_err_style);
+      
+      % Fix up x axis
+      if (strcmp(x_range, 'tight'))
+	 ax = axis;
+	 ax(1) = 1;
+	 ax(2) = test_info.numiterations;
+	 axis(ax);
+      else
+	 ax = axis;
+	 ax(1) = x_range(1);
+	 ax(2) = x_range(2);
+	 axis(ax);
+      end
+   
+      current_subplot = current_subplot + 1;
    end
+   
+   grid on;
+
+end
+
+% Return our axes if needed
+if (nargout == 1)
+   h = axis_h;
 end
 
 
-function draw_training_profile(test_d, train_d, graphtitle)
+function draw_training_profile(test_d, train_d, graphtitle, test_s, train_s)
 
 % Draws a graph
 
@@ -74,19 +185,52 @@ if (~isempty(minus1))
 end
 
 iter = 1:length(test_d);
-semilogx(iter, test_d, 'r-');  hold on;
+semilogx(iter, test_d, test_s);  hold on;
 
 iter = 1:length(train_d);
-semilogx(iter, train_d, 'b-');
+semilogx(iter, train_d, train_s);
 
-grid on;
-
-%xlabel('Iterations');
-%ylabel('Error');
+xlabel('Iterations');
+ylabel('Error');
 
 %legend('Test error', 'Training error');
-title(graphtitle);
+if (~isempty(graphtitle))
+   title(graphtitle);
+end
+
+
+function title = parse_title(format, noise, p, subplot)
+
+% Doesn't handle multiple %s properly.
+
+keywords = {'%%', '%', '%n', num2str(noise), '%p', num2str(p), ...
+	    '%l', 96 + subplot, '%N', [num2str(100*noise) '%']};
+
+% Find any keywords that match and replace them with the replacement
+% string
+
+title = format;
+
+for i=1:length(keywords)./2
+   kw = keywords{i*2-1};
+   index = findstr(kw, title);
+   while (length(index) > 0)
+      index = index(1);
+      title(index:index+length(kw)-1) = [];
+      before = title(1:index-1);
+      after = title(index:length(title));
+      title = [before keywords{i*2} after];
+      index = findstr(kw, title);
+   end
+end
 
 
 
+function default_setup_figure
 
+% Does nothing by default
+
+
+function default_setup_axis
+
+% Does nothing by default
