@@ -46,5 +46,5 @@ text(0.5, 0.5, '\it{p=1}', 'fontname', 'times');
 
 set(1, 'paperposition', [0 0 6 2.5]);
 
-print(EPSFILENAME, '-f1', '-deps2', '-loose');
+print(EPSFILENAME, '-f1', '-deps2');
 

@@ -19,6 +19,6 @@ ylabel('Classifier weight \it{b_t}');
 axis([0 0.5, 0.0 10.0]);
 axis square;
 
-set(1, 'paperposition', [0 0 6 2.8]);
+set(1, 'paperposition', [0 0 6 2.5]);
 
-print(EPSFILENAME, '-f1','-deps', '-loose');
+print(EPSFILENAME, '-f1','-deps2');

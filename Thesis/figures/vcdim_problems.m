@@ -34,9 +34,9 @@ ylabel('\it{y_1}');
 title('(b) \sl{VCdim = \infty}');
 axis square;  axis([-1.2 1.2 -1.2 1.2]);
 
-set(1, 'paperposition', [1 1 6 2.7]);
+set(1, 'paperposition', [1 1 6 2.5]);
 
-print(EPSFILENAME, '-f1','-deps', '-loose');
+print(EPSFILENAME, '-f1','-deps2');
 
 
 

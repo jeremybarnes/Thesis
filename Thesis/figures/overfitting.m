@@ -51,7 +51,6 @@ set(gca, 'xtick', [], 'ytick', []);
 
 
 
-
 set(1, 'paperposition', [0 0 6 2.5]);
 
-print(EPSFILENAME, '-f1','-depsc');
+print(EPSFILENAME, '-f1','-deps2');
