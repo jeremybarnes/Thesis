@@ -58,10 +58,5 @@ obj.rightcategory = 1;
 obj.trainingerror = 0.0;
 
 % construct class and use superior/inferior relationship
-obj = class(obj, 'decision_stump', parent);
+obj = class(obj, 'decision_stump');
 superiorto('double', 'classifier');
-
-
-% POSTCONDITIONS
-check_invariants(obj);
-
