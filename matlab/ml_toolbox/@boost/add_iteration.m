@@ -10,7 +10,7 @@ function obj_r = add_iteration(obj, new_c, new_b, new_w)
 
 i = iterations(obj) + 1;
 
-obj.classifiers(i) = new_c;
+obj.classifiers{i} = new_c;
 obj.b = new_b;
 obj.w = new_w;
 obj.iterations = i;
