@@ -24,7 +24,6 @@ function obj_r = train(obj, varargin)
 % calling TRAINAGAIN until the training is aborted or maxiterations are
 % reached.
 
-% PRECONDITIONS
 [x, y, w] = get_xyw(obj, 'train', varargin);
 
 
@@ -41,10 +40,3 @@ end
 
 
 obj_r = obj;
-
-
-% POSTCONDITIONS
-check_invariants(obj);
-
-return;
-
