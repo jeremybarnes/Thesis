@@ -17,8 +17,8 @@ if ((s(1) ~= 1) | (s(2) ~= 1))
    disp(['Array of decision stumps, size = ' sizestr])
 else
    disp(['    decision stump object:']);
-   disp(['      dimensions    = ' int2str(obj.dimensions)]);
-   disp(['      categories    = ' int2str(numcategories(obj.categories))]);
+   disp(['      dimensions    = ' int2str(dimensions(obj))]);
+   disp(['      categories    = ' int2str(numcategories(obj))]);
    disp(['      splitvar      = ' int2str(obj.splitvar)]);
    disp(['      splitval      = ' num2str(obj.splitval)]);
    disp(['      leftcategory  = ' int2str(obj.leftcategory)]);
