@@ -62,6 +62,9 @@ obj = add_iteration(obj, new_c, [obj.b bt], new_w);
 
 obj_r = obj;
 
+% Return useful stuff in context
 context.wl_y = new_y;
 context.wl_instance = new_c;
 context.bt = bt;
+context.b = [obj.b bt];
+context.w = new_w;
