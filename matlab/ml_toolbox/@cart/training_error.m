@@ -15,14 +15,11 @@ function e = training_error(obj)
 % Jeremy Barnes 22/4/1999
 % $Id$
 
-% PRECONDITIONS:
+obj = cart(obj);
+
 if (obj.tree.totalweight == 0.0)
    error('training_error: no weight in samples');
 end
 
 
 e = obj.tree.incorrectweight;
-
-
-% POSTCONDITIONS:
-check_invariants(obj);
