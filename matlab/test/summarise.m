@@ -60,6 +60,11 @@ train_mean = test_mean;
 train_std  = test_mean;
 count_res  = test_mean;
 
+% These arrays hold our information on the best test error and on which
+% iteration it occurred.
+best_test_error = zeros(num_noise_values, num_p_values, trials);
+best_test_iter  = best_test_error;
+
 % The counter variables
 trial = 1;
 pvalue = 1;
@@ -99,6 +104,17 @@ for noisevalue=1:num_noise_values
 	 
 	 this_test_res = [this_test_res; teste padding];
 	 this_train_res = [this_train_res; traine padding];
+	 
+	 % Now find where the best test error occurred and its value, and
+         % store these away also
+	 bte = min(teste);
+	 index = find(teste == bte);
+	 if (length(index) > 1)
+	    index = index(1);
+	 end
+	 
+	 best_test_error(noisevalue, pvalue, trial) = bte;
+	 best_test_iter(noisevalue, pvalue, trial) = index;
       end
       
       % For each iteration of this_test_res and this_train_res, we
@@ -157,7 +173,7 @@ savefile = [DATA_SAVE_PATH '/' test '-summary.mat'];
 
 save(savefile, 'test_mean', 'test_std', 'train_mean', 'train_std', ...
      'count_res', 'name', 'algorithm', 'p', 'dist', 'samples', ...
-     'noise', 'numiterations', 'trials');
+     'noise', 'numiterations', 'trials', 'best_test_error', 'best_test_iter');
 
 % Finished!
  
