@@ -24,6 +24,12 @@ function obj = classifier(categories, dimensions)
 % Jeremy Barnes, 4/4/1999
 % $Id$
 
+% 0 arguments -- make a default version
+if (nargin == 0)
+   categories = category_list;
+   dimensions = 2;
+end
+
 % 1 argument -- just make a copy
 if (nargin == 1)
    obj = categories;

@@ -41,7 +41,11 @@ if (nargin == 1)
 end
 
 % ancestor relationship
-parent = classifier(categories, dimensions);
+if (nargin == 0) % zero arguments --> use default
+   parent = classifier;
+else
+   parent = classifier(categories, dimensions);
+end
 
 % Our default split, which splits on the first variable at 0.500
 obj.splitvar = 1;

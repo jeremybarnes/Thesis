@@ -46,6 +46,13 @@ if (nargin == 1)
    return
 end
 
+% ancestor relationship
+if (nargin == 0)
+   parent = classifier;
+else
+   parent = classifier(categories, dimensions);
+end
+
 % More than one arg --> construct a new one
 switch cost_fn
    case {'misclassification', 'gini', 'entropy'}
@@ -56,9 +63,6 @@ end
 if (maxdepth < 1)
    error('cart: MAXDEPTH must be >= 1');
 end
-
-% ancestor relationship
-parent = classifier(categories, dimensions);
 
 % initialisation of variables in obj
 obj.cost_fn = cost_fn;
