@@ -11,15 +11,9 @@ function e = training_error(obj)
 % The training error is the sum of the weights of samples that are
 % classified incorrectly.  This is returned in E.
 
-% @decision_stump/training_error.m
+% @classifier/training_error.m
 % Jeremy Barnes 22/4/1999
 % $Id$
 
-% PRECONDITIONS:
-% none
-
-e = empirical_risk(obj, obj.x, obj.y);
-
-
-% POSTCONDITIONS:
-check_invariants(obj);
+[x_data, y_data] = training_data(obj);
+e = empirical_risk(obj, x_data, y_data);
