@@ -31,15 +31,53 @@
 #include "mex.h"
 #include <memory.h>
 
+#define mxArray_t mxArray
 
-void do_classify(const mxArray *obj, const mxArray *x, double *y,
+
+void call_matlab_1_1(mxArray_t **lhs0, char *command, const mxArray_t *rhs0)
+{
+    /* This function calls MATLAB, executing the given command on the
+       given argument and returning the result. */
+    
+    mxArray_t *lparams[1], *rparams[1];
+
+    mexPrintf("Trying to execute MATLAB command \"%s\" on a parameter with "
+	      "class \"%s\"\n", command, mxGetClassName(rhs0));
+    
+    /* Get MATLAB to perform the function we ask it to */
+    (const mxArray_t *)rparams[0] = rhs0;
+    mexCallMATLAB(1, lparams, 1, rparams, command);
+    *lhs0 = lparams[0];
+}	
+
+
+void call_matlab_1_2(mxArray_t **lhs0, char *command,
+		     const mxArray_t *rhs0, const mxArray_t *rhs1)
+{
+    /* This function calls MATLAB, executing the given command on the
+       given argument and returning the result. */
+    
+    mxArray_t *lparams[1], *rparams[2];
+    
+    /* Get MATLAB to ask our classifier to classify the data */
+    
+    (const mxArray_t *)rparams[0] = rhs0;
+    (const mxArray_t *)rparams[1] = rhs1;
+    
+    mexCallMATLAB(1, lparams, 2, rparams, command);
+    
+    *lhs0 = lparams[0];
+}	
+
+
+void do_classify(const mxArray_t *obj, const mxArray_t *x, double *y,
 		 int data_len, int cat)
 {
 
     double *votes, *b, *their_b, b_sum, b_sum_recip, this_b;
     double max_value, this_vote, *this_y;
-    mxArray *f_b, *f_iterations;	
-    mxArray *this_classifier, *lparams[1], *rparams[2];
+    mxArray_t *f_b, *f_iterations, *classifiers, *f_this_y;	
+    mxArray_t *this_classifier;
     int i, j, iterations, max_cat;
 
     /* We need a votes matrix.  There is an entry for each category
@@ -115,8 +153,22 @@ void do_classify(const mxArray *obj, const mxArray *x, double *y,
 
     for (i=0; i<iterations; i++)
 	b[i] = their_b[i] * b_sum_recip;
-    
 
+    classifiers = mxGetField(obj, 0, "classifiers");
+    if (classifiers == NULL) {
+	mexErrMsgTxt("classify: Error reading CLASSIFIERS field");
+	return;
+    }
+
+    { int m,n,ne;
+    m = mxGetM(classifiers);
+    n = mxGetN(classifiers);
+
+    ne = mxGetNumberOfElements(classifiers);
+
+    mexPrintf("CLASSIFIERS is a (%d x %d) array of %s with %d elements\n",
+	      m, n, mxGetClassName(classifiers), ne);
+    }
     /* Now go through each classifer, getting it to classify each
        datapoint, and add its votes up for each. */
 
@@ -124,28 +176,25 @@ void do_classify(const mxArray *obj, const mxArray *x, double *y,
 
 	this_b = b[i];
 
+	mexPrintf("i = %d\n", i);
+
 	this_classifier = mxGetField(obj, i, "classifiers");
 	if (this_classifier == NULL) {
-	    mexErrMsgTxt("classify: Error reading CLASSIFIER field");
+	    mexErrMsgTxt("classify: Error reading THIS_CLASSIFIER");
 	    return;
 	}
 
 
 	/* Get MATLAB to ask our classifier to classify the data */
-
-	(const mxArray *)rparams[0] = this_classifier;
-	(const mxArray *)rparams[1] = x;
-
-	mexCallMATLAB(1, lparams, 2, rparams, "classify");
-
-	this_y = mxGetPr(lparams[0]);
+	call_matlab_1_2(&f_this_y, "classify", this_classifier, x);
+	this_y = mxGetPr(f_this_y);
 	
 	/* Add the votes on */
 	for (j=0; j<data_len; j++)
 	    votes[j*cat + (int)this_y[j]] += this_b;
 
 	/* Free the array that the classify routine created */
-	mxDestroyArray(lparams[0]);
+	mxDestroyArray(f_this_y);
 
     }
 
@@ -174,10 +223,11 @@ void do_classify(const mxArray *obj, const mxArray *x, double *y,
 
 
 /* Gateway function */
-void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
+void mexFunction(int nlhs, mxArray_t *plhs[],
+		 int nrhs, const mxArray_t *prhs[])
 {
     double *y;
-    mxArray *f_dimensions, *f_categories, *rparams[1], *lparams[1];
+    mxArray_t *f_dimensions, *f_numcategories, *obj, *classifier;
     int dimensions, data_len, categories;
 
     /* Check that we have 2 RHS arguments */
@@ -194,34 +244,37 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 
     if (nlhs == 0) return;
 
+    (const mxArray_t *)obj = prhs[0];
+
+    { int m,n;
+    m = mxGetM(obj);
+    n = mxGetN(obj);
+
+    mexPrintf("prhs[0] is a (%d x %d) array of %s\n",
+	      m, n, mxGetClassName(obj));
+    }
+
     /* Make sure its a BOOST object */
-    if (!mxIsClass(prhs[0], "boost")) {
+    if (!mxIsClass(obj, "boost")) {
 	mexErrMsgTxt("classify: First input must be of type BOOST");
 	return;
     }
+
+    /* NOTE: This is a hack, but seems necessary as MATLAB won't seem to
+       recognise that obj has an inherited DIMENSIONS method from the
+       CLASSIFIER ancestor. */
+    call_matlab_1_1(&classifier, "classifier", obj);
     
     /* Get our number of dimensions */
-    f_dimensions = mxGetField(prhs[0], 0, "dimensions");
-    if (f_dimensions == NULL) {
-	mexErrMsgTxt("classify: Error reading DIMENSIONS field");
-	return;
-    }
-    
+    call_matlab_1_1(&f_dimensions, "dimensions", classifier);
     dimensions = (int)mxGetScalar(f_dimensions);
+    mxDestroyArray(f_dimensions);
 
     /* Ask MATLAB to tell us how many categories are in our dataset */
-    f_categories = mxGetField(prhs[0], 0, "categories");
-    if (f_categories == NULL) {
-	mexErrMsgTxt("classify: Error reading CATEGORIES field");
-	return;
-    }
-
-    rparams[0] = f_categories;
-
-    mexCallMATLAB(1, lparams, 1, rparams, "numcategories");
-
-    categories = (int)(*mxGetPr(lparams[0]));
-    mxDestroyArray(lparams[0]);
+    call_matlab_1_1(&f_numcategories, "numcategories", classifier);
+    categories = (int)mxGetScalar(f_numcategories);
+    mxDestroyArray(f_numcategories);
+    mxDestroyArray(classifier);
 
     /* Get our X variable.  Make sure its a matrix, and get its number of
        rows and columns. */
@@ -231,6 +284,9 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
     }
 
     data_len = mxGetM(prhs[1]);
+
+    mexPrintf("dimensions = %d, mxGetN(prhs[1]) = %d\n",
+	      dimensions, mxGetN(prhs[1]));
 
     /* Check that the number of dimensions matches */
     if (dimensions != mxGetN(prhs[1])) {
@@ -251,6 +307,3 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
     do_classify(prhs[0], prhs[1], y, data_len, categories);
 
 }
-
-
-
