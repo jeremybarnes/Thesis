@@ -4,24 +4,27 @@ function [x, y, w] = get_xyw(obj, s, args)
 %
 % SYNTAX:
 %
-% [x, y, w] = get_xyw(obj, s, {dataset, [w]})
-% [x, y, w] = get_xyw(obj, s, {x, y, [w]})
+% [x, y, w, opt] = get_xyw(obj, s, {dataset, [w]})
+% [x, y, w, opt] = get_xyw(obj, s, {x, y, [w]})
 %
 % S is the string that describes the name of the function
 %
 % Designed to be called as [x, y, w] = get_xyw(obj, 'name', varargin)
 %
+% OPT holds any other strings that were passed in args.
+% 
 % FIXME: comment
 
 % get_xyw.m
 % Jeremy Barnes, 23/4/1999
 % $Id$
 
+l = length(args);
 
-if (length(args) == 0)
+if (l == 0)
    error([s ': not enough arguments given']);
 
-elseif (length(args) == 1)
+elseif (l == 1)
    % Must be just a dataset.  Check that this is so, and extract our x
    % and y parameters from it.
 
@@ -31,7 +34,7 @@ elseif (length(args) == 1)
 
    w = ones(length(y), 1);
    
-elseif (length(args) == 2)
+elseif (l == 2)
    % Either we have a dataset followed by weights, or a {x, y} set.  We
    % can determine which case by looking at the type of the first
    % parameter.
@@ -59,7 +62,7 @@ elseif (length(args) == 2)
       check_w(obj, s, x, y, w);
    end
    
-elseif (length(args) == 3)
+elseif (l == 3)
    % We have a x, then a y, then a w
    
    x = args{1};
