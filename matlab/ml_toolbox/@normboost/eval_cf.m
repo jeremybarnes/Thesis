@@ -94,6 +94,3 @@ d2_sample_costs = (factor_1 + factor_2 + factor_3) .* sample_costs;
 cost = sum(sample_costs);
 dcost = sum(d_sample_costs);
 d2cost = sum(d2_sample_costs); 
-
-
-
