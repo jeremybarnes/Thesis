@@ -12,6 +12,8 @@
 #include "mex.h"
 #include <memory.h>
 
+#include "matlab_common.c"
+
 
 void do_margins(const mxArray *obj, const mxArray *x, double *m,
 		 int data_len, int cat)
@@ -19,8 +21,8 @@ void do_margins(const mxArray *obj, const mxArray *x, double *m,
 
     double *votes, *b, *their_b, this_b;
     double max_value, second_max_value, this_vote, *this_y;
-    mxArray *f_b, *f_iterations, *classifiers, *this_struct;	
-    mxArray *this_classifier, *lparams[1], *rparams[2];
+    mxArray_t *f_b, *f_iterations, *classifiers;	
+    mxArray_t *this_classifier, *f_this_y;
     int i, j, iterations;
 
     /* We need a votes matrix.  There is an entry for each category
@@ -40,7 +42,7 @@ void do_margins(const mxArray *obj, const mxArray *x, double *m,
 
     votes = mxCalloc(data_len * cat, sizeof(double));
     if (votes == NULL) {
-	mexErrMsgTxt("classify: out of memory to allocate VOTES!");
+	mexErrMsgTxt("margins: out of memory to allocate VOTES!");
 	return;
     }
     
@@ -50,17 +52,19 @@ void do_margins(const mxArray *obj, const mxArray *x, double *m,
     /* Get the b vector from obj, and normalise it.  This is important,
        as they are all negative, and the sign needs to be changed. */
 
-    f_b = mxGetField(obj, 0, "b");
+
+    call_matlab_1_1(&f_b, "classifier_weights", obj);
     if (f_b == NULL) {
-	mexErrMsgTxt("classify: Error reading B field");
+	mexErrMsgTxt("margins: Error reading B field");
 	return;
     }
 
     their_b = mxGetPr(f_b);
 
-    f_iterations = mxGetField(obj, 0, "iterations");
+
+    call_matlab_1_1(&f_iterations, "iterations", obj);
     if (f_iterations == NULL) {
-	mexErrMsgTxt("classify: Error reading ITERATIONS field");
+	mexErrMsgTxt("margins: Error reading ITERATIONS field");
 	return;
     }
 
@@ -73,7 +77,7 @@ void do_margins(const mxArray *obj, const mxArray *x, double *m,
 	/* Don't cause an error, as this seems to break the rest of
 	   our code. */
 	/*
-	mexErrMsgTxt("classify: Can't classify with zero iterations");
+	mexErrMsgTxt("margins: Can't classify with zero iterations");
 	*/
 
 	for (i=0; i<data_len; i++)
@@ -84,7 +88,7 @@ void do_margins(const mxArray *obj, const mxArray *x, double *m,
 
     b = mxCalloc(iterations, sizeof(double));
     if (b == NULL) {
-	mexErrMsgTxt("classify: out of memory to allocate B!");
+	mexErrMsgTxt("margins: out of memory to allocate B!");
 	return;
     }
 
@@ -96,10 +100,11 @@ void do_margins(const mxArray *obj, const mxArray *x, double *m,
     for (i=0; i<iterations; i++)
 	b[i] = fabs(their_b[i]);
     
-    /* classifiers is a cell array of structures */
+    /* classifiers is a cell array of classifiers */
     classifiers = mxGetField(obj, 0, "classifiers");
+    /*     call_matlab_1_1(&classifiers, "wl_instance", obj); */
     if (classifiers == NULL) {
-	mexErrMsgTxt("classify: Error reading CLASSIFIERS field");
+	mexErrMsgTxt("margins: Error reading CLASSIFIERS field");
 	return;
     }
 
@@ -110,35 +115,23 @@ void do_margins(const mxArray *obj, const mxArray *x, double *m,
 
 	this_b = b[i];
 
-	/* Find our classifier */
-	this_struct = mxGetCell(classifiers, i);
-	if (this_struct == NULL) {
-	    mexErrMsgTxt("classify: Error reading cell in THIS_STRUCT");
-	    return;
-	}
-
-	this_classifier = mxGetField(this_struct, 0, "classifier");
+	this_classifier = mxGetCell(classifiers, i);
 	if (this_classifier == NULL) {
-	    mexErrMsgTxt("classify: Error reading CLASSIFIER field");
+	    mexErrMsgTxt("margins: Error reading THIS_CLASSIFIER");
 	    return;
 	}
 
 
 	/* Get MATLAB to ask our classifier to classify the data */
+	call_matlab_1_2(&f_this_y, "classify", this_classifier, x);
+	this_y = mxGetPr(f_this_y);
 
-	(const mxArray *)rparams[0] = this_classifier;
-	(const mxArray *)rparams[1] = x;
-
-	mexCallMATLAB(1, lparams, 2, rparams, "classify");
-
-	this_y = mxGetPr(lparams[0]);
-	
 	/* Add the votes on */
 	for (j=0; j<data_len; j++)
 	    votes[j*cat + (int)this_y[j]] += this_b;
 
 	/* Free the array that the classify routine created */
-	mxDestroyArray(lparams[0]);
+	mxDestroyArray(f_this_y);
 
     }
 
@@ -186,7 +179,7 @@ void do_margins(const mxArray *obj, const mxArray *x, double *m,
 void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 {
     double *m;
-    mxArray *f_dimensions, *f_categories, *rparams[1], *lparams[1];
+    mxArray_t *f_dimensions, *f_numcategories, *obj, *classifier;
     int dimensions, data_len, categories;
 
     /* Check that we have 2 RHS arguments */
@@ -203,34 +196,26 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 
     if (nlhs == 0) return;
 
-    /* Make sure its a BOOST object */
-    if (!mxIsClass(prhs[0], "boost")) {
-	mexErrMsgTxt("margins: First input must be of type BOOST");
-	return;
-    }
+    (const mxArray_t *)obj = prhs[0];
+
+    /* Turn it into a BOOST object */
+    call_matlab_1_1(&obj, "as_boost", prhs[0]);
+
+    /* NOTE: This is a hack, but seems necessary as MATLAB won't seem to
+       recognise that obj has an inherited DIMENSIONS method from the
+       CLASSIFIER ancestor. */
+    call_matlab_1_1(&classifier, "as_classifier", obj);
     
     /* Get our number of dimensions */
-    f_dimensions = mxGetField(prhs[0], 0, "dimensions");
-    if (f_dimensions == NULL) {
-	mexErrMsgTxt("margins: Error reading DIMENSIONS field");
-	return;
-    }
-    
+    call_matlab_1_1(&f_dimensions, "dimensions", classifier);
     dimensions = (int)mxGetScalar(f_dimensions);
+    mxDestroyArray(f_dimensions);
 
     /* Ask MATLAB to tell us how many categories are in our dataset */
-    f_categories = mxGetField(prhs[0], 0, "categories");
-    if (f_categories == NULL) {
-	mexErrMsgTxt("margins: Error reading CATEGORIES field");
-	return;
-    }
-
-    rparams[0] = f_categories;
-
-    mexCallMATLAB(1, lparams, 1, rparams, "numcategories");
-
-    categories = (int)(*mxGetPr(lparams[0]));
-    mxDestroyArray(lparams[0]);
+    call_matlab_1_1(&f_numcategories, "numcategories", classifier);
+    categories = (int)mxGetScalar(f_numcategories);
+    mxDestroyArray(f_numcategories);
+    mxDestroyArray(classifier);
 
     /* Get our X variable.  Make sure its a matrix, and get its number of
        rows and columns. */
@@ -257,6 +242,6 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
     m = mxGetPr(plhs[0]);
 
     /* Call our computational routine */
-    do_margins(prhs[0], prhs[1], m, data_len, categories);
+    do_margins(obj, prhs[1], m, data_len, categories);
 
 }

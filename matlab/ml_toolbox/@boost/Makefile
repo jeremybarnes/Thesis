@@ -11,10 +11,13 @@
 MEXFILES = $(patsubst %.c,%$(MEX_EXTN),$(wildcard *.c))
 MEX=mex
 
+
 all: $(MEXFILES)
 
-%$(MEX_EXTN): %.c
+%$(MEX_EXTN): %.c matlab_common.c
 	$(MEX) $(MEXFLAGS) $<
 
+# To stop it from trying to compile it
+matlab_common$(MEX_EXTN):	;
 
 

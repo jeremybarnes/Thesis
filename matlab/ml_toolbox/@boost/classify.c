@@ -31,41 +31,7 @@
 #include "mex.h"
 #include <memory.h>
 
-#define mxArray_t mxArray
-
-
-void call_matlab_1_1(mxArray_t **lhs0, char *command, const mxArray_t *rhs0)
-{
-    /* This function calls MATLAB, executing the given command on the
-       given argument and returning the result. */
-    
-    mxArray_t *lparams[1], *rparams[1];
-
-    /* Get MATLAB to perform the function we ask it to */
-    (const mxArray_t *)rparams[0] = rhs0;
-    mexCallMATLAB(1, lparams, 1, rparams, command);
-    *lhs0 = lparams[0];
-}	
-
-
-void call_matlab_1_2(mxArray_t **lhs0, char *command,
-		     const mxArray_t *rhs0, const mxArray_t *rhs1)
-{
-    /* This function calls MATLAB, executing the given command on the
-       given argument and returning the result. */
-    
-    mxArray_t *lparams[1], *rparams[2];
-    
-    /* Get MATLAB to ask our classifier to classify the data */
-    
-    (const mxArray_t *)rparams[0] = rhs0;
-    (const mxArray_t *)rparams[1] = rhs1;
-    
-    mexCallMATLAB(1, lparams, 2, rparams, command);
-    
-    *lhs0 = lparams[0];
-}	
-
+#include "matlab_common.c"
 
 void do_classify(const mxArray_t *obj, const mxArray_t *x, double *y,
 		 int data_len, int cat)
@@ -104,7 +70,7 @@ void do_classify(const mxArray_t *obj, const mxArray_t *x, double *y,
     /* Get the b vector from obj, and normalise it.  This is important,
        as they are all negative, and the sign needs to be changed. */
 
-    f_b = mxGetField(obj, 0, "b");
+    call_matlab_1_1(&f_b, "classifier_weights", obj);
     if (f_b == NULL) {
 	mexErrMsgTxt("classify: Error reading B field");
 	return;
@@ -235,16 +201,13 @@ void mexFunction(int nlhs, mxArray_t *plhs[],
 
     (const mxArray_t *)obj = prhs[0];
 
-    /* Make sure its a BOOST object */
-    if (!mxIsClass(obj, "boost")) {
-	mexErrMsgTxt("classify: First input must be of type BOOST");
-	return;
-    }
+    /* Turn it into a BOOST object */
+    call_matlab_1_1(&obj, "as_boost", prhs[0]);
 
     /* NOTE: This is a hack, but seems necessary as MATLAB won't seem to
        recognise that obj has an inherited DIMENSIONS method from the
        CLASSIFIER ancestor. */
-    call_matlab_1_1(&classifier, "classifier", obj);
+    call_matlab_1_1(&classifier, "as_classifier", obj);
     
     /* Get our number of dimensions */
     call_matlab_1_1(&f_dimensions, "dimensions", classifier);
@@ -282,5 +245,5 @@ void mexFunction(int nlhs, mxArray_t *plhs[],
     y = mxGetPr(plhs[0]);
 
     /* Call our computational routine */
-    do_classify(prhs[0], prhs[1], y, data_len, categories);
+    do_classify(obj, prhs[1], y, data_len, categories);
 }

@@ -10,6 +10,8 @@ function wl = wl_instance(obj, range)
 % weak learning algorithm.  RANGE indicates for which iterations the weak
 % learning algorithm will be returned.
 %
+% RANGE defaults to all iterations.
+%
 % EXAMPLES:
 %
 % wl = wl_instance(obj, 1:iterations(obj));
@@ -22,6 +24,10 @@ function wl = wl_instance(obj, range)
 % @boost/wl_instance.m
 % Jeremy Barnes, 6/8/1999
 % $Id$
+
+if (nargin == 1)
+   range = 1:iterations(obj);
+end
 
 if (length(range) == 0)
    wl = [];
