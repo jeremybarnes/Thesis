@@ -24,8 +24,7 @@ function obj_r = trainagain(obj)
 
 if (obj.iterations > obj.maxiterations)
    obj_r = obj;
-   warning('trainagain: attempt to train past MAXITERATIONS');
-   return;
+   warning('trainagain: training past MAXITERATIONS');
 end
 
 if (obj.aborted)
@@ -54,18 +53,20 @@ if ((new_error == 0) | (new_error > 0.49))
 end
 
 
-% This section updates the weights.  This is done...
-% FIXME: comment
+% This section updates the weights.
 
-phi = 0.5;
+phi = 0.5; % phi is here in case we want to use "soft margins".
+
+% beta_t is one if new_error is 0.5, and drops down towards zero as
+% new_error approaches zero.
 beta_t =(new_error * (1 - phi)) / (phi * (1 - new_error));
+
+% bt is zero if new_error is 0.5, and drops down towards minus infinity
+% as new_error approaches zero.
 bt = log(beta_t);
 
 
-% This is where we use our p parameter...
-bt = sign(bt) * abs(bt)^(1/obj.p);
-
-new_w = obj.w .* exp(log(beta_t^(1/obj.p)) .* (new_y == obj.y));
+new_w = obj.w .* exp(bt .* (new_y == obj.y));
 sum_new_w = sum(new_w);
 
 if (sum(new_w) == Inf)
@@ -77,6 +78,10 @@ if (sum(new_w) == Inf)
 end
 
 new_w = new_w ./ sum_new_w;
+
+% This is where we use our p parameter.  This has the effect of rewarding
+% the classifiers that do well more and more as p increases.
+bt = sign(bt) * abs(bt)^(1/obj.p);
 
 % create a structure for our new classifier
 s.w = obj.w;
