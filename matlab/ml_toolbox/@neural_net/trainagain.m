@@ -97,9 +97,13 @@ h_in_bias = [ones(numsamples, 1) x_data];
 update_o = eta * o_in_bias' * delta_o;
 update_h = eta * h_in_bias' * delta_h;
 
-% Update all sets of values
-obj.w_out = obj.w_out + update_o;
-obj.w_hidden = obj.w_hidden + update_h;
+% Update weights
+obj.w_out = obj.w_out + update_o + alpha .* obj.last_update_o;
+obj.w_hidden = obj.w_hidden + update_h + alpha .* obj.last_update_h;
+
+% Save last updates for next momentum calculation
+obj.last_update_o = update_o;
+obj.last_update_h = update_h;
 
 % Finished!
 obj.iterations = obj.iterations + 1;
