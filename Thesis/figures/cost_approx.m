@@ -14,8 +14,8 @@ yvalues = exp(-xvalues);
 plot(xvalues, yvalues, 'k--');  hold on;
 plot([-1 0 0 1], [1 1 0 0], 'k-', 'linewidth', 2);
 
-xlabel('Margin \it{\gamma}');
-ylabel('Cost \it{c(\gamma)}');
+xlabel('Margin \it{\lambda}');
+ylabel('Cost \it{c(\lambda)}');
 
 set(1, 'paperposition', [0 0 6 2.0]);
 

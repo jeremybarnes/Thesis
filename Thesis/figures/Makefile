@@ -62,7 +62,8 @@ all:		b_func.epsg classification_problem.epsg \
 		test_err_summary.epsg test_iter_summary.epsg \
 		effect_of_p.epsg margin_distribution.epsg \
 		adaboost_margins.epsg training_curves_strict.epsg \
-		training_curves_sloppy.epsg training_curves_boost.epsg
+		training_curves_sloppy.epsg training_curves_boost.epsg \
+		alpha_function.epsg
 
 clean:		
 		-rm *.epsg *.mscript *~ tmpcommand

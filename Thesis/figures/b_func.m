@@ -1,4 +1,4 @@
-function bfunc
+function b_func
 
 global EPSFILENAME
 
@@ -7,4 +7,4 @@ plot([1 2], [3 4]);
 
 set(1, 'paperposition', [0 0 4 3]);
 
-print(EPSFILENAME, '-f1','-depsc');
+print(EPSFILENAME, '-f1','-deps2');

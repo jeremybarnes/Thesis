@@ -8,42 +8,44 @@
 \chapter{AdaBoost and boosting algorithms}
 \label{chapter:boosting}
 
-Boosting algorithms are a very important recent development in machine
-learning that has significantly altered the field.  The name
-``Boosting'' is applied to a range of  machine learning algorithms,
-all of which combine many weak hypotheses to form a ``strong''
-hypothesis that significantly outperforms them. 
+Boosting algorithms (AdaBoost being one of the first) are a very
+important recent development in machine learning that has
+significantly altered the field.  The name ``Boosting'' is applied to
+a range of  machine learning algorithms, all of which combine several
+``weak'' hypotheses to form a combined ``strong'' hypothesis that
+significantly outperforms all of them.
 
 In this chapter we describe the classic algorithm \emph{AdaBoost}
-developed by Freund and Schapire \cite{Freund96}.  Results on its
-properties and generalisation performance are also presented.  We then
-look at AdaBoost as optimisation via gradient descent of a cost
-function, and derive a result which shows this to be the case.  We
-digress slightly to look at \emph{normed} boosting algorithms, a minor
-modification, and conclude by considering the problem of overfitting
-as applied to boosting algorithms.
+developed by Freund and Schapire \cite{Freund96}, and present results
+on its properties and generalisation performance.  We then show that
+AdaBoost implements the optimisation of a cost functional via gradient
+descent, an property that proves to provide a useful framework for the
+development of modified algorithme in chapter \ref{chapter:pboosting}.
+We than digress slightly to look at \emph{normed} boosting algorithms,
+a minor modification, and conclude by again considering the inherent
+problem of overfitting.
 
 \section{The AdaBoost algorithm}
 
-We first describe the AdaBoost algorithm, first published by Freund
-and Schapire \cite{Freund96}.  In essence, this algorithm
+We first describe the AdaBoost algorithm, published by Freund and
+Schapire in 1996 \cite{Freund96}.  In essence, this algorithm 
 ``bootstraps'' itself onto another learning algorithm (the \emph{weak
-learning algorithm}) and improves performance by using a ``voting
+learning algorithm}), improving its performance by using a ``voting
 committee'' (linear combination) of weak learning hypotheses.
 
 AdaBoost performs \emph{very} well; its combined hypotheses generally
-perform significantly better than \emph{any} non-boosted algorithm.
-This is particularly true for reliable (low-noise) data.  Even
-the simplest of weak algorithms, when ``boosted'', will usually
-outperform the best unboosted algorithms.
+perform significantly better than \emph{any} non-boosted algorithm
+(particularly for reliable (low-noise) data).  Even the simplest of
+weak algorithms, when ``boosted'', will usually outperform the best
+unboosted algorithms%
 \footnote{As a result, the focus of recent research effort has shifted
 from the development of \emph{learning} algorithms (which are all more 
 or less equivalent when boosted) to the development of better
-\emph{boosting} algorithms.}
+\emph{boosting} algorithms.}.
 
-We consider questions of how and why AdaBoost works; in
-particular how it chooses the optimal linear combination of
-classifiers from the very large set of possible linear combinations.
+We consider questions of how and why AdaBoost works; in particular how
+it chooses the optimal linear combination of classifiers from the very
+large set of possible linear combinations. 
 
 Figure \ref{fig:boosting algorithm} gives an explicit description of
 AdaBoost.  The key features are:
@@ -64,16 +66,9 @@ AdaBoost.  The key features are:
 	weights} describes these sample weights in more detail.
 \end{enumerate}
 
-The notation $w_{t,i}$ denotes the weight of sample $i$ at iteration
-$t$.  The process of training AdaBoost for one iteration is denoted $F_t
-\trainboost F_{t+1}$.   Two AdaBoost hypotheses are said to be
-\emph{equivalent} ($\equiv$) if they produce the same output for all
-input, even if their internal state ($b$ and $w$ values) are not
-identical.
-
 \begin{linefigure}
 \label{fig:boosting algorithm}
-\noindent{\bf Input:} $m$ examples $X = ((\bfx_1, y_1), \ldots, (\bfx_l,
+\noindent{\bf Input:} $m$ examples $X = ((\bfx_1, y_1), \ldots, (\bfx_m,
 y_m))$ and a weak learning algorithm $\bbW$
 \par
 \noindent{\bf Initialisation:} $F_0(\bfx) = 0$; $\bfw_0 : w_{0,i} = 1/m$ for
@@ -86,11 +81,11 @@ $i=1 \ldots m$
 \begin{enumerate}
 
 \item	Train weak learner $\bbW$ on the weighted sample set 
-	$(\bfx_1, y_1, w_{t,1} \ldots (\bfx_m, y_m, w_{t,m})$
+	$((\bfx_1, y_1, w_{t,1}), \ldots, (\bfx_m, y_m, w_{t,m}))$
 	and obtain weak learner $h_t : \calI \rightarrow \{\pm 1\}$
 
-\item	Calculate the weighted empirical risk (training error
-	$\epsilon_t$) of $h_t$: 
+\item	Calculate the weighted empirical risk (training error)
+	$\epsilon_t$ of $h_t$: 
 	%
 	\begin{equation}
 	\epsilon_t = R_{\emp}^{\bfw_t}(h) = \sum_{j : h(\bfx_j) \neq
@@ -104,7 +99,8 @@ $i=1 \ldots m$
 
 \item	Calculate the classifier weight $b_t$:
 	\begin{equation}
-	b_t = - \frac{1}{2} \log \frac{\epsilon_t}{1 - \epsilon_t}
+	b_t = - \frac{1}{2} \log \left( \frac{\epsilon_t}{1 -
+	\epsilon_t} \right)
 	\end{equation}
 
 \item	Update the sample weights $\bfw_t \Rightarrow \bfw_{t+1}$:
@@ -121,7 +117,7 @@ $i=1 \ldots m$
 	\end{equation}
 
 	where $Z_t$ is a normalisation constant, such that
-	$\sum_{i=1}^{m} w_{t, i} = 1$
+	$\sum_{i=1}^{m} w_{t+1, i} = 1$
 \end{enumerate}
 
 \par
@@ -133,22 +129,29 @@ h_i(\bfx) \right\}
 \caption{The AdaBoost algorithm $\bbB$}
 \end{linefigure}
 
+The notation $w_{t,i}$ denotes the weight of sample $i$ at iteration
+$t$.  The process of training AdaBoost for one iteration is denoted $F_t
+\trainboost F_{t+1}$.   Two AdaBoost hypotheses $F_a$ and $F_b$ are
+said to be \emph{equivalent} ($F_a \equiv F_b$) if they produce the
+same output for any input, even if their internal state ($b$ and $w$
+values) are not identical.
 
 \subsection{Classifier weights}
 \label{sec:classifier weights}
 
-AdaBoost's training process is divided into iterations.  On iteration
-$t$, one weak learner $h_t(\cdot)$ is added to the linear
-combination ($h_t$ is chosen by the weak learning algorithm).  The
-coefficient $b_t$ of $h_t$ is calculated from the 
+On training iteration $t$, one weak learner $h_t(\cdot)$ is added to
+the linear combination ($h_t$ is chosen by the weak learning
+algorithm).  The coefficient $b_t$ of $h_t$ is calculated from the 
 training error $\epsilon_t$ of $h_t$ as 
 %
 \begin{equation}
-b_t = - \log \frac{\epsilon_t}{1 - \epsilon_t}
+b_t = - \frac{1}{2} \log \left( \frac{\epsilon_t}{1 - \epsilon_t} \right)
 \label{eqn:theory:bt}
 \end{equation}
 %
-which is plotted in figure \ref{fig:b function}.
+which is plotted in figure \ref{fig:b function}.  In section
+\ref{sec:theory:gradient descent} we will show how
+(\ref{eqn:theory:bt}) is derived.
 
 \begin{linefigure}
 \begin{center}
@@ -170,11 +173,13 @@ those weak hypotheses that performed well on the training samples
 \label{sec:sample weights}
 
 Each sample in the training set has a corresponding weight $w_j$ which
-is updated to reflect the difficulty of that sample.  On each iteration the
-weights of samples which $h_t$ classified incorrectly are increased
-(scaled by $\exp \{ -b_t \}$); the whole lot are then normalised.
-This function has the following effect on the distribution of weights
-(illustrated in figure \ref{fig:sample weights}):
+is updated to reflect the difficulty of that sample.  On each
+iteration the weights of samples which $h_t$ classified incorrectly
+are increased (multiplied by $\exp \{\frac{1}{2} b_t \}$); those which
+$h_t$ classified correctly are \emph{divided} by the same amount.  The
+whole lot are then normalised.  As a result, the sample weight
+distribution is affected in the following manner (illustrated in
+figure \ref{fig:sample weights}): 
 
 \begin{itemize}
 \item	Training samples which are misclassified often, or are one of 
@@ -193,8 +198,8 @@ The figure shows the evolution of the sample weights from (a) 10
 iterations to (b) 100 iterations of boosting over a set of training
 data in $\bbR^2$.  The sample weight at a point is proportional to the
 intensity of the dot.  It can be seen that as $t \rightarrow \infty$,
-the ``easy'' samples (far from the decision boundary) lose weight
-relative to the ``hard'' samples.
+the ``easy'' samples (far from the decision boundary--indicated by the
+dashed line) lose weight relative to the ``hard'' samples.
 \end{capt}
 \end{linefigure}
 
@@ -211,10 +216,10 @@ is not desirable.
 
 Recent work has shown boosting to be an implementation of a gradient
 descent algorithm in an inner product space
-\cite{Mason99}.%
+\cite{Mason99}
 \footnote{This discussion follows \cite{Mason99} rather closely with
 some changes in notation and omission of details such as stopping
-criteria.}
+criteria.}.
 An inner product space requires both a universal set $\mathcal{X}$ and
 an inner product operator \ip{\cdot}{\cdot}.  We define
 %
@@ -228,7 +233,7 @@ an inner product operator \ip{\cdot}{\cdot}.  We define
 f_i : f_1, \ldots, f_n \in \calH, \quad
  b_1, \ldots, b_n > 0, \quad
  \sum_{i=1}^{n} b_i = 1
-\right\} \cup \emptyset
+\right\} \cup \{ \emptyset \}
 \end{equation}
 %
 (which is the convex hull of \calH), and
@@ -240,26 +245,30 @@ F, G \in \calX
 \end{equation}
 %
 where it should be noted that $\ip{\cdot}{\cdot}$ implicitly depends
-upon a series of training samples $X = ((\bfx_1, y_1), \ldots,
-(\bfx_m, y_m))$.
+upon a series of training samples
+%
+\begin{equation}
+X = ((\bfx_1, y_1), \ldots, (\bfx_m, y_m))
+\end{equation}
 
-We furthermore define the \emph{cost functional}
+We furthermore define the \emph{cost functional} (which our gradient
+descent algorithm is trying to minimise) as
 %
 \begin{equation}
 \label{eqn:gradient descent cost functional}
 C(F) = \frac{1}{m} \sum_{i=1}^{m} c(y_i F(\bfx_i))
 \end{equation}
 %
-which sums another function $c$ over the \emph{margin} of all training
-samples.
+which sums another function $c$ (introduced below) over the
+\emph{margin} of all training samples in $X$.
 
 At iteration $t$ of gradient descent, we wish to choose a hypothesis $h_t$ and
 a weight $b_t$ such that $C(F + b_t h_t) < C(F)$.  We do not choose
-$h_t$ directly, however--that is done by the weaklearner--instead, we
-manipulate the sample weights $\bfw_t$ in such a manner that (as we
-will see) the weaklearner chooses the ``right'' $h_t$ for us.  The
-right $h_t$ is the one that leads to the steepest reduction in the cost
-function:
+$h_t$ directly, however--that is done by the weak learning
+algorithm--instead, we manipulate the sample weights $\bfw_t$ in such
+a manner that (as we will see) the weak learning algorithm chooses the
+``right'' $h_t$ for us.  The optimal $h_t$, called $h_t^{\ast}$, is
+the one that leads to the steepest reduction in the cost function:
 %
 \begin{equation}
 h_t^{\ast} = -\nabla C(F)(\bfx) = \left. \frac{\partial C(F + \alpha
@@ -267,13 +276,12 @@ h_t^{\ast} = -\nabla C(F)(\bfx) = \left. \frac{\partial C(F + \alpha
 \label{eqn:functional derivative}
 \end{equation}
 %
-where $1_{\bfx}$ is the indicator function of $\bfx$; this is
-necessary as we can only evaluate (\ref{eqn:functional derivative})
-where we have a sample.  Since the optimal $h_t^{\ast}$ will not
-necessarily be in $\calH$, we choose the $h_t \in \calH$ with the
-greatest inner product $\ip{-\nabla C(F)}{h_t^{\ast}}$.  More
-specifically, using the inner product space and cost functions we have
-chosen we are maximising 
+where $1_{\bfx}$ is the indicator function of $\bfx$; the use of which
+is necessary as (\ref{eqn:functional derivative}) is known only where
+we have a sample.  Since the optimal $h_t^{\ast}$ will not necessarily
+be in $\calH$, we choose the $h_t \in \calH$ with the greatest inner
+product $\ip{-\nabla C(F)}{h_t^{\ast}}$.  More specifically, using the
+inner product space and cost functions we have chosen we are maximising 
 %
 \begin{equation}
 - \ip{\nabla C(F)}{f} = - \frac{1}{m^2} \sum_{i=1}^{m} y_i f(\bfx_i)
@@ -282,38 +290,43 @@ chosen we are maximising
 \end{equation}
 %
 The following theorem states that the \emph{weighted empirical risk}
-$R_{\emp}^{w}$ (section \ref{sec:weighted empirical risk}) is the
-``right'' form of risk to minimise, and gives the weights $\bfw_t$.
+$R_{\emp}^{\bfw_t}$ (section \ref{sec:weighted empirical risk}) is
+the ``right'' form of risk to minimise, and gives the weights
+$\bfw_t = (w_{1,t}, \ldots, w_{m,t})$:
 
-\begin{theorem}[Weighted empirical risk minimisation]
+\begin{theorem}[Weighted empirical risk minimisation \cite{Mason99}]
+\label{thm:gradient descent weights and direction}
 Maximising (\ref{eqn:function to maximise}) is equivalent to
 minimising the weighted empirical risk
 %
 \begin{equation}
-R_{\emp}^{w_{|t}} = \sum_{i:y_i \neq h(\bfx_i)}^{m} w_{i|t}
+R_{\emp}^{\bfw_t} = \sum_{i:y_i \neq h(\bfx_i)}^{m} w_{t,i}
 \end{equation}
 %
 where $\bfw_{t}$ is given by
 %
 \begin{equation}
 w_{t,i} = \frac{C'(y_i \: F_t (\bfx_i))}{\sum_{j=1}^{m} C'(y_j \:
-F(\bfx_j))}
+F(\bfx_j))} \qquad i=1 \ldots m
 \label{eqn:gradient sample weights}
 \end{equation}
 \end{theorem}
-\proof See \cite{Mason99}.  We assume that $C(\alpha)$ is
+\proof See \cite{Mason99}.  We assume that $c(\alpha)$ is
 monotonically decreasing with respect to an increasing $\alpha$; the
 result follows easily from this assumption.
 
-Having chosen our direction $h_t$, we now choose a step size $b_t$.
-AdaBoost uses a line search for the minimum of the cost functional
-along the line
+Having chosen our direction (hypothesis) $h_t$, we now choose a step
+size (classifier weight) $b_t$.  AdaBoost uses a line search for the
+minimum of the cost functional along the line parallel with $h_t$
+through $F_t$:
 %
 \begin{equation}
-b_t = \arg \min_{b_t} \sum_{i=1}^{m} C(y_i F(\bfx_i) + y_i b_t h_t(\bfx_i))
+b_t = \argmin_{\alpha} \sum_{i=1}^{m} C(y_i F(\bfx_i) + y_i \alpha
+h_t(\bfx_i))
 \end{equation}
 %
-The line search is illustrated in figure \ref{fig:gradient descent}.
+The gradient descent process is illustrated in figure
+\ref{fig:gradient descent}.
 
 \begin{linefigure}
 \begin{center}
@@ -322,23 +335,24 @@ The line search is illustrated in figure \ref{fig:gradient descent}.
 \begin{capt}{Schematic representation of gradient
 descent.}{fig:gradient descent}
 Points within the circle are in \calH, the height of the surface
-the value of (\ref{eqn:theory:cost function}) at that point.  (a) is a
-3D view, (b) is top view. Lines show line searches; markers
-minimums.  We descend from $\circ$ through $\Box$ to $\Diamond$, where
-the algorithm terminates due to a local minima.
+the value of $C(\bfx)$ at that point.  (a) is a 3D view, (b) is plan
+view. Lines show line searches; markers minima.  We descend from
+$\circ$ through $\Box$ to $\Diamond$, where the algorithm terminates
+due to a local minima.
 \end{capt}
 \end{linefigure}
 
 We will now show that AdaBoost implements gradient descent using the
-cost function $c(\alpha) = e^{-\alpha}$.  We do this by showing that
-gradient descent produces the same $b_t$ and $\bfw_t$ values as AdaBoost.
+cost function $c(\lambda) = e^{-\lambda}$.  We do this by showing that
+gradient descent produces the same $b_t$ and $\bfw_t$ values as
+AdaBoost.
 
-\begin{theorem}[AdaBoost implements gradient descent]
+\begin{theorem}[AdaBoost implements gradient descent \cite{Mason99}]
 The AdaBoost algorithm implements gradient descent over a margin cost
 function
 %
 \begin{equation}
-c(\alpha) = e^{-\alpha}
+c(\lambda) = e^{-\lambda}
 \end{equation}
 \end{theorem}
 
@@ -347,40 +361,38 @@ stopping conditions.  We will show that, given a state at iteration
 $t$, then boosting and gradient descent produce identical states at
 iteration $t+1$.
 
-Once the weaklearner has chosen $h_{t+1}$ using weighted empirical risk
-minimisation, we choose $w_{t+1}$ to minimise the cost functional
-along the line $F_t + b_{t+1} h_{t+1}$.  The value of the cost
-functional along this line is
+Once $\bbW$ has chosen $h_{t+1}$ using weighted empirical risk
+minimisation, we choose $b_{t+1} = \alpha^{\ast}$ that minimises the
+cost functional along the line $F_t + \alpha h_{t+1}$.  The value of
+the cost functional along this line is
 %
 \begin{equation}
-C = \sum_{i=1}^{m} c \left( y_i F_t(\bfx_i) + y_i b_{t+1}
+C = \sum_{i=1}^{m} c \left( y_i F_t(\bfx_i) + y_i \alpha
 h_{t+1}(\bfx_i) \right)
 \end{equation}
 %
 Substituting in $c(F(\bfx_i)) = e^{-yF(\bfx_i)}$, we obtain
 %
 \begin{equation}
-C = \sum_{i=1}^{m} \exp \left\{ y_i F_t(\bfx_i) + y_i b_{t+1}
+C = \sum_{i=1}^{m} \exp \left\{ y_i F_t(\bfx_i) + y_i \alpha
 h_{t+1}(\bfx_i) \right\}
 \label{eqn:cost functional along line}
 \end{equation}
 %
 We minimise (\ref{eqn:cost functional along line}) by
-differentiating and setting the derivative to zero.  The task is
-simplified considerably by noting that only the second half of the
-exponential term is variable with $b_{t+1}$.  The result is that
+differentiating with respect to $\alpha$ and setting the derivative to
+zero.  The task is simplified considerably by noting that only the
+second half of the exponential is a function of $\alpha$.  The result
+is that
 %
-\begin{eqnarray}
+\begin{equation}
 \label{eqn:differentiate}
-\frac{\partial C}{\partial b_{t+1}} &
-= & \sum_{i=1}^{m} \frac{\partial}{\partial b_{t+1}}
-\exp \left\{ y_i F_t(\bfx_i) + y_i b_{t+1}
-h_{t+1}(\bfx_i) \right\} \nonumber \\
-& = & \sum_{i=1}^{m} y_i \exp \left\{ y_i F_t(\bfx_i) + y_i b_{t+1}
-h_{t+1}(\bfx_i) \right\} 
-\end{eqnarray}
+\frac{\partial C}{\partial \alpha}
+= \sum_{i=1}^{m} y_i h_{t+1}(\bfx_i) \exp \left\{ y_i F_t(\bfx_i) +
+y_i \alpha \right\} = 0
+\end{equation}
 %
-We make several simplifications.  Noting that
+We make several algebraic simplifications.  Noting that
 %
 \begin{equation}
 y_i h_{t+1}(\bfx_i) = \left\{ 
@@ -388,40 +400,41 @@ y_i h_{t+1}(\bfx_i) = \left\{
 	1 &	\qquad \mbox{if $y_i = h_{t+1}(\bfx_i)$} \\
 	-1 &	\qquad \mbox{if $y_i \neq h_{t+1}(\bfx_i)$}
 	\end{array}
-\right.
+\right. 
 \end{equation}
 %
-and that $w_{t,i} = k \exp \{ -y_i F_t(x_i) \}$ where $k$ is some
+and that $w_{t,i} = k \exp \{ -y_i F_t(\bfx_i) \}$ where $k$ is some
 (normalising) constant, we recast (\ref{eqn:differentiate}) into
 the form 
 %
 \begin{equation}
 \overbrace{
 \underbrace{
-	\frac{\sum_{i : y_i = f_{t+1}(\bfx_i)} w_{i|t}}
-	     {\sum_{i : y_i \neq f_{t+1}(\bfx_i)} w_{i|t}}
+	\frac{\sum_{i : y_i = f_{t+1}(\bfx_i)} w_{t,i}}
+	     {\sum_{i : y_i \neq f_{t+1}(\bfx_i)} w_{t,i}}
 }_{\epsilon_t}
 }^{1 - \epsilon_t}
-= \exp \left\{ 2 b_{t+1} \right\} 
+= \exp \left\{ 2 \alpha^{\ast} \right\} 
 \end{equation}
 %
-from which it is simple algebra to obtain (\ref{eqn:theory:bt}).
-Thus, we update our state in the same manner as AdaBoost; therefore
-AdaBoost implements gradient descent.
+from which it is simple algebra to obtain $b_{t+1} = \alpha^{\ast}$,
+the classifier weight equation(\ref{eqn:theory:bt}). Thus, gradient
+descent updates the internal state in the same manner as AdaBoost;
+therefore AdaBoost implements gradient descent. 
 
-The cost functional $c(\alpha) = e^{-\alpha}$ is an approximation to
-the misclassification risk (\ref{eqn:misclassification risk}) that is
-differentiable at all points and leads to a closed-form solution for
-the step size.  It is plotted in figure \ref{fig:cost functional
-approximation}.  Other approximations have been used; see Mason
-et. al. \cite{Mason99} for details.
+The cost functional $c(\lambda) = e^{-\lambda}$ is an approximation to
+the misclassification risk (\ref{eqn:misclassification loss function})
+that is differentiable at all points and leads to a closed-form
+solution for the step size.  It is plotted in figure \ref{fig:cost
+functional approximation}.  Other approximations have been used; see
+Mason et. al. \cite{Mason99} for details.
 
 \begin{linefigure}
 \begin{center}
 \includegraphics{figures/cost_approx.epsg}
 \end{center}
 \begin{capt}{Approximation to the misclassification risk
-function}{fig:cost functional}
+function}{fig:cost functional approximation}
 The misclassification risk is plotted in the dotted line, with the
 AdaBoost approximation plotted in the solid line.  It is clear that
 the effect of this cost function will be to maximise the margins of
@@ -436,16 +449,16 @@ gradient descent.  There are four degrees of freedom which can be
 exploited to produce modified versions of gradient descent:
 %
 \begin{enumerate}
-\item	What is our universal set? (AdaBoost: $\co(\calH)$)
-\item	What is our inner product? (AdaBoost: equation (\ref{eqn:inner
+\item	Choice of universal set? (AdaBoost: $\co(\calH)$)
+\item	Choice of inner product? (AdaBoost: equation (\ref{eqn:inner
 	product definition}))
-\item	What is our cost function? (AdaBoost: $c(\alpha) =
+\item	Choice of cost function? (AdaBoost: $c(\alpha) =
 	e^{-\alpha}$)
-\item	How do we choose a step size? (AdaBoost: line search).
+\item	Method of choosing step size? (AdaBoost: line search).
 \end{enumerate}
 %
-In chapter \ref{chapter:development} we will consider changing some of
-these to implement algorithms with desirable properties.
+In chapter \ref{chapter:pboosting} we consider alternative choices to
+generate algorithms with desirable properties.
 
 
 \section{AdaBoost and Boosting algorithms}
@@ -456,25 +469,19 @@ algorithms are termed ``boosting algorithms''.
 
 There has recently been some debate over what constitutes a ``boosting
 algorithm''; see for example Duffy and Helmbold \cite{Duffy99} who
-adopt quite a restrictive definition.  In this thesis, we take a very
-broad definition:
-
-\begin{definition}[A boosting algorithm]
-Any learning machine that constructs a hypothesis that is a linear
-combination of base hypotheses by leveraging another learning machine
-in an interative manner is a boosting algorithm.
-\end{definition}
-
-In particular, we don't require that the training error be guaranteed
-to reach zero.  All algorithms considered in this thesis are,
-according to definition \ref{def:boosting}, boosting algorithms.
+adopt a quite restrictive definition.  In this thesis, we take a very
+broad definition, allowing any learning machine that is clearly
+operating in an ``AdaBoost-like'' manner to be called a ``boosting''
+algorithm.  In particular, we don't require that the training error be
+guaranteed to reach zero.
 
 
 \section{Properties of AdaBoost}
 
-We have covered the \emph{form} of the AdaBoost algorithm quite
-extensively.  We now cover the \emph{function} of the algorithm, so
-that we have a basis for comparison.
+We have covered the intrinsic properties of the AdaBoost algorithm quite
+extensively.  We now cover some extrinsic properties, allowing
+comparison of AdaBoost to other algorithms in chapter
+\ref{chapter:results}.
 
 \subsection{Convergence properties}
 

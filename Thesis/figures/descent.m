@@ -99,7 +99,7 @@ draw_on_surface(x, y, z, xmin2, ymin2, 'rd');
 axis([-2 2 -2 2 -16 16]);
 axis square;
 colormap white;
-title('\it{(a) Elevated view}');
+title('\(a) \sl{Elevated view}');
 xlabel('\it{x_1}');
 ylabel('\it{x_2}');
 zlabel('\it{C(\rm\bfx)}');
@@ -113,7 +113,7 @@ axis([-2 2 -2 2 -16 16]);
 shading flat;
 colormap(sqrt(gray));
 axis square;
-title('\it{(b) Top view}');
+title('(b) \sl{Plan view}');
 
 plot(xl, yl, 'r-');
 plot(xl2, yl2, 'r-');

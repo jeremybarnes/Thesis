@@ -12,21 +12,17 @@ result is a series of machine learning algorithms called
 \emph{$p$-boosting algorithms}.  These algorithms are developed,
 analysed and tested in later chapters.
 
-
-\section{Overview}
+\subsection*{Part I: Background}
 
 This introduction provides an overview of the rest of the thesis, and
 covers the bigger picture, describing the field of machine learning
-and its applications to practical problems.  The rest of the thesis
-may is composed of three four parts.
-
-\subsection*{Part I: Background}
+and its applications to practical problems.
 
 The next three chapters rapidly narrow the focus.  Chapter
 \ref{chapter:slt} describes the field of \emph{Statistical learning
 theory} (SLT)\footnote{A table of acronyms is provided in the
 preface.}, which provides much of the theoretical
-foundations of (but by no means encompasses) the field of machine
+foundation of (but by no means encompasses) the field of machine
 learning.  Assumptions of \emph{binary problems} and
 \emph{classification problems} further restrict the scope of the
 investigation.
@@ -34,24 +30,21 @@ investigation.
 Chapter \ref{chapter:stumps} provides a description of, and proves
 some properties of, a very simple learning algorithm called
 \emph{decision stumps} which fits within the restricted scope imposed
-by the first two chapters.  This learning algorithm
-is used as a basis for the more powerful Boosting algorithms described
-later.
+by the first two chapters.  This learning algorithm is used as a basis
+for the more powerful Boosting algorithms described later.
 
 With the necessary background in place, the \emph{Boosting} algorithm
 itself is the subject of chapter \ref{chapter:boosting}.  This
 algorithm forms the starting point for the original work that is
-considered in further chapters.  We consider what it means to
-``boost'', adopting a broad definition, and many properties of the
-Boosting algorithm are given.  Finally the \emph{problem} of overfitting in
-boosting is investigatied, as a prelude to the \emph{solutions}
-investigated in the second part of the thesis.
+considered in further chapters.  The \emph{problem} of overfitting in
+boosting is investigated, as a prelude to the \emph{solutions}
+investigated in the second part of the thesis. 
 
 
-\subsection*{Part 2: Theoretical investigation}
+\subsection*{Part II: New work}
 
-The key inventive step of the project thesis is the use of a
-\emph{$p$-convex hull} to reduce the problem of overfitting.  Chapter 
+The key inventive step of the project is the use of a \emph{$p$-convex
+hull} to reduce the problem of overfitting.  Chapter
 \ref{chapter:pboosting} investigates the theoretical justification
 behind this line of reasoning in some detail.  These abstract ideas
 are then developed into concrete algorithms, and properties of these
@@ -59,23 +52,17 @@ algorithms are considered.
 
 Chapter \ref{chapter:method} describes how these algorithms were
 tested.  Chapter \ref{chapter:results} details the main results of the
-project (more detail is available in the appendixes and the complete
-set of results on the attached CD-ROM inside the back cover).
-
-\subsection*{Part 3: Evaluation}
-
-The thesis concludes with a discussion (chapter
-\ref{chapter:discussion}) and a conclusion (chapter
-\ref{chapter:conclusion}.  These two sections evaulate the results
-obtained in the context of the project and in the broader scope of the
-field of machine learning and suggest avenues of further enquiry which
-may be fruitful.
+project, and discusses their significance and relation to the theory.
+A conclusion (chapter \ref{chapter:conclusion}) completes the thesis, 
+evaulating the results obtained in the context of the project and in
+the broader scope of the field of machine learning.  Suggestions of
+avenues further enquiry which may prove fruitful are also made.
 
 \section{The scheme of things}
 
-This section provides an overview of the context in which this project
-exists, starting very broadly and rapidly focusing on the immediate
-background.
+This section provides an overview of the context of this project,
+starting very broadly and rapidly focusing on the immediate
+background. 
 
 
 \subsection{Artificial intelligence}
@@ -83,22 +70,19 @@ background.
 The broadest possible subject area in which this work is contained is
 often described as \emph{artificial intelligence}.  This field
 essentially contains our efforts to make computers act in a similar
-manner to humans.
-
-This field encompasses a large body of history, philosophy and
+manner to humans, encompassing a large body of history, philosophy and
 knowledge (see, for example \cite{Penrose89}).  We will ignore much
-of this, and concentrate on efforts to make a computer ``think'' like
-a human.
+of this, and concentrate on efforts to make computers ``learn''.
 
 Early work in this field (from the 1950s to the 1980s) was based on
 the idea that intelligence can be emulated with a large set of rules.
 The systems generated as a result, known as \emph{expert systems},
 were huge databases of human-generated rules that were meant to
-represent the complete knowledge of a human expert on a particular
-domain.  These systems were reasonably successful at first, but became
-unwieldy as the number of rules increased (a large amount of effort is
-required to generate even the 1000 rules that were used in large
-expert systems in 1980). 
+represent the complete knowledge of a human expert over a particular
+problem domain.  These systems were reasonably successful at first,
+but became unwieldy as the number of rules increased (a large amount
+of effort is required to generate even the 1000 rules that were used
+in large expert systems in 1980). 
 
 The problem was more practical than theoretical: systems with large
 numbers of rules can theoretically learn any learnable problem to a
@@ -117,34 +101,35 @@ supervisor.  An example is trying to learn the likely outcome of a
 court case based upon details of similar cases (the ``supervisor''
 here is the information on the outcomes of cases on file).  All
 algorithms discussed in this thesis are supervised algorithms.
-\footnote{\emph{Unsupervised algorithms} are given a set of data and
-asked to learn a pattern in the data (for example, identifying
-interesting clumps of stars from telescope images).}
+\emph{Unsupervised algorithms} are given a set of data and asked to
+learn a pattern in the data (for example, identifying interesting
+clumps of stars from telescope images).
 
 
 \subsection{Statistical learning theory}
 
-Statistical learning theory provides the theoretical foundation upon
-which machine learning rests.  It provides a body of knowledge that
-allows bounds on the performance of learning algorithms to be
-generated.  Much of this theory can be attributed to V.M.Vapnik
-\cite{Vapnik98}.  Results from statistical learning theory enable us
-to design learning machines which we can be sure will learn a function
-that is close to the optimal.
+Machine learning rests upon the theoretical foundation of statistical
+learning theory (SLT).  It provides a body of knowledge that allows
+bounds on the performance of learning algorithms to be generated%
+\footnote{Much of this theory can be attributed to V.N.Vapnik
+\cite{Vapnik98}.}.
+Results from statistical learning theory enable us to be confident
+that learning machines will learn in a manner that is close to optimal.
 
 \subsection{Voting methods}
 
-\todo{Explain hypothesis vs algorithm (one sentence).}
-Boosting and $p$-boosting are both examples of \emph{voting methods},
-a relatively new class of algorithm which operates in a bootstrap-like
-manner by combining many ``weak''\footnote{A definition of a weak
-algorithm appears in chapter \ref{chapter:boosting}; as a rough guide any
-algorithm that is not a combination of other algorithms may be
-considered weak.} hypotheses to generate a composite hypothesis.  The
-success of these algorithms has been remarkable; as a result of these
-algorithms the focus of machine learning research in recent years to
-shifted away from the classical algorithms (all of which are more or
-less equal when boosted) and on to developments in voting methods.
+Boosting is an example of a \emph{voting method}, a relatively new
+class of algorithm which operates in a bootstrap-like 
+manner by combining many ``weak''%
+\footnote{Strictly, the term ``weak'' is used in an informal manner
+only; we call any non-voting method weak.  However, it is usually true
+that these weak algorithms perform significantly worse than voting
+methods.}
+hypotheses to generate a composite ``strong'' hypothesis.  Their success
+algorithms has been remarkable; as a result of these algorithms the
+focus of machine learning research in recent years has shifted from
+the classical algorithms (all of which are more or less equal when
+boosted) to developments in voting methods.
 
 These algorithms were initially observed to be immune to many of the
 problems of overfitting.  Recent results have indicated that this is
@@ -155,58 +140,32 @@ unfortunately not the case.
 
 Consider a telephone company that is interested in predicting whether
 its customers are likely to ``churn'' (change telephone companies) in
-the near future.  Such a telephone company may have a database with
-the data shown in table \ref{table:churn attributes} for several
-customers; this data can be used to train a learning machine.  
-The resultant learning machine can then be used to predict whether
-current customers are likely to churn (classify customers into
-``churn'' and ``not churn'' categories).  The company can then target
-these customers with special offers or improved service.
-This particular application will be revisited throughout the thesis.
-
-\begin{table}
-\newcommand{\szo}{\{0,1\}}
-\begin{center}
-\begin{tabular}{r l c l}
-\small
-{\bf No.} & {\bf Name} & {\bf Range} & {\bf Description} \\
-\hline
- 1 & length      & $\bbR$ & Weeks customer has been with telco \\
- 2 & area        & $\bbN$ & Telephone area code \\
- 3 & intnlp      & $\szo$ & Whether customer has international plan \\
- 4 & mailp       & $\szo$ & Whether customer has mail plan \\
- 5 & messages    & $\bbN$ & Number of voice mail messages \\
- 6 & daymin      & $\bbR$ & Number of day minutes \\
- 7 & daycalls    & $\bbN$ & Number of day calls \\
- 8 & daycost     & $\bbR$ & Total cost of day calls \\
- 9 & evemin      & $\bbR$ & Number of evening minutes \\
-10 & evecalls    & $\bbN$ & Number of evening calls \\
-$\vdots$ & $\vdots$ & $\vdots$ & $\vdots$ \\
-19 & churn       & $\szo$ & {\bf Whether customer ``churned''} \\
-\end{tabular}
-\end{center}
-\caption{Attributes of a the ``churn'' machine learning problem}
-\label{table:churn attributes}
-\end{table}
+the near future.  Such a telephone company will have a detailed
+database with customer statistics such as frequency of telephone
+usage, number of service calls, etc.  This data can be used to train a
+learning machine.   The resultant learning machine can then be used to
+predict whether current customers are likely to churn (classify
+customers into ``churn'' and ``not churn'' categories).  The company
+can then target these likely customers with special offers or improved
+service, thereby retaining their custom.
 
 \section{Issues in machine learning}
 
-Machine learning is a hard problem, and there are many issues
-involved.  A real-world example of many of these problems concerns
-efforts by the US army to detect tanks from photographs using a
-learning machine.  The training data was two sets of photographs of
-terrain; one set including tanks and the other without.  These
-photographs were taken at different times during the day.  When the
-learning machine was trained, it learned to detect differences in the
-sun position rather than the presence of tanks! Although the learning
-machine could classify the training data correctly, its generalisation
-ability was poor.
+Machine learning is a mathematically hard (ill-posed) problem, and
+there are many issues involved.  A real-world example of many of these
+problems%
+\footnote{Part of machine learning folklore.}
+concerns efforts by the US army to construct a learning machine to
+detect tanks from photographs.  The training data was two sets of
+photographs of terrain; one set including tanks and the other without.
+Each set of  photographs was taken at a different time during the day.
+When the learning machine was trained, it learned to detect
+differences in the sun position rather than the presence of tanks!
+Although the learning machine could classify the training data
+correctly, its generalisation ability was poor.
 
-This example illustrates the 
 Overfitting, simply put, is learning the specifics of a process too
-well to be able to apply the knowledge to a more general problem.
-A familiar example for many people would be driving a well-known route
-on ``auto-pilot'' and almost coming to grief on a new obstacle.  In
+well to be able to apply the knowledge to a more general problem.  In
 the context of machine learning, overfitting occurs when the learning
 machine adapts to peculiarities or noise in the input data, to the
 detriment of generalisation ability.

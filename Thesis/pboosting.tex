@@ -215,9 +215,12 @@ current hypothesis.
 \end{capt}
 \end{linefigure}
 
+\subsection{Classifier weights}
+
 Algebraicaly, we are seeking a minimum of the expression
 %
 \begin{equation}
+\label{eqn:classifier weight cost function approximation}
 C(F_{t+1}) = \sum_{i=1}^{m} \exp \left\{ -y_i F_{t+1}(\bfx_i) \right\}
 \end{equation}
 %
@@ -229,6 +232,7 @@ subject to the constraint that
 
 Substituting in the constraint, and performing some manipulations, we
 are looking for
+\todo{Emphasise that \emph{all} weights are updated, not just $b_{t+1}$.}
 %
 \begin{equation}
 b_{t+1} = \frac{\alpha}{\left( 1 + \alpha^p \right) ^ {1/p}}
@@ -252,14 +256,114 @@ Several technical points concerned with making the Netwon-Raphson
 method robust are addressed in appendix \ref{appendix:newton-raphson}
 and \cite{Heath97}.
 
+\subsection{Sample weights}
+
+As the strict algorithm is performing gradient descent, the sample
+weights are calculated using the results from theorem
+\ref{thm:gradient descent weights and direction}:
+%
+\begin{equation}
+w_{t,i} = \frac{C'(y_i F_t (\bfx_i))}{\sum_{j=1}^{m} C'(y_j
+F(\bfx_j))} = \frac{- \exp \{ y_i F_t (\bfx_i)\}}{\sum_{j=1}^{m} -
+\exp \{y_j F(\bfx_j)\}}
+\end{equation}
+
+\subsection{Existance of an optimal $b_{t+1}$ for $p < 1$}
+
 As we shall see in chapter \ref{chapter:results}, when $p < 1$ the
 strict $p$-boosting algorithm suffers from a cost surface that is in
 many cases strictly increasing along the $p$-convex hull after a
 handfull of iterations.  The problem with a strictly increasing cost
 function is that it results in $F_{t+1} = F_t$, and the algorithm must
-be aborted (or continue in steady state endlessly).  Thus, a
-simplification of the optimisation goal (\ref{eqn:strict minimise
-function}) was required.
+be aborted (or continue in steady state endlessly).
+
+In order to determine the mechanism through this phenomenon occurs,
+some very simple simulations were performed.  These simulations
+trained the strict algorithm with $p = \frac{1}{2}$ on a simple
+(random) dataset in $\bbR^2$ containing 10 samples.  It was observed
+that sometimes there was no optimal solution at $t=2$ (that is, 
+\emph{no} $p$-convex combination of the first two weaklearners produced a
+smaller cost than the first weaklearner only.  It was furthermore
+observed that a sufficient condition for there to be no solution was:
+%
+\begin{enumerate}
+\item	The weaklearner $h_1$ classified 9 out of 10 training samples
+	correctly; 
+\item	The weaklearner $h_2$ classified 8 out of 10 training samples
+	correctly, including the sample it classified
+	\emph{incorrectly} on the first round.
+\end{enumerate}
+%
+Furthermore, adjusting the $p$ parameter revealed that this behaviour
+occurred for $p \leq 0.6695$, and did \emph{not} occur for $p \geq
+0.6698$.  Thus, there appears to be a threshold value of $p$ above
+which this behaviour is not observed.
+
+Recalling that the cost functional $C(F)$ is the sum over the $m$
+training samples of the cost function approximation
+(\ref{eqn:classifier weight cost function approximation}), it is
+useful to look at the contribution of each \emph{sample} $S = (\bfx,
+y)$ to the total cost, as a function of $\alpha$:
+%
+\begin{equation}
+\label{eqn:sample cost function}
+c_S(\alpha, p) = \exp \left\{ \frac{-y F_t(\bfx) - \alpha y h_{t+1}
+(\bfx)}{(1 + \alpha^p)^{\frac{1}{p}}} \right\}
+\end{equation}
+%
+When $\alpha = 0$, (\ref{eqn:sample cost function}) reduces to
+%
+\begin{equation}
+c_S(0, p) = \exp \left\{ -y F_t(\bfx) \right\}
+\end{equation}
+%
+It is useful to consider the meaning behind each part of
+(\ref{eqn:sample cost function}).  The term $y F_t(\bfx)$ is simply
+the margin of the sample $S$ at iteration $t$.  We write this $m_{S,
+t}$.  The term $y \alpha f_{t+1}(\bfx)$ is equal to $\alpha$ if the
+weaklearner $h_{t+1}$ classifies $S$ correctly, or $-\alpha$
+otherwise.  The denominator $(1 + \alpha^p)^{\frac{1}{p}}$ is equal to
+$1$ at $\alpha=0$ and approaches $\alpha$ as $\alpha \rightarrow
+\infty$.
+
+When applied to our simple simulation, this analysis yields some
+insight into the processes that are occurring.  The margin
+$m_{(\bfx_i, y_i), 1}$ will have one of two values: $+1$ if
+$h_1(\bfx_i) = y_i$ and $-1$ otherwise.  Thus, the per-sample cost
+cost function $c_{(\bfx, y), 1}$ for a given $p$ and $\alpha$ will
+have one of four forms, depending the history of the sample:
+%
+\providecommand{\ra}{\rightarrow}
+\providecommand{\Pn}{(1 + \alpha^p)^{\frac{1}{p}}}
+\begin{equation}
+\begin{array}{rclrcl}
+c_(-1 \ra -1),i & = & \exp \left\{ \frac{ 1 + \alpha}{\Pn} \right\} &
+c_(-1 \ra +1),i & = & \exp \left\{ \frac{ 1 - \alpha}{\Pn} \right\} \\
+c_(+1 \ra -1),i & = & \exp \left\{ \frac{-1 + \alpha}{\Pn} \right\} &
+c_(+1 \ra +1),i & = & \exp \left\{ \frac{-1 - \alpha}{\Pn} \right\}
+\end{array}
+\end{equation}
+%
+where the subscript to $c$ gives the history of the correctness of
+weaklearners $h_1$ and $h_2$ in classifying the sample $(\bfx_i,
+y_i)$.  These functions are plotted against alpha in figure
+\ref{fig:alpha function}.
+
+\begin{linefigure}
+\begin{center}
+\includegraphics{figures/alpha_function.epsg}
+\end{center}
+\begin{capt}{Sample cost contributions}
+Parts (a) through (d) show the sample cost at iteration $t=2$ as a
+function of the history of the sample through weaklearners $h_1$ and
+$h_2$.
+\end{capt}
+\end{linefigure}
+
+The shape of the $(-1, +1)$ and $(+1, -1)$ curves is
+sensible: as $\alpha$ increases, samples which were wrong and are now
+classified correctly decrease in weight, while the opposite occurs for
+samples which were right and are now wrong.
 
 
 \subsection{Sloppy algorithm}
