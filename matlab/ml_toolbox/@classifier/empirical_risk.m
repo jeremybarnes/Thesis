@@ -1,4 +1,4 @@
-function Pe = empirical_risk(obj, x, y)
+function Pe = empirical_risk(obj, varargin)
 
 % EMPIRICAL_RISK calculate the empirical risk of a data set
 %
@@ -19,7 +19,10 @@ function Pe = empirical_risk(obj, x, y)
 % Jeremy Barnes, 4/4/1999
 % $Id$
 
+[x, y] = get_xy(obj, 'empirical_risk', varargin);
+
 this_y = classify(obj, x);
+
 errors = (this_y ~= y);
 
 Pe = sum(errors) ./ length(y);
