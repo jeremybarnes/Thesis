@@ -30,13 +30,6 @@ function obj = boost(weaklearner, maxiterations)
 % Jeremy Barnes, 22/4/1999
 % $Id$
 
-
-% PRECONDITIONS
-if (~isa(weaklearner, 'classifier'))
-   error('boost: weak learner must be a CLASSIFIER object');
-end
-
-
 parent = classifier(categories(weaklearner), dimensions(weaklearner));
 obj = struct(parent);
 
@@ -75,9 +68,3 @@ obj.b = zeros(1, maxiterations);
 % construct class and define superior/inferior relationship
 obj = class(obj, 'boost', parent);
 superiorto('double', 'classifier');
-
-
-% POSTCONDITIONS
-check_invariants(obj);
-
-return;
