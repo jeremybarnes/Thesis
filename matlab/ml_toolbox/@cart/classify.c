@@ -308,6 +308,7 @@ void mexFunction(int nlhs, mxArray_t *plhs[],
     /* Get our number of dimensions */
     call_matlab_1_1(&f_dimensions, "dimensions", obj);
     dimensions = (int)mxGetScalar(f_dimensions);
+    mxDestroyArray(f_dimensions);
 
     /* Get our tree structure */
     tree = mxGetField(obj, 0, "tree");
