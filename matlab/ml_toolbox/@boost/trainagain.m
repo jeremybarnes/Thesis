@@ -46,6 +46,7 @@ new_y = classify(new_c, x_data);
 % find if we need to abort
 if ((new_error == 0) | (new_error > 0.5 - eps))
    obj_r = abort(obj);
+   context.aborted = 1;
    return
 end
 
@@ -68,3 +69,4 @@ context.wl_instance = new_c;
 context.bt = bt;
 context.b = obj.b;
 context.w = new_w;
+context.aborted = 0;
