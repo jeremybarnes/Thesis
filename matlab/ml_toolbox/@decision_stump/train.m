@@ -35,7 +35,7 @@ function obj_r = train(obj, varargin)
 % that variable.  These are searched in a exhaustive fashion for the
 % optimal value.
 
-cat = numcategories(obj.categories);
+cat = numcategories(obj);
 s = size(x);
 dimensions = s(2);
 
