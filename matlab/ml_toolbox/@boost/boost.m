@@ -25,6 +25,13 @@ function obj = boost(weaklearner)
 % Jeremy Barnes, 22/4/1999
 % $Id$
 
+% Boosting algorithm as first argument --> just return a copy
+if (isa(weaklearner, 'boost'))
+   obj = weaklearner;
+   return
+end
+
+
 parent = classifier(categories(weaklearner), dimensions(weaklearner));
 
 % This is a template, which is trained at each boosting iteration
