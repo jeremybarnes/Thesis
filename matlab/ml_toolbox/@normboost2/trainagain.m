@@ -1,4 +1,4 @@
-function obj_r = trainagain(obj)
+function [obj_r, context] = trainagain(obj)
 
 % TRAINAGAIN perform another training iteration of the boosting algorithm
 %
@@ -11,11 +11,15 @@ function obj_r = trainagain(obj)
 % used to determine the initial relative importance of each training
 % sample in the dataset.
 %
+% [obj_r, context] = trainagain(obj)
+%
+% This form returns information designed to make the testing process more
+% efficient.  It is a struct array, with (at least) the fields 
 % RETURNS:
 %
 % A classifier that has had one more iteration of "boosting" performed on it
 
-% @normboost/trainagain.m
+% @normboost2/trainagain.m
 % Jeremy Barnes, 17/8/1999
 % $Id$
 
@@ -68,69 +72,24 @@ else
    % Calculate b_t using a line search.  This uses the Newton-Raphson method
    % to find the minimum.
 
-   % DEBUGGING CODE -- draw a graph so that we can follow the progress
-
-   alphas = linspace(0.01, 0.99);
-   all_c = zeros(size(alphas));
-   all_d = zeros(size(alphas));
-   all_d2 = zeros(size(alphas));
-
-   for i=1:length(alphas)
-      [all_c(i), all_d(i), all_d2(i), crap] = eval_cf(obj, new_c, ...
-						      alphas(i));
-   end
-   
-   % Calculate numerically to test that we got them right...
-   calc_alpha = (alphas(1:length(alphas)-1) + alphas(2:length(alphas))) / 2;
-   calc_d = diff(all_c) ./ diff(alphas);
-   calc_alpha2 = (calc_alpha(1:length(calc_alpha)-1) + ...
-		  calc_alpha(2:length(calc_alpha))) / 2;
-   calc_d2 = diff(calc_d) ./ diff(calc_alpha);
-   
-   figure(1);  clf;
-   subplot(3, 1, 1);  plot(alphas, all_c);   grid on;  hold on;
-   subplot(3, 1, 2);  plot(alphas, all_d);   grid on;  hold on;
-   plot(calc_alpha, calc_d, 'k-');
-   subplot(3, 1, 3);  plot(alphas, all_d2);  grid on;  hold on;
-   plot(calc_alpha2, calc_d2, 'k-');
-
-   % END DEBUGGING
-
    % Initialisation
    new_alpha = 0.5 / iterations(obj);
    d = 1;
 
    % Iterate
-
    while (abs(d) >= 0.001)
       alpha = new_alpha;
       
       [c, d, d2, marg] = eval_cf(obj, new_c, alpha);
-      c
-      d
-      d2
-
-      % DEBUGGING
-      
-      subplot(3, 1, 1);  plot(alpha, c, 'rx');
-      subplot(3, 1, 2);  plot(alpha, d, 'rx');
-      subplot(3, 1, 3);  plot(alpha, d2, 'rx');
-      
-      % END DEBUGGING
 
       % FIXME: need to gracefully handle d2 = 0
       
-      new_alpha = alpha - (d / d2)
-
-      pause;
+      new_alpha = alpha - (d / d2);
    end
 
    old_b = classifier_weights(obj);
-   new_b = [old_b alpha] ./ (1 + alpha.^p).^(1/p)
-   pnorm(new_b, p)
-
+   new_b = [old_b alpha] ./ (1 + alpha.^p).^(1/p);
 end
-
 
 % Update the sample weights.  These are calculated as the derivatives
 % of the cost _function_ (not functional) and then normalised with a
@@ -148,3 +107,8 @@ obj = add_iteration(obj, new_c, new_b, new_w);
 obj.margins = marg;
 
 obj_r = obj;
+
+
+context.wl_y = new_y;
+context.wl_instance = new_c;
+context.alpha = alpha;

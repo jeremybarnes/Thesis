@@ -57,10 +57,6 @@ test_res  = zeros(num_noise_values, num_p_values, numiterations);
 train_res = test_res;
 count_res = test_res;
 
-size(test_res)
-size(train_res)
-size(count_res)
-
 % The counter variables
 trial = 1;
 pvalue = 1;
@@ -87,16 +83,20 @@ for noisevalue=1:num_noise_values
 	 it = length(teste);
 	 padding = zeros(1, numiterations-it);
 	 counts = ones(1, it);
+
+	 test_add(1, 1, :) = [teste padding];
+	 train_add(1, 1, :) = [traine padding];
+	 count_add(1, 1, :) = [counts padding];
 	 
 	 % Update totals and count values
 	 test_res(noisevalue, pvalue, :) = ...
-	     test_res(noisevalue, pvalue, :) + [teste padding];
+	     test_res(noisevalue, pvalue, :) + test_add;
 
 	 train_res(noisevalue, pvalue, :) = ...
-	     train_res(noisevalue, pvalue, :) + [traine padding];
+	     train_res(noisevalue, pvalue, :) + train_add;
 	 
-	 count(noisevalue, pvalue, :) = ...
-	     count(noisevalue, pvalue, :) + [counts padding];
+	 count_res(noisevalue, pvalue, :) = ...
+	     count_res(noisevalue, pvalue, :) + count_add;
       end
    end
 end
@@ -104,15 +104,15 @@ end
 disp('Calculating averages...');
 
 % total / count = average
-test_res = test_res ./ count;
-train_res = train_res ./ count;
+test_res = test_res ./ count_res;
+train_res = train_res ./ count_res;
 
 disp('Saving...');
 
 % Save the file
 savefile = [DATA_SAVE_PATH '/' test '-summary.mat'];
 
-save(savefile, 'test_res', 'train_res', 'count', 'name', 'algorithm', ...
+save(savefile, 'test_res', 'train_res', 'count_res', 'name', 'algorithm', ...
      'p', 'dist', 'samples', 'noise', 'numiterations', 'trials');
 
 % Finished!

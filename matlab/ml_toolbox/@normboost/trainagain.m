@@ -153,8 +153,10 @@ else
       % FIXME: need to gracefully handle d2 = 0
       
       new_alpha = alpha - (d / d2)
-
-      pause;
+      if (DEBUG_TRAIN)
+	 new_alpha
+	 pause;
+      end
    end
 
    old_b = classifier_weights(obj);
