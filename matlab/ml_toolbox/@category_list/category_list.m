@@ -25,7 +25,11 @@ function obj = category_list(categories)
 % Jeremy Barnes, 3/4/1999
 % $Id$
 
-% PRECONDITIONS
+if (nargin == 0)
+   % Default: binary categories
+   categories = {'+1', '-1'};
+end
+
 if (length(categories) == 0)
    error('You must specify at least one category');
 end
@@ -33,7 +37,7 @@ end
 if (isa(categories, 'double') | isa(categories, 'char'))
    switch categories
       case 'binary'
-	 categories = {'false', 'true'};
+	 categories = {'+1', '-1'};
       otherwise,
 	 error(['classlabel: unknown class type "' categories '"']);
    end
