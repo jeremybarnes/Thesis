@@ -14,4 +14,4 @@ function c = numcategories(obj)
 % Jeremy Barnes, 18/8/1999
 % $Id$
 
-c = numcategories(categories(obj));
+c = obj.numcategories;

@@ -1,4 +1,4 @@
-function obj = dataset(categories, dimensions)
+function obj = dataset(numcategories, dimensions)
 
 % DATASET - dataset to be used in classification problem
 %
@@ -6,9 +6,9 @@ function obj = dataset(categories, dimensions)
 %
 % SYNTAX:
 %
-% d = dataset(categories, dimensions)
+% d = dataset(numcategories, dimensions)
 %
-% Generates an empty dataset, with the specified CATEGORIES, and the
+% Generates an empty dataset, with the specified NUMCATEGORIES, and the
 % specified number of DIMENSIONS.
 %
 % RETURNS:
@@ -27,7 +27,7 @@ end
 
 % Default values
 if (nargin == 0)
-   categories = category_list('binary');
+   numcategories = 2;
    dimensions = 2;
 elseif (nargin == 1)
    dimensions = 2;
@@ -37,15 +37,10 @@ if (dimensions < 1)
    error('dataset: Data must be at least one dimensional');
 end
 
-if (~(isa(categories, 'category_list')))
-   error('dataset: Categories must be a CATEGORY_LIST object');
-end
-
 % Set up our variables
-
 obj.initialised = 1;
 obj.dimensions = dimensions;
-obj.categories = categories;
+obj.numcategories = numcategories;
 
 obj.x_values = zeros(0, dimensions);
 obj.y_values = zeros(0, 1);

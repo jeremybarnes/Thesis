@@ -69,7 +69,7 @@ while (noisevalue <= length(noise))
 	 test_d = datagen(d, dist, 5000, 0, 0);
 	 
 	 % Create our weaklearner and boosting algorithm
-	 wl = decision_stump(category_list('binary'), 2);
+	 wl = decision_stump(2, 2);
 	 switch algorithm
 	    case 'boost'
 	       alg = boost(wl);

@@ -33,7 +33,7 @@ elseif (nargin == 0)
    weaklearner = decision_stump;
 end
 
-parent = classifier(categories(weaklearner), dimensions(weaklearner));
+parent = classifier(numcategories(weaklearner), dimensions(weaklearner));
 
 % This is a template, which is trained at each boosting iteration
 obj.weaklearner = weaklearner;
