@@ -26,6 +26,8 @@ dimensions = 2;
 x = [];
 y = [];
 
+filename = [filename '.mat'];
+
 load_error = 0;
 eval('load(filename, ''x'', ''y'', ''numcategories'', ''dimensions'');' ...
      , 'load_error = 1;');
