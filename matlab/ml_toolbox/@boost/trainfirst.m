@@ -20,24 +20,14 @@ function obj_r = trainfirst(obj, varargin)
 % Jeremy Barnes, 25/4/1999
 % $Id$
 
-% PRECONDITIONS
-% none
-
 [obj.x, obj.y, w] = get_xyw(obj, 'trainonce', varargin);
-
 
 % Normalise our w vector
 obj.w = w ./ sum(w);
 
+obj = trainagain(obj);
 
-obj_r = trainagain(obj);
-
-
-% POSTCONDITIONS
-check_invariants(obj_r);
-
-return;
-
+obj_r = obj;
 
 
 
