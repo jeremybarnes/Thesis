@@ -1,10 +1,13 @@
-function [trained, train_err, test_err] = test(obj, traind, testd, iterations,option)
+function [trained, train_err, test_err, best_weights, best_margins, ...
+	  end_weights, end_margins] ...
+      = test(obj, traind, testd, iterations, option)
 
 % TEST test a BOOST object
 %
 % SYNTAX:
 %
-% [trained, train_err, test_err] = test(obj, traind, testd, iterations)
+% [trained, train_err, test_err, best_weights, best_margins, end_weights,
+%  end_margins] = test(obj, traind, testd, iterations)
 %
 % This function exhaustively tests a boost object.  It does this by
 % training OBJ many times (ITERATIONS times or until training gets
@@ -34,9 +37,20 @@ function [trained, train_err, test_err] = test(obj, traind, testd, iterations,op
 % TRAIN_ERR is the same size as TEST_ERR, but contains the results of
 % testing on the test dataset TESTD.
 %
+% BEST_WEIGHTS returns the classifier weights at the best iteration (the
+% one with the least test error).  BEST_MARGINS returns the margins at
+% this iteration.
+%
+% END_WEIGHTS and END_MARGINS are similar but return these quantities
+% after the _last_ iteration.  This is designed to give an appreciation
+% for the limiting behaviour.
+%
 % LIMITATIONS:
 %
-% Currently, it is only sped up for binary classifiers.
+% * Currently, it is only sped up for binary classifiers.
+% * The best/end training errors/margins are not available for the slow
+%   version.
+
 
 % @boost/test.m
 % Jeremy Barnes, 22/9/1999
@@ -72,6 +86,7 @@ iter = 1;
 
 nosave = strcmp(option, 'nosave');
 obj.nosave = nosave;
+best_test_err = inf; % real bad
 
 if ((numcategories(obj) == 2) & (~strcmp(option, 'slow')))
    % Binary classifier
@@ -79,9 +94,19 @@ if ((numcategories(obj) == 2) & (~strcmp(option, 'slow')))
    % Initialisation
    train_margins = zeros(size(trainy));
    test_margins = zeros(size(testy));
+
+   % Set up in case we abort on the first iteration
+   best_weights = [];
+   end_weights = [];
+   best_margins = test_margins;
+   end_margins = test_margins;
    
    % First round of training
    [obj, context] = trainfirst(obj, trainx, trainy);
+   if (aborted(obj))
+      trained = obj;
+      return;
+   end
    
    this_wl = context.wl_instance;
    wl_train_y = context.wl_y;
@@ -100,9 +125,14 @@ if ((numcategories(obj) == 2) & (~strcmp(option, 'slow')))
 	 disp(['iteration ' num2str(iter)]);
       end
       
-      % Continue training
+      % Continue training...
       [obj, context] = trainagain(obj);
-   
+      
+      % ... but not if training aborted
+      if (aborted(obj))
+	 break;
+      end
+      
       this_wl = context.wl_instance;
       wl_train_y = context.wl_y;
       wl_test_y = classify(this_wl, testx);
@@ -114,9 +144,18 @@ if ((numcategories(obj) == 2) & (~strcmp(option, 'slow')))
       % Calculate errors
       train_err(iter) = sum((train_margins > 0) ~= trainy) / length(trainy);
       test_err (iter) = sum((test_margins  > 0) ~= testy) / length(testy);
-   
+
+      if (test_err < best_test_err)
+	 best_test_err = test_err;
+	 best_margins = train_margins;
+	 best_weights = classifier_weights(obj);
+      end
+      
       iter = iter + 1;
    end
+
+   end_weights = obj.classifier_weights;
+   end_margins = train_margins;
    
 else
    % Not a binary classifier
