@@ -51,7 +51,7 @@ for name_num=1:length(usernames)
 	    disp(filename);
 	    
 	    eval_error = 0;
-	    eval('img = load_pgm(filename);', 'eval_error = 1');
+	    eval('img = load_pgm(filename);', 'eval_error = 1;');
 	    if (~eval_error)
 	       xvalues = [xvalues; img(:)];
 	       yvalues = [yvalues; name_num-1 dir_num-1 expression_num-1 ...
@@ -70,13 +70,13 @@ numcategories = length(usernames);
 save('faces-name', 'x', 'y', 'dimensions', 'numcategories');
 
 y = yvalues(:, 2);
-numcategories = length(expressionss);
-save('faces-expression', 'x', 'y', 'dimensions', 'numcategories');
+numcategories = length(directions);
+save('faces-direction', 'x', 'y', 'dimensions', 'numcategories');
 
 y = yvalues(:, 3);
-numcategories = length(eyes);
-save('faces-sunglasses', 'x', 'y', 'dimensions', 'numcategories');
+numcategories = length(expressions);
+save('faces-expression', 'x', 'y', 'dimensions', 'numcategories');
 
 y = yvalues(:, 4);
-numcategories = length(usernames);
-save('faces-name', 'x', 'y', 'dimensions', 'numcategories');
+numcategories = length(eyes);
+save('faces-sunglasses', 'x', 'y', 'dimensions', 'numcategories');
