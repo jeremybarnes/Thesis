@@ -42,11 +42,6 @@ dimensions = s(2);
 [var, val, leftcat, rightcat] = train_guts(obj, x, y, w, dimensions, ...
 						  cat);
 
-% Check for a stupid classifier
-if (leftcat == rightcat)
-   warning('train: useless decision stump returned');
-end
-
 % We now know which variable to split on
 obj.splitvar = var;
 obj.splitval = val;
