@@ -19,8 +19,6 @@ function obj = dataset(categories, dimensions)
 % Jeremy Barnes, 2/4/1999
 % $Id$
 
-
-% PRECONDITIONS
 if (dimensions < 1)
    error('dataset: Data must be at least one dimensional');
 end
@@ -44,6 +42,3 @@ obj.numsamples = 0;
 obj = class(obj, 'dataset');
 
 superiorto('double');
-
-% POSTCONDITIONS
-check_invariants(obj);
