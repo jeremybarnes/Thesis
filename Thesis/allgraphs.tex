@@ -5,13 +5,94 @@
 % This file provides about 10 million graphs which cover pretty much all
 % the information.
 
+\newcommand{\ig}[1]{\hspace*{-1cm}\includegraphics{t:/figures/#1.eps}}
+
 \chapter{Detailed results}
 \label{appendix:allgraphs}
 
+This appendix includes all test/training curves, and scatterplots of
+the best test error against $p$, and the best test iteration against
+$p$.  Axis labels are neglected in order to avoid clutter.
+
+The training curves are averages over all trials.  The $x$ axis is
+trial number; the $y$ axis is test or training error.  Test error is
+the black curve; training error is the grey curve.  The number of
+trials completing a certain number of iterations is plotted in the
+dashed line, on the right hand scale.
+
+The best test error and best test iteration curves show the scatter
+over all trials.  The $x$ axis is the $p$ value; the $y$ axis the best
+test error or number of iterations at which this occurs.
+
+The thin lines indicate averages (these are also plotted in figure
+\ref{fig:effect of p}).  The dotted line indicates one standard
+deviation above and below.  The thick line indicates AdaBoost's result
+over that training set, with the thick dotted line one standard
+deviation above and below.
+
 \section{AdaBoost}
+
+\ig{boost-summary}
 
 \section{Strict}
 
+\subsection*{Best test error vs $p$}
+
+\ig{strict-err-summary}
+
+\subsection*{Best test iter vs $p$}
+
+\ig{strict-iter-summary}
+
+\subsection*{Training curves}
+
+\subsubsection*{\ds{ring0}}\ig{strict-ring0}
+\subsubsection*{\ds{ring10}}\ig{strict-ring10}
+\subsubsection*{\ds{ring20}}\ig{strict-ring20}
+\subsubsection*{\ds{ring30}}\ig{strict-ring30}
+\subsubsection*{\ds{sonar}}\ig{strict-sonar}
+\subsubsection*{\ds{wpbc}}\ig{strict-wpbc}
+\subsubsection*{\ds{acacia}}\ig{strict-acacia}
+
+
+
 \section{Sloppy}
 
+\subsection*{Best test error vs $p$}
+
+\ig{sloppy-err-summary}
+
+\subsection*{Best test iter vs $p$}
+
+\ig{sloppy-iter-summary}
+
+\subsection*{Training curves}
+
+\subsubsection*{\ds{ring0}}\ig{sloppy-ring0}
+\subsubsection*{\ds{ring10}}\ig{sloppy-ring10}
+\subsubsection*{\ds{ring20}}\ig{sloppy-ring20}
+\subsubsection*{\ds{ring30}}\ig{sloppy-ring30}
+\subsubsection*{\ds{sonar}}\ig{sloppy-sonar}
+\subsubsection*{\ds{wpbc}}\ig{sloppy-wpbc}
+\subsubsection*{\ds{acacia}}\ig{sloppy-acacia}
+
+
 \section{Na\"{\i}ve}
+
+
+\subsection*{Best test error vs $p$}
+
+\ig{naive-err-summary}
+
+\subsection*{Best test iter vs $p$}
+
+\ig{naive-iter-summary}
+
+\subsection*{Training curves}
+
+\subsubsection*{\ds{ring0}}\ig{naive-ring0}
+\subsubsection*{\ds{ring10}}\ig{naive-ring10}
+\subsubsection*{\ds{ring20}}\ig{naive-ring20}
+\subsubsection*{\ds{ring30}}\ig{naive-ring30}
+\subsubsection*{\ds{sonar}}\ig{naive-sonar}
+

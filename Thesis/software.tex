@@ -43,6 +43,10 @@ dataplot	& Generate a plot of the dataset \\
 
 \subsection{Classifier}
 
+The classifier type is the ancestor of all of the learning machines.
+The following functions apply to both the classifier type and all of
+its descendent types.
+
 \begin{tabular}{ll}
 \hline
 classifier		& Create a classifier object \\
@@ -66,6 +70,10 @@ plot\_decision\_boundary	& Approximate and plot decision boundary from margins \
 
 
 \subsection{CART}
+
+The CART classifier is a full decision-tree based algorithm (a
+generalisation of Decision Stumps).  In addition to the functions
+inherited from classifier, it includes the following functions.
 
 \begin{tabular}{ll}
 \hline
