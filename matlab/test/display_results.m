@@ -79,6 +79,7 @@ opt.comparewith = [];
 opt.stdev_curves = 1;
 opt.errorbars = 0;
 opt.display_counts = 0;
+opt.showminimum = 0;
 
 % Parse our options
 for i=1:length(varargin)./2
@@ -126,6 +127,8 @@ for i=1:length(varargin)./2
 	 opt.errorbars = opt_value;
       case 'display_counts'
 	 opt.display_counts = opt_value;
+      case 'show_minimum'
+	 opt.showminimum = opt_value;
       otherwise,
 	 error(['Unknown option ''' opt_name '''.']);
    end
@@ -211,6 +214,10 @@ switch type
 	    train_d = permute(train_mean(noisevalue, pvalue, :), [3 1 2]);
 	    test_d  = permute(test_mean (noisevalue, pvalue, :), [3 1 2]);
 	    count_d = permute(counts    (noisevalue, pvalue, :), [3 1 2]); 
+
+	    min_iter = find(test_d == min(test_d));
+	    min_iter = min_iter(1);
+	    min_error = test_d(min_iter);
 	    
 	    graphtitle = parse_title(opt.title_format, current_noise, ...
 				     current_p, status.current_subplot);
@@ -296,6 +303,13 @@ switch type
 	       ax(4) = opt.y_range(2);
 	       axis(ax);
 	    end
+	    
+	    if (opt.showminimum)
+	       plot(min_iter, min_error, 'ko', 'markersize', 10);
+	       plot([1 min_iter], [min_error, min_error], 'k-.');
+	       plot([min_iter min_iter], [0 min_error], 'k-.');
+	    end
+
 	    
 	    grid(opt.gridtype);
 	 end
