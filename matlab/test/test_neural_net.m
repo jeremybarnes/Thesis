@@ -8,7 +8,11 @@ function test_neural_net
 
 % We create a simple classifier which learns a binary relationship
 
-train_data_x = [1 0 0 0; 0 1 0 0; 0 0 1 0; 0 0 0 1];
+train_data_x = [1 0 0 0; ...
+		0 1 0 0; ...
+		0 0 1 0; ...
+		0 0 0 1];
+
 train_data_y = [0; 1; 2; 3];
 
 nn = neural_net(2, 4, 4);
