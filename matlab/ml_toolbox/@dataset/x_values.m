@@ -11,7 +11,7 @@ function x = x_values(obj)
 % An array of size (NUMSAMPLES x DIMENSIONS) is returned, which contains
 % all of the independent (x) values of the data, one sample per row.
 
-% samples.m
+% @dataset/x_values.m
 % Jeremy Barnes, 3/4/1999
 % $Id$
 
