@@ -89,9 +89,9 @@ switch(categories)
 end
 
 
-if (model == 'subtractive')
+%if (model == 'subtractive')
 %   color_map = cmy2rgb(color_map);
-end
+%end
       
 
 

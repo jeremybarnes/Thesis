@@ -1,4 +1,4 @@
-function testcart(datatype, numpoints, cost_fn, maxdepth)
+function newc = testcart(datatype, numpoints, cost_fn, maxdepth)
 
 % TESTCART test out the CART classifier
 %
@@ -33,15 +33,27 @@ function testcart(datatype, numpoints, cost_fn, maxdepth)
 
 binary = category_list('binary');
 d = dataset(binary, 2);
-data = datagen(d, datatype, numpoints, 0, 0);
+
+train_data = datagen(d, datatype, numpoints, 0, 0);
+test_data  = datagen(d, datatype, numpoints, 0, 0);
 
 c = cart(binary, 2, cost_fn, maxdepth);
 
-newc = train(c, data);
+tic; newc = train(c, train_data); toc
 printtree(newc);
 
 figure(1);
 clf;
 
-dataplot(data)
+dataplot(train_data);
 plottree(newc, [1 1; 0 0]);
+
+x = x_values(test_data);
+y = classify(newc, x);
+
+categorised = addsamples(d, x, y);
+hold on;
+dataplot(categorised, 'g+', 'k*');
+
+train_error = training_error(newc)
+class_error = classification_error(newc, test_data)

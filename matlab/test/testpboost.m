@@ -40,7 +40,7 @@ end
 
 
 % Construct our boosting objects
-pvalues = [1 2 4 8 16 32 64 128];
+pvalues = [0.4 0.6 0.8 1.0 1.2 1.4];
 %pvalues = [1.00 1.00 1.00 1.00 1.00];
 %pvalues = [0.50 0.55 0.60 0.65 0.70 0.75];
 %pvalues = [0.60 0.61 0.62 0.63 0.64 0.65];
