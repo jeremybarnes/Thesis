@@ -2,7 +2,7 @@ function overfitting
 
 global EPSFILENAME
 
-figure(1);  clf;
+figure(1);  clf;  setup_figure;
 
 % Parameters
 yint = 2;
@@ -28,19 +28,27 @@ fit10 = polyval(p10, fitx);
 
 
 % Draw graphs
-subplot(1, 2, 1);
+subplot(1, 2, 1);  setup_axis;
 plot(x, ynoise, 'kx');  hold on;
 plot([0 10], [yint yint+10*slope], 'k--');
 plot(fitx, fit2, 'k-');
 title('(a)');
 axis([0 10 -2 8]);
+xlabel('\it{x_1}');
+ylabel('\it{x_2}');
+set(gca, 'xtick', [], 'ytick', []);
 
-subplot(1, 2, 2);
+
+subplot(1, 2, 2);  setup_axis;
 plot(x, ynoise, 'kx');  hold on;
 plot([0 10], [yint yint+10*slope], 'k--');
 plot(fitx, fit10, 'k-');
 title('(b)');
 axis([0 10 -2 8]);
+xlabel('\it{x_1}');
+ylabel('\it{x_2}');
+set(gca, 'xtick', [], 'ytick', []);
+
 
 
 

@@ -57,14 +57,18 @@ are then developed into concrete algorithms, and properties of these
 algorithms are considered.
 
 Chapter \ref{chapter:method} describes how these algorithms were
-tested.  Chapter \ref{chapter:results} details the results of the
-investigations.
+tested.  Chapter \ref{chapter:results} details the main results of the
+project (more detail is available in the appendixes and the complete
+set of results on the attached CD-ROM inside the back cover).
 
-\subsection*{Part 3: Discussions and conclusion}
+\subsection*{Part 3: Evaluation}
 
-The chapters in this part evaluate the project.  (I'll fill this in
-when I've done it...)
-
+The thesis concludes with a discussion (chapter
+\ref{chapter:discussion}) and a conclusion (chapter
+\ref{chapter:conclusion}.  These two sections evaulate the results
+obtained in the context of the project and in the broader scope of the
+field of machine learning and suggest avenues of further enquiry which
+may be fruitful.
 
 \section{The scheme of things}
 
@@ -123,7 +127,7 @@ Statistical learning theory provides the theoretical foundation upon
 which machine learning rests.  It provides a body of knowledge that
 allows bounds on the performance of learning algorithms to be
 generated.  Much of this theory can be attributed to V.M.Vapnik
-\cite{Vapnik95}.  Results from statistical learning theory enable us
+\cite{Vapnik98}.  Results from statistical learning theory enable us
 to design learning machines which we can be sure will learn a function
 that is close to the optimal.
 
@@ -145,25 +149,27 @@ These algorithms were initially observed to be immune to many of the
 problems of overfitting.  Recent results have indicated that this is
 unfortunately not the case.
 
-\subsection{A real-world machine learning problem}
+\subsection{A real-world application}
+\label{sec:churn example}
 
 Consider a telephone company that is interested in predicting whether
 its customers are likely to ``churn'' (change telephone companies) in
-the near future.  Such a telephone company may have a dataset with
+the near future.  Such a telephone company may have a database with
 the data shown in table \ref{table:churn attributes} for several
-customers.
-
-The machine learning problem is to generate a machine that can
-accurately predict whether current and future customers are likely to
-churn, given this training data.  This problem will be revisited
-throughout the thesis.
+customers; this data can be used to train a learning machine.  
+The resultant learning machine can then be used to predict whether
+current customers are likely to churn (classify customers into
+``churn'' and ``not churn'' categories).  The company can then target
+these customers with special offers or improved service.
+This particular application will be revisited throughout the thesis.
 
 \begin{table}
 \newcommand{\szo}{\{0,1\}}
-\begin{tabular}{r l l l}
-\hline
+\begin{center}
+\begin{tabular}{r l c l}
+\small
 {\bf No.} & {\bf Name} & {\bf Range} & {\bf Description} \\
-\hline\hline
+\hline
  1 & length      & $\bbR$ & Weeks customer has been with telco \\
  2 & area        & $\bbN$ & Telephone area code \\
  3 & intnlp      & $\szo$ & Whether customer has international plan \\
@@ -175,31 +181,34 @@ throughout the thesis.
  9 & evemin      & $\bbR$ & Number of evening minutes \\
 10 & evecalls    & $\bbN$ & Number of evening calls \\
 $\vdots$ & $\vdots$ & $\vdots$ & $\vdots$ \\
-
-11 & evecost     & $\bbR$ & Total cost of evening calls \\
-12 & nightmin    & $\bbR$ & Number of night minutes \\
-13 & nightcalls  & $\bbN$ & Number of night calls \\
-14 & nightcost   & $\bbR$ & Total cost of night calls \\
-15 & intlmin     & $\bbR$ & Number of inernational minutes \\
-16 & intlcalls   & $\bbN$ & Number of international calls \\
-17 & intlcost    & $\bbR$ & Total cost of international calls \\
-18 & servicecalls& $\bbN$ & Number of service calls \\
 19 & churn       & $\szo$ & {\bf Whether customer ``churned''} \\
-\hline
 \end{tabular}
-\caption{Attributes of a telephone company ``churn'' dataset}
+\end{center}
+\caption{Attributes of a the ``churn'' machine learning problem}
 \label{table:churn attributes}
 \end{table}
 
-\section{Overfitting}
+\section{Issues in machine learning}
 
+Machine learning is a hard problem, and there are many issues
+involved.  A real-world example of many of these problems concerns
+efforts by the US army to detect tanks from photographs using a
+learning machine.  The training data was two sets of photographs of
+terrain; one set including tanks and the other without.  These
+photographs were taken at different times during the day.  When the
+learning machine was trained, it learned to detect differences in the
+sun position rather than the presence of tanks! Although the learning
+machine could classify the training data correctly, its generalisation
+ability was poor.
+
+This example illustrates the 
 Overfitting, simply put, is learning the specifics of a process too
 well to be able to apply the knowledge to a more general problem.
 A familiar example for many people would be driving a well-known route
 on ``auto-pilot'' and almost coming to grief on a new obstacle.  In
 the context of machine learning, overfitting occurs when the learning
 machine adapts to peculiarities or noise in the input data, to the
-detriment of generalisation ability.  \todo{Better expression!}
+detriment of generalisation ability.
 
 Statistical learning theory gives us a theoretical reason for
 overfitting, and also an insight into how it may be avoided.  In
@@ -209,7 +218,7 @@ that the learning machine may generate we can avoid overfitting.
 
 \section{Original work}
 
-The original work of this thesis is motivated by observations of a
+The original work of this project is motivated by observations of a
 theoretical bound on overfitting; and in particular on a method of
 reducing overfitting in the boosting algorithm.  This theory is first
 developed into several practical algorithms; these algorithms are then

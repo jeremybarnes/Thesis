@@ -189,7 +189,8 @@ This function is plotted in figure \ref{fig:b function}.
 \begin{center}
 \includegraphics{figures/classifier_weights.epsg}
 \end{center}
-\begin{capt}{Classifier weights against weighted training error}
+\begin{capt}{Classifier weights against weighted training error}{fig:b
+function}
 When $\epsilon_t = 1/2$, the classifier only does as well as random
 guessing, and $b_t = 0$.  As $\epsilon_t$ approaches zero, $b_t$
 increases without bound.  The effect is that $F$ becomes dominated by
@@ -224,7 +225,7 @@ This function has the following effect on distribution of weights:
 \begin{center}
 \includegraphics{figures/sample_weights.epsg}
 \end{center}
-\begin{capt}{Evolution of sample weights}
+\begin{capt}{Evolution of sample weights}{fig:sample weights}
 The figure shows the evolution of the sample weights from (a) 10
 iterations to (b) 100 iterations of boosting over a set of training
 data in $\bbR^2$.  The sample weight at a point is proportional to the
@@ -238,9 +239,7 @@ increase in weight, and those far from it to decrease.  This forces
 the algorithm to concentrate on the hard samples, and is one reason
 why it works well on low-noise datasets.  Unfortunately, those samples
 corrupted by noise are usually hard also, and concentrating on those
-is not desirable. (clarify)
-
-\subsection{Summary}
+is not desirable.
 
 
 \section{Boosting as gradient descent}
@@ -354,14 +353,14 @@ illustrated in figure \ref{fig:gradient descent}.
 \begin{center}
 \includegraphics{figures/descent.epsg}
 \end{center}
-\begin{capt}{Schematic representation of gradient descent.}
+\begin{capt}{Schematic representation of gradient
+descent.}{fig:gradient descent}
 Points within the circle are in \calH, the height of the surface
 the value of (\ref{eqn:theory:cost function}) at that point.  (a) is a
 3D view, (b) is top view. Lines show line searches; markers
 minimums.  We descend from $\circ$ through $\Box$ to $\Diamond$, where
 the algorithm terminates due to a local minima.
 \end{capt}
-\label{fig:gradient descent}
 \end{linefigure}
 
 This statement is formalised in the following theorem.
@@ -448,13 +447,13 @@ et. al. \cite{Mason99} for details.
 \begin{center}
 \includegraphics{figures/cost_approx.epsg}
 \end{center}
-\begin{capt}{Approximation to the misclassification risk function}
+\begin{capt}{Approximation to the misclassification risk
+function}{fig:cost functional}
 The misclassification risk is plotted in the dotted line, with the
 AdaBoost approximation plotted in the solid line.  It is clear that
 the effect of this cost function will be to maximise the margins of
 the samples.
 \end{capt}
-\label{fig:cost functional}
 \end{linefigure}
 
 \subsection{Summary}

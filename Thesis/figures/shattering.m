@@ -23,7 +23,7 @@ plot(three_points_x, three_points_y, 'k.', 'MarkerSize', 15);  hold on;
 plot([0 1], [0 1], 'k--');
 plot([0 0.8], [0.8 0], 'k--');
 plot([0.5 0.5], [0 1], 'k--');
-title('(a) \bf{Three points}');
+title('(a) \sl{Three points}');
 set(gca, 'xtick', [], 'ytick', []);
 xlabel('\itx_1');  ylabel('\itx_2');
 axis square;
@@ -34,7 +34,7 @@ plot([0.5 0.5], [0.3 0.7], 'ko');
 axis([0 1 0 1]);
 xlabel('\itx_1');  ylabel('\itx_2');
 set(gca, 'xtick', [], 'ytick', []);
-title('(b) \bf{Four points}');
+title('(b) \sl{Four points}');
 axis square;
 
 set(1, 'paperposition', [0 0 6 2.5]);

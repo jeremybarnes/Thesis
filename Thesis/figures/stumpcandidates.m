@@ -30,7 +30,7 @@ end
 
 for i=1:length(xcand)
    x = xcand(i);
-   plot(x, 0, 'k.');
+   plot(x, 0, 'k.', 'markersize', 20);
 end
 
 xlabel('x_1');  ylabel('x_2');  title('(a)');
@@ -52,7 +52,7 @@ end
 
 for i=1:length(xcand)
    y = ycand(i);
-   plot(0, y, 'k.');
+   plot(0, y, 'k.', 'markersize', 20);
 end
 
 xlabel('x_1');  ylabel('x_2');  title('(b)');

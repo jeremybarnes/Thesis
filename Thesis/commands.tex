@@ -12,7 +12,7 @@
 \providecommand{\co}{\ensuremath{\mathrm{co}}}
 \providecommand{\bfx}{\ensuremath{\mathbf{x}}}
 \providecommand{\bfy}{\ensuremath{\mathbf{y}}}
-\providecommand{\bfyh}{\ensuremath{\hat{\mathbf{y}}}}
+\providecommand{\yh}{\ensuremath{\hat{y}}}
 \providecommand{\calO}{\ensuremath{\mathcal{O}}}
 \providecommand{\calI}{\ensuremath{\mathcal{I}}}
 \providecommand{\calH}{\ensuremath{\mathcal{H}}}
@@ -32,6 +32,7 @@
 \providecommand{\bbB}{\ensuremath{\mathbb{B}}}
 \providecommand{\bbN}{\ensuremath{\mathbb{N}}}
 \providecommand{\trainboost}{\stackrel{\bbB}{\Longrightarrow}}
+\providecommand{\hh}{\hat{h}}
 
 % Theorem-like constructs
 \newtheorem{theorem}{Theorem}
@@ -46,5 +47,5 @@
 		{\begin{figure} \rule{\textwidth}{\figlinewidth}}%
 		{\rule{\textwidth}{\figlinewidth}\end{figure}}
 
-\newenvironment{capt}[1]%
-	{\caption{#1}\begin{minipage}[t]{\textwidth}\sl}{\end{minipage}}
+\newenvironment{capt}[2]%
+	{\caption{#1}\label{#2}\begin{minipage}[t]{\textwidth}\sl}{\end{minipage}}

@@ -3,6 +3,7 @@
 % $Id$
 
 \chapter{$p$-boosting}
+\label{chapter:pboosting}
 
 This chapter describes the concepts behind and a theoretical
 justification of \emph{$p$-boosting}, a generalisation of the boosting
@@ -76,11 +77,10 @@ effect of $p$ is plotted figure \ref{fig:naive b values}.
 \begin{center}
 \includegraphics{figures/naive.epsg}
 \end{center}
-\begin{capt}{Effect of $p$ on classifier weights for naive algorithm}
+\begin{capt}{Effect of $p$ on classifier weights for naive algorithm}{fig:naive b values}
 The three lines show $b_t$ against $\epsilon_t$ for $p \in \{ 0.5,
 0.7. 1.0 \}$.
 \end{capt}
-\label{fig:naive b values}
 \end{linefigure}
 
 There are two options for updating the sample weights $w$: based upon
@@ -128,12 +128,11 @@ illustrated in figure \ref{fig:strict line search}.
 \begin{center}
 \includegraphics{figures/strict_search.epsg}
 \end{center}
-\begin{capt}{Line search for strict $p$-boosting algorithm}
+\begin{capt}{Line search for strict $p$-boosting algorithm}{fig:strict line search}
 The strict $p$-boosting algorithm confines its line search to the
 $p$-convex hull of points, whereas AdaBoost searches orthogonal to the
 current hypothesis.
 \end{capt}
-\label{fig:strict line search}
 \end{linefigure}
 
 Algebraicaly, we are seeking a minimum of the expression
@@ -206,14 +205,13 @@ L1 and L2 algorithms are special cases of this algorithm.
 \begin{center}
 \includegraphics{figures/sloppy_search.epsg}
 \end{center}
-\begin{capt}{Line search for sloppy $p$-boosting algorithm}
+\begin{capt}{Line search for sloppy $p$-boosting algorithm}{fig:sloppy line search}
 Comparison between the line search for the sloppy and strict
 algorithms.  The strict alrogithm searches directly along the
 $p$-convex hull.  The sloppy algorithm searches along the same line as
 AdaBoost, and then normalises to put the point back onto the
 $p$-convex hull.
 \end{capt}
-\label{fig:strict line search}
 \end{linefigure}
 
 

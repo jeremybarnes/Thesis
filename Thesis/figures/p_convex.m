@@ -8,7 +8,7 @@ function p_convex
 global EPSFILENAME
 
 
-figure(1);  clf;
+figure(1);  clf;  setup_figure;  setup_axis;
 
 
 a = linspace(0, 1, 101);
@@ -30,7 +30,6 @@ for i=1:length(pvalues)
    plot(-a, b, marker);
    plot(a, -b, marker);
    plot(-a, -b, marker);
-   
 end
 
 plot([0 0], [-1.1 1.1], 'k-');
@@ -38,11 +37,12 @@ plot([-1.1 1.1], [0 0], 'k-');
 
 axis([-1.1 1.1 -1.1 1.1]);
 axis square;
-xlabel('u');
-ylabel('v');
+xlabel('\itu');
+ylabel('\itv');
 
-legend(handles, 'p = 0.5', 'p = 1', 'p = 2', -1);
-
+text(0.6, 0.9, '\it{p=2}', 'fontname', 'times');
+text(0.2, 0.2, '\it{p=1/2}', 'fontname', 'times');
+text(0.5, 0.5, '\it{p=1}', 'fontname', 'times');
 
 set(1, 'paperposition', [0 0 6 2.5]);
 

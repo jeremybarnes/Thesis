@@ -82,7 +82,7 @@ xmin2 = xl2(i);
 ymin2 = yl2(i);
 
 
-figure(1);  clf;  subplot(2, 1, 1);
+figure(1);  clf;  setup_figure;  subplot(1, 2, 1);  setup_axis;
 set(1, 'Renderer', 'painters');
 surf(x,y,z);  hold on;
 theta = linspace(0, 2*pi, 200);
@@ -99,9 +99,12 @@ draw_on_surface(x, y, z, xmin2, ymin2, 'rd');
 axis([-2 2 -2 2 -16 16]);
 axis square;
 colormap white;
-title('(a)');
+title('\it{(a) Elevated view}');
+xlabel('\it{x_1}');
+ylabel('\it{x_2}');
+zlabel('\it{C(\rm\bfx)}');
 
-subplot(2, 1, 2);
+subplot(1, 2, 2);  setup_axis;
 [x, y, z] = peaks(49);
 pcolor(x, y, z);  hold on;
 
@@ -110,20 +113,23 @@ axis([-2 2 -2 2 -16 16]);
 shading flat;
 colormap(sqrt(gray));
 axis square;
-title('(b)');
+title('\it{(b) Top view}');
 
 plot(xl, yl, 'r-');
 plot(xl2, yl2, 'r-');
 plot(firstlinex(1), firstliney(1), 'ro');
 plot(xmin, ymin, 'rs');
 plot(xmin2, ymin2, 'rd');
+xlabel('\it{x_1}');
+ylabel('\it{x_2}');
 
-set(1, 'paperposition', [0 0 7 9]);
+set(1, 'paperposition', [0 0 6 2.8]);
 print(EPSFILENAME, '-depsc', '-f1');
 
 function draw_on_surface(sx, sy, sz, fx, fy, linestyle)
 
-% DRAW_ON_SURFACE draw the closed figure given by the points (fx, fy) on the surface (sx, sy, sz).
+% DRAW_ON_SURFACE draw the closed figure given by the points (fx, fy) on
+% the surface (sx, sy, sz).
 fz = interp2(sx, sy, sz, fx, fy);
 plot3(fx, fy, fz + 0.5, linestyle);
 

@@ -53,7 +53,7 @@ semilogx(iter, test_d, 'k-');  hold on;
 iter = 1:length(train_d);
 semilogx(iter, train_d, 'k:');
 
-xlabel('Iteration \it{t}');
+xlabel('|\itH|');
 ylabel('Risk');
 
 optimal_i = find(test_d == min(test_d));
@@ -71,5 +71,5 @@ get(gca)
 
 set(1, 'paperposition', [0 0 6 2.5]);
 
-print(EPSFILENAME, '-f1','-depsc');
+print(EPSFILENAME, '-f1','-depsc', '-loose');
 
