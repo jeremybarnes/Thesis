@@ -1,4 +1,4 @@
-function obj = boost(weaklearner, maxiterations)
+function obj = boost(weaklearner)
 
 % BOOST classifier based upon boosting of a weaker classifier
 %
@@ -6,7 +6,7 @@ function obj = boost(weaklearner, maxiterations)
 %
 % SYNTAX:
 %
-% obj = boost(weaklearner, maxiterations)
+% obj = boost(weaklearner)
 %
 % Creates a boosted classifier, based upon the WEAKLEARNER.  The
 % dimensions and categories of the weak learner are copied as the
@@ -15,11 +15,6 @@ function obj = boost(weaklearner, maxiterations)
 % WEAKLEARNER is a any descendent type of the CLASSIFIER class (using
 % another BOOST as the weaklearner is not recommended for sanity!).  It
 % is used as a template to construct useful instances of a weak learner.
-%
-% MAXITERATIONS specifies the maximum number of times that the boosting
-% algorithm can be iterated.  It is used to allocate storage ahead of
-% time to improve efficiency, and to tell the TRAIN method how long to
-% train for.
 %
 % RETURNS:
 %
@@ -38,7 +33,6 @@ obj = struct(parent);
 obj.weaklearner = weaklearner;
 
 % boosting parameters
-obj.maxiterations = maxiterations;
 obj.iterations = 0;
 
 % Classifiers are stored as a cell array of structures.
@@ -47,7 +41,7 @@ obj.iterations = 0;
 % obj.classifiers{i}.error = classification error for this classifier
 % obj.classifiers{i}.w = weights for this classifier
 
-obj.classifiers = cell(1, maxiterations);
+obj.classifiers = cell(1, 0);
 
 % These are the weights to use for the NEXT iteration
 obj.w = [];
@@ -63,7 +57,7 @@ obj.y = [];
 obj.aborted = 0;
 
 % The b value is a measure of how good each classifier is
-obj.b = zeros(1, maxiterations);
+obj.b = zeros(1, 0);
 
 % construct class and define superior/inferior relationship
 obj = class(obj, 'boost', parent);
