@@ -9,11 +9,15 @@
 # $Id$
 
 SUBDIRS=@boost @cart @decision_stump 
+MEXFILES = $(patsubst %.c,%$(MEX_EXTN),$(wildcard *.c))
+MEX=mex
 
 .PHONY : all
 
-all:	Makefile
+all:	Makefile $(MEXFILES)
 	$(foreach dir, $(SUBDIRS), make -C $(dir) ;)
 	touch .done~
 
+%$(MEX_EXTN): %.c
+	$(MEX) $(MEXFLAGS) $<
 
