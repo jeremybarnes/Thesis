@@ -80,6 +80,7 @@ opt.stdev_curves = 1;
 opt.errorbars = 0;
 opt.display_counts = 0;
 opt.showminimum = 0;
+opt.squareaxis = 0;
 
 % Parse our options
 for i=1:length(varargin)./2
@@ -129,6 +130,8 @@ for i=1:length(varargin)./2
 	 opt.display_counts = opt_value;
       case 'show_minimum'
 	 opt.showminimum = opt_value;
+      case 'squareaxis'
+	 opt.squareaxis = opt_value;
       otherwise,
 	 error(['Unknown option ''' opt_name '''.']);
    end
@@ -310,6 +313,9 @@ switch type
 	       plot([min_iter min_iter], [0 min_error], 'k-.');
 	    end
 
+	    if (opt.squareaxis)
+	       axis square;
+	    end
 	    
 	    grid(opt.gridtype);
 	 end
