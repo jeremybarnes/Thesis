@@ -101,9 +101,6 @@ void do_classify(const mxArray *obj, const mxArray *x, double *y,
 	return;
     }
 
-    mexPrintf("iterations = %d\n", iterations);
-
-
     b = mxCalloc(iterations, sizeof(double));
     if (b == NULL) {
 	mexErrMsgTxt("classify: out of memory to allocate B!");
