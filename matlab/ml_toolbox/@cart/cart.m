@@ -62,8 +62,21 @@ obj.maxdepth = maxdepth;
 obj.dimensions = dimensions;
 obj.categories = categories;
 
-% Our root tree, which does exactly nothing.
-obj.tree = 0;
+% Our default tree, which arbitrarily classifies all samples into the
+% first category.
+obj.tree.isterminal = 1;
+obj.tree.size = 1;
+obj.tree.category = 0;
+obj.tree.x = [];
+obj.tree.y = [];
+obj.tree.w = [];
+obj.tree.numsamples = 0;
+obj.tree.numcorrect = 0;
+obj.tree.numincorrect = 0;
+obj.tree.totalweight = 0;
+obj.tree.correctweight = 0;
+obj.tree.incorrectweight = 0;
+
 
 % construct class and use superior/inferior relationship
 obj = class(obj, 'cart', parent);
