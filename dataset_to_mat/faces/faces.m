@@ -35,6 +35,8 @@ dimensions = 32*30;
 xvalues = zeros(0, dimensions);
 yvalues = zeros(0, 4);
 
+currentrow = 1;
+
 for name_num=1:length(usernames)
    for dir_num=1:length(directions)
       for expression_num=1:length(expressions)
@@ -53,9 +55,10 @@ for name_num=1:length(usernames)
 	    eval_error = 0;
 	    eval('img = load_pgm(filename);', 'eval_error = 1;');
 	    if (~eval_error)
-	       xvalues = [xvalues; img(:)];
-	       yvalues = [yvalues; name_num-1 dir_num-1 expression_num-1 ...
-			  eyes_num-1];
+	       xvalues(currentrow, :) = img(:)';
+	       yvalues(currentrow, :) = [name_num-1 dir_num-1 ...
+		    expression_num-1 eyes_num-1];
+	       currentrow = currentrow + 1;
 	    else
 	       disp('ERROR: skipped');
 	    end
