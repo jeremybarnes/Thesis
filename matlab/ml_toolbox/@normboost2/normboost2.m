@@ -42,3 +42,4 @@ obj.dummy = 1; % Dummy field to stop complaints
 % construct class and define superior/inferior relationship
 obj = class(obj, 'normboost2', parent);
 superiorto('double', 'classifier', 'boost', 'normboost');
+
