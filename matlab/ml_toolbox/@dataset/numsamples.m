@@ -17,14 +17,4 @@
 
 function n = numsamples(obj)
 
-% PRECONDITIONS:
-% none
-
 n = obj.numsamples;
-
-% POSTCONDITIONS:
-check_invariants(obj);
-
-return;
-
-
