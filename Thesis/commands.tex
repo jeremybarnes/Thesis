@@ -1,3 +1,7 @@
+% commands.tex
+% Jeremy Barnes, 1999
+% $Id$
+
 \providecommand{\emp}{\mathrm{emp}}
 \providecommand{\calF}{\ensuremath{\mathcal{F}}}
 \providecommand{\fat}{\ensuremath{\mathrm{fat}}}
@@ -13,3 +17,15 @@
 \providecommand{\calX}{\ensuremath{\mathcal{X}}}
 \providecommand{\ip}[2]{\ensuremath{\langle {#1} , {#2} \rangle}}
 \providecommand{\lin}{\mathrm{lin}}
+
+
+% Theorem-like constructs
+
+%\newtheorem{theorem}{Theorem}
+\providecommand{\proof}{\par \par \noindent {\bf Proof:\ }}
+
+\providecommand{\figlinewidth}{1pt}
+
+\newenvironment{linefigure}%
+		{\begin{figure} \rule{\textwidth}{\figlinewidth}}%
+		{\rule{\textwidth}{\figlinewidth}\end{figure}}

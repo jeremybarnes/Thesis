@@ -1,9 +1,16 @@
+% thesis.tex
+% Jeremy Barnes, 1999
+% $Id$
+
 \documentclass[a4paper,11pt,oneside]{book}
 
 \usepackage{graphics}
 \usepackage{amsmath}
 \usepackage{amsfonts}
 \usepackage{amssymb}
+
+% Times new roman font: smaller so less pages
+%\usepackage{times}
 
 % Get a decent page width
 \oddsidemargin 0.1 in      %   Left margin on odd-numbered pages.
@@ -32,46 +39,43 @@
 \renewcommand{\baselinestretch}{1.2}
 
 \include{abstract}
-
-
-
+\include{acknowledgements}
 
 \mainmatter
 
 \include{intro}
 
+\part{Background}
 \include{slt}
-
+\include{stumps}
 \include{boosting}
 
+\part{Theoretical development}
+\include{pboosting}
 \include{development}
 
-\include{testing}
+\part{Testing}
+\include{method}
+\include{results}
 
+\part{Discussions}
 \include{discussion}
-
+\include{furtherwork}
 \include{conclusion}
+
 
 \appendix
 
-
 % Put it back to normal for the non-body parts of the thesis.
 \renewcommand{\baselinestretch}{1.0}
-
-
 \include{acronyms}
-
 \include{notation}
-
 \include{implementation}
-
+\include{userguide}
+\include{progguide}
 \include{proposal}
 
-
-
 \backmatter
-
-\nocite{*}
 
 \bibliography{../Bibliography/biblio}
 \bibliographystyle{plain}
