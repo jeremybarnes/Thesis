@@ -62,7 +62,7 @@ end
 pboosts = cell(n, 1);
 
 for i=1:n
-   pboosts{i} = p_boost(wl, 1000, pvalues(i));
+   pboosts{i} = p_boost(wl, pvalues(i));
 end
 
 
@@ -71,7 +71,7 @@ d = dataset(b, 2);
 d = datagen(d, datatype, numpoints, 0.05, 0);
 [x, y] = data(d);
 
-figure(4);  clf;  dataplot(d);
+%figure(4);  clf;  dataplot(d);
 
 test_d = dataset(b, 2);
 test_d = datagen(test_d, datatype, numpoints, 0, 0);
@@ -145,11 +145,11 @@ while (1)
 
    legend(char(the_legend));
 
-   figure(4);  clf;
-   marginplot(pboosts{3}, [0 0; 1 1]);
-   hold on;
-   dataplot(d);
-   axis([-0.2 1.2 -0.2 1.2 0 2]); 
+%   figure(4);  clf;
+%   marginplot(pboosts{3}, [0 0; 1 1]);
+%   hold on;
+%   dataplot(d);
+%   axis([-0.2 1.2 -0.2 1.2 0 2]); 
 
    if (iter >= 5)
       pause;
