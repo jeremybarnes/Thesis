@@ -8,7 +8,7 @@ function e = training_error(obj)
 %
 % RETURNS:
 %
-% The training error is the sum of the weights of samples that are
+% The training error is the number of training samples that are
 % classified incorrectly.  This is returned in E.
 
 % @boost/training_error.m
