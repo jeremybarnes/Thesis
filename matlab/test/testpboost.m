@@ -40,12 +40,15 @@ end
 
 
 % Construct our boosting objects
-pvalues = [0.25 0.50 0.75 1.00 1.25 1.50];
+pvalues = [0.40 0.50 0.60 0.70 0.80 0.90 1.00 1.20 1.40 1.60 1.80 2.00];
 %pvalues = [1.00 1.00 1.00 1.00 1.00];
 %pvalues = [0.50 0.55 0.60 0.65 0.70 0.75];
 %pvalues = [0.60 0.61 0.62 0.63 0.64 0.65];
 %pvalues = [0.65 0.66 0.67 0.68 0.69 0.70];
 %pvalues = [0.5];
+
+colors = {'r-', 'b-', 'g-', 'k-', 'c-', 'm-', 'r:', 'b:', 'g:', 'k:', 'c:', ...
+	  'm:'};
 
 n = length(pvalues);
 
@@ -68,7 +71,7 @@ d = dataset(b, 2);
 d = datagen(d, datatype, numpoints, 0.05, 0);
 [x, y] = data(d);
 
-figure(4);  dataplot(d);
+figure(4);  clf;  dataplot(d);
 
 test_d = dataset(b, 2);
 test_d = datagen(test_d, datatype, numpoints, 0, 0);
@@ -92,8 +95,6 @@ end
 iter = 1;
 
 
-colors = 'rbgkmy';
-
 
 while (1)
    disp(['Iteration ' num2str(iter)]);
@@ -105,7 +106,7 @@ while (1)
    hold on;
 
    for i=1:n
-      plot(train_error(i, :), [colors(i) '-']);
+      plot(train_error(i, :), colors{i});
    end
 
    xlabel('Iteration');
@@ -122,7 +123,7 @@ while (1)
    hold on;
 
    for i=1:n
-      plot(test_error(i, :), [colors(i) '-']);
+      plot(test_error(i, :), colors{i});
    end
 
    xlabel('Iteration');
@@ -132,26 +133,27 @@ while (1)
    legend(char(the_legend));
 
 
-   % Plot densities
+   % Plot b weights
    figure(3);
    clf;
 
    for i=1:n
       hold on;
-      b_plot(pboosts{i}, [colors(i) '-']);
+      b_plot(pboosts{i}, colors{i});
       title('B weights');
    end
 
    legend(char(the_legend));
 
+%   figure(5);  clf;
+%   marginplot(pboosts{3}, [0 0; 1 1]);
+%   hold on;
+%   dataplot(d);
+%   axis([-0.2 1.2 -0.2 1.2 0 2]); 
+
    if (iter >= 5)
       pause;
    end
-
-   figure(5);  clf;
-   marginplot(pboosts{3}, [0 0; 1 1]);
-   hold on;
-   dataplot(data);
 
    
    % Now continue training
