@@ -9,11 +9,13 @@
 % SYNTAX:
 %
 % obj = classlabel({'label0', 'label1', ...})
+%     - this abstract data type holds information about the labels of
+%       classes us used in a classifier.  You pass it a list of textual
+%       labels, which correspond to the classes of your data.  They are
+%       mapped onto the numbers 0, 1, 2,...
 %
-% This abstract data type holds information about the labels of classes
-% used in a classifier.  You pass it a list of textual labels, which
-% correspond to the classes of your data.  They are mapped onto the
-% numbers 0, 1, 2, ...
+% obj = classlabel('binary')
+%     - a simple way to create binary classlabels.
 %
 % RETURNS:
 %
@@ -37,6 +39,9 @@ if (length(labels) == 0)
    error('You must specify at least one label.');
 end
 
+if (labels == 'binary')
+   labels = {'false', 'true'};
+end
 
 % initialisation of variables in obj
 obj.initialised = 1;
