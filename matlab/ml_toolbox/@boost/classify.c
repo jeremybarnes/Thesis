@@ -2,7 +2,7 @@
  * Jeremy Barnes, 18/5/1999
  * $Id$
  *
- * CLASSIFY classify a set of data
+ * CLASSIFY classify a dataset
  *
  * SYNTAX:
  *
@@ -38,7 +38,7 @@ void do_classify(const mxArray *obj, const mxArray *x, double *y,
 
     double *votes, *b, *their_b, b_sum, b_sum_recip, this_b;
     double max_value, this_vote, *this_y;
-    mxArray *f_b, *f_iterations, *classifiers, *this_struct;	
+    mxArray *f_b, *f_iterations;	
     mxArray *this_classifier, *lparams[1], *rparams[2];
     int i, j, iterations, max_cat;
 
@@ -116,12 +116,6 @@ void do_classify(const mxArray *obj, const mxArray *x, double *y,
     for (i=0; i<iterations; i++)
 	b[i] = their_b[i] * b_sum_recip;
     
-    /* classifiers is a cell array of structures */
-    classifiers = mxGetField(obj, 0, "classifiers");
-    if (classifiers == NULL) {
-	mexErrMsgTxt("classify: Error reading CLASSIFIERS field");
-	return;
-    }
 
     /* Now go through each classifer, getting it to classify each
        datapoint, and add its votes up for each. */
@@ -130,14 +124,7 @@ void do_classify(const mxArray *obj, const mxArray *x, double *y,
 
 	this_b = b[i];
 
-	/* Find our classifier */
-	this_struct = mxGetCell(classifiers, i);
-	if (this_struct == NULL) {
-	    mexErrMsgTxt("classify: Error reading cell in THIS_STRUCT");
-	    return;
-	}
-
-	this_classifier = mxGetField(this_struct, 0, "classifier");
+	this_classifier = mxGetField(obj, i, "classifiers");
 	if (this_classifier == NULL) {
 	    mexErrMsgTxt("classify: Error reading CLASSIFIER field");
 	    return;
@@ -146,8 +133,8 @@ void do_classify(const mxArray *obj, const mxArray *x, double *y,
 
 	/* Get MATLAB to ask our classifier to classify the data */
 
-	rparams[0] = this_classifier;
-	rparams[1] = x;
+	(const mxArray *)rparams[0] = this_classifier;
+	(const mxArray *)rparams[1] = x;
 
 	mexCallMATLAB(1, lparams, 2, rparams, "classify");
 
