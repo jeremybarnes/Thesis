@@ -1,27 +1,27 @@
-function obj = classifier(classes, dimensions)
+function obj = classifier(categories, dimensions)
+
 % CLASSIFIER abstract ancestor class for a classification machine
 %
 % This is the constructor for the classifier type.
 %
 % SYNTAX:
 %
-% obj = classifier(classes, dimensions)
+% obj = classifier(categories, dimensions)
 %
-% Creates a classifier.  Not much use as this is just an abstract class,
-% anyway.
+% Creates a classifier.
 %
 % DIMENSIONS specifies the number of dimensions that the independent
 % variable will have.
 %
-% CLASSES is a CLASSLABEL object that specifies the classes to be used in
-% the data.
+% CATEGORIES is a CATEGORY_LIST object that specifies the categories to be
+% used in the data.
 %
 % RETURNS:
 %
 % OBJ is the new classifier.
 %
 
-% classifier/classifier.m
+% @classifier/classifier.m
 % Jeremy Barnes, 4/4/1999
 % $Id$
 
@@ -31,15 +31,15 @@ if (dimensions <= 0)
    error('classifier: DIMENSIONS must be >= 1');
 end
 
-if (~isa(classes, 'classlabel'))
-   error('classifier: CLASSES needs to be a CLASSLABEL');
+if (~isa(categories, 'category_list'))
+   error('classifier: CLASSES needs to be a CATEGORY_LIST');
 end
 
 
 % initialisation of variables in obj
 obj.initialised = 1;
 obj.dimensions = dimensions;
-obj.classes = classes;
+obj.categories = categories;
 obj.trained_samples = 0;
 
 % construct class and define superior/inferior relationship
