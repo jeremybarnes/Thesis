@@ -41,9 +41,6 @@ void call_matlab_1_1(mxArray_t **lhs0, char *command, const mxArray_t *rhs0)
     
     mxArray_t *lparams[1], *rparams[1];
 
-    mexPrintf("Trying to execute MATLAB command \"%s\" on a parameter with "
-	      "class \"%s\"\n", command, mxGetClassName(rhs0));
-    
     /* Get MATLAB to perform the function we ask it to */
     (const mxArray_t *)rparams[0] = rhs0;
     mexCallMATLAB(1, lparams, 1, rparams, command);
@@ -154,21 +151,16 @@ void do_classify(const mxArray_t *obj, const mxArray_t *x, double *y,
     for (i=0; i<iterations; i++)
 	b[i] = their_b[i] * b_sum_recip;
 
+    /* CLASSIFIERS is a cell array, each element of which is a CLASSIFIER
+       object corresponding to an instance of a weak learner. */
+
     classifiers = mxGetField(obj, 0, "classifiers");
     if (classifiers == NULL) {
 	mexErrMsgTxt("classify: Error reading CLASSIFIERS field");
 	return;
     }
 
-    { int m,n,ne;
-    m = mxGetM(classifiers);
-    n = mxGetN(classifiers);
 
-    ne = mxGetNumberOfElements(classifiers);
-
-    mexPrintf("CLASSIFIERS is a (%d x %d) array of %s with %d elements\n",
-	      m, n, mxGetClassName(classifiers), ne);
-    }
     /* Now go through each classifer, getting it to classify each
        datapoint, and add its votes up for each. */
 
@@ -176,14 +168,11 @@ void do_classify(const mxArray_t *obj, const mxArray_t *x, double *y,
 
 	this_b = b[i];
 
-	mexPrintf("i = %d\n", i);
-
-	this_classifier = mxGetField(obj, i, "classifiers");
+	this_classifier = mxGetCell(classifiers, i);
 	if (this_classifier == NULL) {
 	    mexErrMsgTxt("classify: Error reading THIS_CLASSIFIER");
 	    return;
 	}
-
 
 	/* Get MATLAB to ask our classifier to classify the data */
 	call_matlab_1_2(&f_this_y, "classify", this_classifier, x);
@@ -246,14 +235,6 @@ void mexFunction(int nlhs, mxArray_t *plhs[],
 
     (const mxArray_t *)obj = prhs[0];
 
-    { int m,n;
-    m = mxGetM(obj);
-    n = mxGetN(obj);
-
-    mexPrintf("prhs[0] is a (%d x %d) array of %s\n",
-	      m, n, mxGetClassName(obj));
-    }
-
     /* Make sure its a BOOST object */
     if (!mxIsClass(obj, "boost")) {
 	mexErrMsgTxt("classify: First input must be of type BOOST");
@@ -285,9 +266,6 @@ void mexFunction(int nlhs, mxArray_t *plhs[],
 
     data_len = mxGetM(prhs[1]);
 
-    mexPrintf("dimensions = %d, mxGetN(prhs[1]) = %d\n",
-	      dimensions, mxGetN(prhs[1]));
-
     /* Check that the number of dimensions matches */
     if (dimensions != mxGetN(prhs[1])) {
 	mexErrMsgTxt("classify: dimensions of x and obj don't match");
@@ -305,5 +283,4 @@ void mexFunction(int nlhs, mxArray_t *plhs[],
 
     /* Call our computational routine */
     do_classify(prhs[0], prhs[1], y, data_len, categories);
-
 }
