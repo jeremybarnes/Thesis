@@ -25,6 +25,12 @@ if (aborted(obj))
    return;
 end
 
+global DEBUG_TRAIN;
+
+if (isempty(DEBUG_TRAIN))
+   DEBUG_TRAIN = 0;
+end
+
 x_data = x(obj);  y_data = y(obj);  w_data = w(obj);  p = norm(obj);
 
 % create and train a new classifier
@@ -50,6 +56,9 @@ if (new_error >= 0.5)
    return;
 end
 
+if ((DEBUG_TRAIN > 1) & (iterations(obj) == 0))
+   figure(1);  clf;
+end
 
 % Calculate alpha
 
@@ -62,37 +71,58 @@ if (iterations(obj) == 0)
    new_b = [1.0];
 
 else
-   % Calculate b_t using a line search.  This uses the Newton-Raphson method
+   % Calculate alpha using a line search.  This uses the Newton-Raphson method
    % to find the minimum.
 
-   % DEBUGGING CODE -- draw a graph so that we can follow the progress
+   if (DEBUG_TRAIN == 1)
+      % DEBUGGING CODE -- draw a graph so that we can follow the progress
 
-   alphas = linspace(0.01, 0.99);
-   all_c = zeros(size(alphas));
-   all_d = zeros(size(alphas));
-   all_d2 = zeros(size(alphas));
+      alphas = linspace(0.01, 20);
+      all_c = zeros(size(alphas));
+      all_d = zeros(size(alphas));
+      all_d2 = zeros(size(alphas));
+      
+      for i=1:length(alphas)
+	 [all_c(i), all_d(i), all_d2(i), crap] = eval_cf(obj, new_c, ...
+							 alphas(i));
+      end
+      
+      % Calculate numerically to test that we got them right...
+      calc_alpha = (alphas(1:length(alphas)-1) + alphas(2:length(alphas))) / 2;
+      calc_d = diff(all_c) ./ diff(alphas);
+      calc_alpha2 = (calc_alpha(1:length(calc_alpha)-1) + ...
+		     calc_alpha(2:length(calc_alpha))) / 2;
+      calc_d2 = diff(calc_d) ./ diff(calc_alpha);
+      
+      figure(1);  clf;
+      subplot(3, 1, 1);  plot(alphas, all_c);   grid on;  hold on;
+      subplot(3, 1, 2);  plot(alphas, all_d);   grid on;  hold on;
+      plot(calc_alpha, calc_d, 'k-');
+      subplot(3, 1, 3);  plot(alphas, all_d2);  grid on;  hold on;
+      plot(calc_alpha2, calc_d2, 'k-');
+      
+      % END DEBUGGING
+   elseif ((DEBUG_TRAIN > 1) & (iterations(obj)-1 <= DEBUG_TRAIN)) 
+      % DEBUGGING
+      % Draw DEBUG_TRAIN plots of the minimisation of the first
+      % DEBUG_TRAIN iterations
 
-   for i=1:length(alphas)
-      [all_c(i), all_d(i), all_d2(i), crap] = eval_cf(obj, new_c, ...
-						      alphas(i));
+      alphas = linspace(0.01, 20);
+      all_c = zeros(size(alphas));
+      all_d = zeros(size(alphas));
+      all_d2 = zeros(size(alphas));
+      
+      for i=1:length(alphas)
+	 [all_c(i), all_d(i), all_d2(i), crap] = eval_cf(obj, new_c, ...
+							 alphas(i));
+      end
+
+      subplot(DEBUG_TRAIN, 1, iterations(obj));
+      plot(alphas, all_c);  grid on;  hold on;
+      
+      % END DEBUGGING
    end
-
-   % Calculate numerically to test that we got them right...
-   calc_alpha = (alphas(1:length(alphas)-1) + alphas(2:length(alphas))) / 2;
-   calc_d = diff(all_c) ./ diff(alphas);
-   calc_alpha2 = (calc_alpha(1:length(calc_alpha)-1) + ...
-		  calc_alpha(2:length(calc_alpha))) / 2;
-   calc_d2 = diff(calc_d) ./ diff(calc_alpha);
    
-   figure(1);  clf;
-   subplot(3, 1, 1);  plot(alphas, all_c);   grid on;  hold on;
-   subplot(3, 1, 2);  plot(alphas, all_d);   grid on;  hold on;
-   plot(calc_alpha, calc_d, 'k-');
-   subplot(3, 1, 3);  plot(alphas, all_d2);  grid on;  hold on;
-   plot(calc_alpha2, calc_d2, 'k-');
-
-   % END DEBUGGING
-
    % Initialisation
    new_alpha = 0.5 / iterations(obj);
    d = 1;
@@ -103,18 +133,23 @@ else
       alpha = new_alpha;
       
       [c, d, d2, marg] = eval_cf(obj, new_c, alpha);
-      c
-      d
-      d2
 
-      % DEBUGGING
+      if (DEBUG_TRAIN == 1)
+	 % DEBUGGING
+	 
+	 c
+	 d
+	 d2
+	 
+	 subplot(3, 1, 1);  plot(alpha, c, 'rx');
+	 subplot(3, 1, 2);  plot(alpha, d, 'rx');
+	 subplot(3, 1, 3);  plot(alpha, d2, 'rx');
+	 
+	 % END DEBUGGING
+      elseif ((DEBUG_TRAIN > 1) & (iterations(obj)-1 <= DEBUG_TRAIN))
+	 plot(alpha, c, 'rx');
+      end
       
-      subplot(3, 1, 1);  plot(alpha, c, 'rx');
-      subplot(3, 1, 2);  plot(alpha, d, 'rx');
-      subplot(3, 1, 3);  plot(alpha, d2, 'rx');
-      
-      % END DEBUGGING
-
       % FIXME: need to gracefully handle d2 = 0
       
       new_alpha = alpha - (d / d2)
@@ -145,3 +180,4 @@ obj = add_iteration(obj, new_c, new_b, new_w);
 obj.margins = marg;
 
 obj_r = obj;
+
