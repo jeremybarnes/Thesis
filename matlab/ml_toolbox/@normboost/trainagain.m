@@ -93,7 +93,10 @@ else
    while (abs(d) >= 0.001)
       alpha = new_alpha;
       
-      [c, d, d2, marg] = eval_cf(obj, new_c, alpha)
+      [c, d, d2, marg] = eval_cf(obj, new_c, alpha);
+      c
+      d
+      d2
 
       % DEBUGGING
       
