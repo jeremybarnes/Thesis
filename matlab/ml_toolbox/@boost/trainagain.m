@@ -51,7 +51,7 @@ end
 
 bt = - 0.5 * log(new_error / (1 - new_error));
 
-new_w = obj.w .* exp(bt .* ((new_y == obj.y)*2-1));
+new_w = obj.w .* exp(bt .* ((new_y == y_data)*2-1));
 new_w = new_w ./ sum(new_w);
 
 obj = add_iteration(obj, new_c, [obj.b bt], new_w);
