@@ -1,8 +1,8 @@
 function obj_r = classifier(obj)
 
-% CLASSIFIER typecast a DECISION_STUMP as a CLASSIFIER
+% CLASSIFIER typecast a CART as a CLASSIFIER
 
-% @decision_stump/classifier.m
+% @cart/classifier.m
 % Jeremy Barnes, 18/8/1999
 % $Id$
 
