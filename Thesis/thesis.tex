@@ -8,6 +8,8 @@
 \usepackage{amsmath}
 \usepackage{amsfonts}
 \usepackage{amssymb}
+\usepackage{alltt}
+\usepackage{times}
 
 % Times new roman font: smaller so less pages
 %\usepackage{times}
@@ -38,7 +40,9 @@
 \listoftables
 
 % According to the thesis rules, spacing must be at least 1.2 times normal
-\renewcommand{\baselinestretch}{1.2}
+\renewcommand{\baselinestretch}{1.0}
+% Execute a change in font size to make it happen
+\small\normalsize
 
 \include{abstract}
 \include{acknowledgements}
@@ -70,6 +74,9 @@
 
 % Put it back to normal for the non-body parts of the thesis.
 \renewcommand{\baselinestretch}{1.0}
+% Execute a change in font size to make it happen
+\small\normalsize
+
 \include{acronyms}
 \include{notation}
 \include{implementation}

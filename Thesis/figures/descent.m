@@ -82,7 +82,7 @@ xmin2 = xl2(i);
 ymin2 = yl2(i);
 
 
-figure(1);  clf;  subplot(1, 2, 1);
+figure(1);  clf;  subplot(2, 1, 1);
 set(1, 'Renderer', 'painters');
 surf(x,y,z);  hold on;
 theta = linspace(0, 2*pi, 200);
@@ -101,7 +101,7 @@ axis square;
 colormap white;
 title('(a)');
 
-subplot(1, 2, 2);
+subplot(2, 1, 2);
 [x, y, z] = peaks(49);
 pcolor(x, y, z);  hold on;
 
@@ -118,7 +118,7 @@ plot(firstlinex(1), firstliney(1), 'ro');
 plot(xmin, ymin, 'rs');
 plot(xmin2, ymin2, 'rd');
 
-set(1, 'paperposition', [0 0 7 3]);
+set(1, 'paperposition', [0 0 7 9]);
 print(EPSFILENAME, '-depsc', '-f1');
 
 function draw_on_surface(sx, sy, sz, fx, fy, linestyle)
