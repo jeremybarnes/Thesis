@@ -53,9 +53,12 @@ end
 num_p_values = length(p);
 num_noise_values = length(noise);
 
-test_res  = zeros(num_noise_values, num_p_values, numiterations);
-train_res = test_res;
-count_res = test_res;
+% These large arrays hold our collated results
+test_mean  = zeros(num_noise_values, num_p_values, numiterations);
+test_std   = test_mean;
+train_mean = test_mean;
+train_std  = test_mean;
+count_res  = test_mean;
 
 % The counter variables
 trial = 1;
@@ -68,6 +71,10 @@ disp('Collating results...');
 
 for noisevalue=1:num_noise_values
    for pvalue=1:num_p_values
+
+      this_test_res = zeros(0, numiterations);
+      this_train_res = zeros(0, numiterations);
+
       for trial=1:trials
 	 
 	 disp(['Trial ' int2str(trial) ' p=' num2str(p(pvalue)) ...
@@ -80,40 +87,77 @@ for noisevalue=1:num_noise_values
 	 
 	 load(load_filename, 'teste', 'traine');
 	 
+	 % We store it in a matrix.  The rows correspond to trials;
+         % the columns are iteration numbers.  Where the full
+         % number of iterations was not performed, it is marked
+         % with a "-1" to indicate this fact.  These are then
+         % stripped out before means and standard deviations are
+         % calculated, in order to avoid skewing the results.
+	 
 	 it = length(teste);
-	 padding = zeros(1, numiterations-it);
-	 counts = ones(1, it);
-
-	 test_add(1, 1, :) = [teste padding];
-	 train_add(1, 1, :) = [traine padding];
-	 count_add(1, 1, :) = [counts padding];
+	 padding = -ones(1, numiterations-it);
 	 
-	 % Update totals and count values
-	 test_res(noisevalue, pvalue, :) = ...
-	     test_res(noisevalue, pvalue, :) + test_add;
-
-	 train_res(noisevalue, pvalue, :) = ...
-	     train_res(noisevalue, pvalue, :) + train_add;
-	 
-	 count_res(noisevalue, pvalue, :) = ...
-	     count_res(noisevalue, pvalue, :) + count_add;
+	 this_test_res = [this_test_res; teste padding];
+	 this_train_res = [this_train_res; traine padding];
       end
+      
+      % For each iteration of this_test_res and this_train_res, we
+      % calculate a mean and a standard devitaion
+
+      disp('Calculating statistics...');
+      
+      for i=1:numiterations
+	 % Calculate test statistics
+	 this_test = this_test_res(:, i);
+	 this_test = this_test(find(this_test >= 0)); % strip out -1s
+	 this_test_mean(i) = mean(this_test);
+	 this_test_std(i)  = std (this_test);
+	 
+	 % Calculate test statistics
+	 this_train = this_train_res(:, i);
+	 this_train = this_train(find(this_train >= 0)); % strip out -1s
+	 this_train_mean(i) = mean(this_train);
+	 this_train_std(i)  = std (this_train);
+	 
+	 % Number of trials that made it through this many iterations
+	 this_counts(i) = length(this_test);
+      end
+
+      
+      % plot for debugging
+      %figure(1);  clf;
+      %iter = 1:numiterations;
+      %semilogx(iter, this_test_mean, 'r-');  hold on;
+      %semilogx(iter, this_test_mean+this_test_std, 'r:');
+      %semilogx(iter, max(this_test_mean-this_test_std, 0), 'r:');
+
+      %semilogx(iter, this_train_mean, 'b-');
+      %semilogx(iter, this_train_mean+this_train_std, 'b:');
+      %semilogx(iter, max(this_train_mean-this_train_std, 0), 'b:');
+      
+      %grid on;
+      %figure(2);  clf;
+
+      %semilogx(iter, this_counts, 'k-');
+      %pause;
+      
+      % Store these where they belong
+      test_mean(noisevalue, pvalue, :) = this_test_mean;
+      test_std (noisevalue, pvalue, :) = this_test_std;
+      train_mean(noisevalue, pvalue, :) = this_train_mean;
+      train_std (noisevalue, pvalue, :) = this_train_std;
+      count_res(noisevalue, pvalue, :) = this_counts;
    end
 end
-
-disp('Calculating averages...');
-
-% total / count = average
-test_res = test_res ./ count_res;
-train_res = train_res ./ count_res;
 
 disp('Saving...');
 
 % Save the file
 savefile = [DATA_SAVE_PATH '/' test '-summary.mat'];
 
-save(savefile, 'test_res', 'train_res', 'count_res', 'name', 'algorithm', ...
-     'p', 'dist', 'samples', 'noise', 'numiterations', 'trials');
+save(savefile, 'test_mean', 'test_std', 'train_mean', 'train_std', ...
+     'count_res', 'name', 'algorithm', 'p', 'dist', 'samples', ...
+     'noise', 'numiterations', 'trials');
 
 % Finished!
  
