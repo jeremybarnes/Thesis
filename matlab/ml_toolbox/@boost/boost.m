@@ -31,7 +31,6 @@ if (isa(weaklearner, 'boost'))
    return
 end
 
-
 parent = classifier(categories(weaklearner), dimensions(weaklearner));
 
 % This is a template, which is trained at each boosting iteration
@@ -40,10 +39,8 @@ obj.weaklearner = weaklearner;
 % boosting parameters
 obj.iterations = 0;
 
-% Classifiers are stored as an array of objects.  The untrained
-% weaklearner is initially put into the first one as a placeholder
-% (overwritten on the first training iteration).
-obj.classifiers = weaklearner;
+% Classifiers are stored as a cell array of objects.
+obj.classifiers = cell(1, 0);
 
 % These are the sample weights to use for the NEXT iteration
 obj.w = [];

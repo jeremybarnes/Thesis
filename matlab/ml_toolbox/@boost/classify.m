@@ -40,7 +40,7 @@ b = obj.b ./ sum(obj.b);
 % adding its votes up for each datapoint.
 
 for i = 1:obj.iterations
-   this_classifier = obj.classifiers(i);
+   this_classifier = obj.classifiers{i};
    this_y = classify(this_classifier, x) + 1; % +1 converts cat to col
 
    for j=1:xs(1)
