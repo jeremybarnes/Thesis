@@ -86,4 +86,3 @@ superiorto('double', 'classifier');
 % POSTCONDITIONS
 check_invariants(obj);
 
-return;
