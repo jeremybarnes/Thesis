@@ -1,4 +1,4 @@
-function obj_r = train(obj, x, y, w)
+function obj_r = train(obj, varargin)
 
 % TRAIN supervised training of CART classifier
 %
@@ -21,49 +21,8 @@ function obj_r = train(obj, x, y, w)
 % $Id$
 
 
-% FIXME: no default values for w if {x,y} instead of dataset given
-
 % PRECONDITIONS
-if (isa(x, 'dataset'))
-   if (numcategories(categories(x)) ~= numcategories(obj.categories))
-      error(['train: numcategories in dataset and classifier don''t' ...
-	     ' match']);
-   end
-   if (dimensions(x) ~= obj.dimensions)
-      error(['train: dimensionality of dataset and classifier don''t' ...
-	     ' match']);
-   end
-   if (nargin == 3) % we have weights
-      [x, y] = data(x); % extract the data
-      w = y;
-   elseif (nargin < 3) % no weights
-      [x, y] = data(x); % extract the data
-      w = ones(length(y), 1); % create equal weights
-   else
-      error('train: too many arguments given');
-   end
-elseif (~(isa(x, double)))
-   error('train: first parameter must be dataset or array');
-else
-   s = size(x);
-   if (length(s) ~= 2)
-      error('train: incorrect dimensionality for x vector');
-   elseif (length(y) ~= s(1))
-      error('train: length of x and y do not match');
-   end
-   m = max(y);
-   if (m >= numcategories(obj.categories))
-      error('train: too many categories in y for this classifier');
-   end
-   if (fix(y) ~= y)
-      error('train: fractional category values in y');
-   end
-end
-
-if (length(w) != length(y))
-   error('train: weight vector must be the same length as data');
-end
-
+[x, y, w] = get_xyw(obj, 'train', varargin);
 
 % Find the domain of the independent variable.
 x_max = max(x); % Returns a row vector with the max of each column
@@ -113,8 +72,8 @@ function tree = recursive_train(x, y, w, domain, depth, maxdepth, cost_fn, ...
 % tree.numcorrect - number of samples correctly classified
 % tree.numincorrect - number of samples incorrectly classified
 % tree.totalweight - amount of weight in this part of the tree
-% tree.weightcorrect - sum of weights of samples correctly classified
-% tree.weightincorrect - sum of weights of samples incorrectly classified
+% tree.correctweight - sum of weights of samples correctly classified
+% tree.incorrectweight - sum of weights of samples incorrectly classified
 %
 % This is a nonterminal node.
 %
@@ -128,8 +87,8 @@ function tree = recursive_train(x, y, w, domain, depth, maxdepth, cost_fn, ...
 % tree.w - the w values in this terminal node
 % tree.numcorrect - number of samples correctly classified
 % tree.numincorrect - number of samples incorrectly classified
-% tree.weightcorrect - sum of weights of samples correctly classified
-% tree.weightincorrect - sum of weights of samples incorrectly classified
+% tree.correctweight - sum of weights of samples correctly classified
+% tree.incorrectweight - sum of weights of samples incorrectly classified
 %
 % This is a terminal node.
 %
@@ -156,10 +115,10 @@ function tree = recursive_train(x, y, w, domain, depth, maxdepth, cost_fn, ...
 % category with the greatest number of samples in y.
 
 if (depth > maxdepth)
-   cats = category_count(y, cat);
+   weights = category_weight(y, w, cat);
 
-   max_count = max(cats);
-   max_index = find(cats == max_count);
+   max_weight = max(weights);
+   max_index = find(weights == max_weight);
    if (length(max_index) > 1)
       category = max_index(1);
    else
@@ -167,7 +126,7 @@ if (depth > maxdepth)
    end
 
    % Terminal node
-   tree = make_terminal(category, x, y, w);
+   tree = make_terminal(category-1, x, y, w);
    return;
 end
 
@@ -237,8 +196,8 @@ tree.numcorrect = tree.left.numcorrect + tree.right.numcorrect;
 tree.numincorrect = tree.left.numincorrect + tree.right.numincorrect;
 
 tree.totalweight = tree.left.totalweight + tree.right.totalweight;
-tree.weightcorrect = tree.left.weightcorrect + tree.right.weightcorrect;
-tree.weightincorrect = tree.left.weightincorrect + tree.right.weightincorrect;
+tree.correctweight = tree.left.correctweight + tree.right.correctweight;
+tree.incorrectweight = tree.left.incorrectweight + tree.right.incorrectweight;
 
 % Finished!
 
@@ -453,8 +412,8 @@ node.numcorrect = sum(correct);
 node.numincorrect = sum(incorrect);
 
 node.totalweight = sum(w);
-node.weightcorrect = correct' * w;
-node.weightincorrect = incorrect' * w;
+node.correctweight = correct' * w;
+node.incorrectweight = incorrect' * w;
 
 
 
@@ -474,8 +433,49 @@ function newtree = recursive_prune(tree, x, y, w, lambda)
 %
 % The specifics: 
 %
-% 
-% more on this later...
-% FIXME: finish
+% The pruning algorithm minimises the model selection criteria which is
+% a penalised form of the misclassification risk, given by
+%
+% Rpen = Remp + lambda * T
+%
+% where Rpen is the model selection criteria, lambda is a parameter which
+% controls how aggresively the model complexity is traded off against
+% training error, and the T is the size of the tree (number of terminal
+% nodes).
+%
+% Lambda is generally chosen by resampling techniques on the training
+% data.  However, in this routine it is simply a parameter (its optimal
+% value will need to be determined elsewhere).
+%
+% The change in the model selection criteria that would be a result of
+% converting a particular node into a terminal node can be calculated
+% using just the information at the node as
+%
+% delta_Rpen = delta_Remp + lambda * delta_T
+%
+% The pruning routine works by the following algorithm:
+%
+% REPEAT
+%
+%   FOREACH nonterminal node in the tree
+%      calculate delta_Rpen for this node
+%
+%   IF min(delta_Rpen) < 0
+%   THEN convert this node into a non-terminal
+%
+% UNTIL min(delta_Rpen >= 0)
+
+% NOTE: I have not actually implemented this code, for the following
+% reasons:
+%
+% * Currently, I am not sure of exactly how to implement the resampling
+%   procedure in a reasonably efficient manner.
+%
+% * Consequently, I would not be able to determine the best value for
+%   lambda.
+%
+% * Thus, I would most likely set lambda to zero anyhow.
+%
+% * Which does exactly nothing.
 
 newtree = tree; % Temporary, until I get around to implementing it.
