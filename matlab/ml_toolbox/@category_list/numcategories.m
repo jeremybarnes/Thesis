@@ -14,13 +14,4 @@ function n = numcategories(obj)
 % Jeremy Barnes, 3/4/1999
 % $Id$
 
-
-% PRECONDITIONS
-% none
-
-
 n = obj.numcategories;
-
-
-% POSTCONDITIONS
-check_invariants(obj);
