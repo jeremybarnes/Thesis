@@ -13,7 +13,7 @@ function obj_r = trainagain(obj)
 %
 % RETURNS:
 %
-% A classifier that has had one iteration of "boosting" performed on it
+% A classifier that has had one more iteration of "boosting" performed on it
 
 % @boost/trainagain.m
 % Jeremy Barnes, 25/4/1999
@@ -61,7 +61,7 @@ phi = 0.5;
 bt = log((new_error * (1 - phi)) / (phi * (1 - new_error)));
 
 
-new_w = obj.w .* exp( -bt .* (new_y == obj.y));
+new_w = obj.w .* exp(bt .* (new_y == obj.y));
 new_w = new_w ./ sum(new_w);
 
 % create a structure for our new classifier
