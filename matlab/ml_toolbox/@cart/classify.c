@@ -31,6 +31,9 @@
 #include "mex.h"
 #include <memory.h>
 
+#define mxArray_t mxArray
+
+void call_matlab_1_1(mxArray_t **lhs0, char *command, const mxArray_t *rhs0);
 
 void split_data(double *x, int data_len, int splitvar, double splitval,
 		int dim,
@@ -45,24 +48,28 @@ void recursive_classify(mxArray *tree, double *x, int data_len, int *y,
 			int dim);
 
 
+void call_matlab_1_1(mxArray_t **lhs0, char *command, const mxArray_t *rhs0)
+{
+    /* This function calls MATLAB, executing the given command on the
+       given argument and returning the result. */
+    
+    mxArray_t *lparams[1], *rparams[1];
+    
+    /* Get MATLAB to ask our classifier to classify the data */
+    
+    (const mxArray_t *)rparams[0] = rhs0;
+    
+    mexCallMATLAB(1, lparams, 1, rparams, command);
+    
+    *lhs0 = lparams[0];
+}	
 
-void recursive_classify(mxArray *tree, double *x, int data_len, int *y,
+
+void recursive_classify(mxArray_t *tree, double *x, int data_len, int *y,
 			int dim)
 {
-    int isterminal, category, i, j;
-    mxArray *f_isterminal, *f_category;
-
-    /*
-    mexPrintf("recursive_classify (%d data points, %d dimensions)\n",
-	      data_len, dim);
-    mexPrintf("input:\n");
-    for (i=0; i<data_len; i++) {
-	mexPrintf("    x: ");
-	for (j=0; j<dim; j++)
-	    mexPrintf("%12.4g  ", x[data_len*j + i]);
-	mexPrintf("    y: %d\n", y[i]);
-    }
-    */
+    int i, isterminal, category;
+    mxArray_t *f_isterminal, *f_category;
 
     /* Check for the trivial case */
     if (data_len == 0)
@@ -82,8 +89,6 @@ void recursive_classify(mxArray *tree, double *x, int data_len, int *y,
 
 	category = (int)mxGetScalar(f_category);
 
-	/*mexPrintf("  TERMINAL: category = %d\n", category); */
-
 	for (i=0; i<data_len; i++)
 	    y[i] = category; /* use setmem for speed? */
     }
@@ -100,7 +105,7 @@ void recursive_classify(mxArray *tree, double *x, int data_len, int *y,
 	int splitvar, *left_index, *right_index, left_len, right_len;
 	int *left_y, *right_y;
 	double splitval, *left_x, *right_x;
-	mxArray *f_splitvar, *f_splitval, *left, *right;
+	mxArray_t *f_splitvar, *f_splitval, *left, *right;
 
 	/* Get our field values out */
 	f_splitvar = mxGetField(tree, 0, "splitvar");
@@ -122,9 +127,6 @@ void recursive_classify(mxArray *tree, double *x, int data_len, int *y,
 	right = mxGetField(tree, 0, "right");
 	if (right == NULL)
 	    mexErrMsgTxt("classify: Error reading RIGHT field");
-
-	/*mexPrintf("  NONTERMINAL: splitvar = %d, splitval = %g\n",
-	  splitvar, splitval);*/
 
 	/* Split the data up */
 	split_data(x, data_len, splitvar, splitval, dim,
@@ -150,19 +152,8 @@ void recursive_classify(mxArray *tree, double *x, int data_len, int *y,
 	mxFree(right_y);
 	mxFree(right_index);
     }
-
-    /*
-    mexPrintf("output:\n");
-    for (i=0; i<data_len; i++) {
-	mexPrintf("    x: ");
-	for (j=0; j<dim; j++)
-	    mexPrintf("%12.4g  ", x[data_len*j + i]);
-	mexPrintf("    y: %d\n", y[i]);
-    }
-    mexPrintf("\n\n");
-    */
-
 }
+
 
 void split_data(double *x, int data_len, int splitvar, double splitval,
 		int dim,
@@ -255,7 +246,7 @@ void merge_data(int *y, int dim,
 {
     /* MERGE_DATA merge together a dataset split using SPLIT_DATA */
 
-    int i, j, data_len, this_index, *py, *pi;
+    int i, data_len, this_index, *py, *pi;
 
     data_len = left_len + right_len;
 
@@ -280,18 +271,19 @@ void merge_data(int *y, int dim,
 
 
 /* Gateway function */
-void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
+void mexFunction(int nlhs, mxArray_t *plhs[],
+		 int nrhs, const mxArray_t *prhs[])
 {
     
-    /* First argument, obj, is ignored */
-     
     /* function [var, val, left_cat, right_cat] = 
      *            train_guts(obj, x, y, w, dimensions, cat);
      */
 
     double *x, *y_double;
-    mxArray *f_dimensions, *tree;
+    mxArray_t *f_dimensions, *tree, *obj;
     int i, *y, dimensions, data_len;
+
+    (const mxArray_t *)obj = prhs[0];
 
     /* Check that we have 2 RHS arguments */
     if (nrhs != 2) {
@@ -314,16 +306,11 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
     }
     
     /* Get our number of dimensions */
-    f_dimensions = mxGetField(prhs[0], 0, "dimensions");
-    if (f_dimensions == NULL) {
-	mexErrMsgTxt("classify: Error reading DIMENSIONS field");
-	return;
-    }
-    
+    call_matlab_1_1(&f_dimensions, "dimensions", obj);
     dimensions = (int)mxGetScalar(f_dimensions);
 
     /* Get our tree structure */
-    tree = mxGetField(prhs[0], 0, "tree");
+    tree = mxGetField(obj, 0, "tree");
     if (tree == NULL) {
 	mexErrMsgTxt("classify: Error reading TREE field");
 	return;
@@ -364,5 +351,4 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 
     /* Free up storage */
     mxFree(y);
-
 }
