@@ -126,14 +126,24 @@ for noisevalue=1:num_noise_values
 	 % Calculate test statistics
 	 this_test = this_test_res(:, i);
 	 this_test = this_test(find(this_test >= 0)); % strip out -1s
-	 this_test_mean(i) = mean(this_test);
-	 this_test_std(i)  = std (this_test);
+	 if (~isempty(this_test))
+	    this_test_mean(i) = mean(this_test);
+	    this_test_std(i)  = std (this_test);
+	 else
+	    this_test_mean(i) = -1;
+	    this_test_std(i) = -1;
+	 end
 	 
 	 % Calculate test statistics
 	 this_train = this_train_res(:, i);
 	 this_train = this_train(find(this_train >= 0)); % strip out -1s
-	 this_train_mean(i) = mean(this_train);
-	 this_train_std(i)  = std (this_train);
+	 if (~isempty(this_train))
+	    this_train_mean(i) = mean(this_train);
+	    this_train_std(i)  = std (this_train);
+	 else
+	    this_train_mean(i) = -1;
+	    this_train_std(i) = -1;
+	 end
 	 
 	 % Number of trials that made it through this many iterations
 	 this_counts(i) = length(this_test);
