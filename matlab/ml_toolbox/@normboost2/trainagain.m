@@ -15,6 +15,7 @@ function [obj_r, context] = trainagain(obj)
 %
 % This form returns information designed to make the testing process more
 % efficient.  It is a struct array, with (at least) the fields 
+%
 % RETURNS:
 %
 % A classifier that has had one more iteration of "boosting" performed on it
