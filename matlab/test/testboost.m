@@ -31,100 +31,39 @@ function testboost(datatype, numpoints, num_iter)
 % Jeremy Barnes, 25/4/1999
 % $Id$
 
-% PRECONDITIONS:
-% none
-
 if (nargin == 2)
-   num_iter = 10;
+   num_iter = 500;
 end
 
 
-% Set up our classifiers
+% Set up our classifier
 b = category_list('binary');
 maxiterations = 100;
 
-wl2 = cart(b, 2, 'gini', 3);
-wl1 = decision_stump(b, 2);
+wl = decision_stump(b, 2);
 
-boost1 = boost(wl1);
-boost2 = boost(wl2);
+boost1 = boost(wl);
 
 d = dataset(b, 2);
 d = datagen(d, datatype, numpoints, 0, 0.1);
 [x, y] = data(d);
 
 test_d = dataset(b, 2);
-test_d = datagen(test_d, datatype, 1000, 0, 0);
+test_d = datagen(test_d, datatype, 5000, 0, 0);
 [xtest, ytest] = data(test_d);
 
-% Complete our initial training step
+% Do the testing
+[trained, test_err, train_err] = test(boost1, d, test_d, num_iter);
+[trained2, test_err2, train_err2] = test(boost1, d, test_d, num_iter, 'slow');
 
-boost1 = trainfirst(boost1, d);
-%boost2 = trainfirst(boost2, d);
+% Plot the results
+figure(1);  clf;
 
-train_error1 = training_error(boost1);
-%train_error2 = training_error(boost2);
-%disp(['Training error (boost2) = ' num2str(train_error2)]);
-
-test_error1 = empirical_risk(boost1, xtest, ytest);
-%test_error2 = empirical_risk(boost2, xtest, ytest);
-
-iter = 1;
-
-train_points = logspace(1, num_iter, 100);
-
-tic;
-
-while (1)
-   disp(['Iteration ' num2str(iter)]);
-
-   % Calculation phase
-   if (~aborted(boost1))
-      boost1 = trainagain(boost1);
-   end
-
-   te1 = training_error(boost1);
-   train_error1 = [train_error1 te1];
-   test_error1 = [test_error1 empirical_risk(boost1, xtest, ytest)];
-
-%   if (~aborted(boost2))
-%      boost2 = trainagain(boost2);
-%   end
-%   te2 = training_error(boost2);
-%   train_error2 = [train_error2 te2];
-%   test_error2 = [test_error2 empirical_risk(boost2, xtest, ytest)];
-
-   if (iter == num_iter)
-      toc
-
-      figure(1);
-      clf;
-
-      % First error plot
-      subplot(2, 1, 1);
-      plot(train_error1, 'b-');
-      hold on;
-      plot(test_error1, 'r-');
-      
-      xlabel('Iteration');
-      ylabel('Error');
-      
-      legend('training error', 'test error');
-      
-%      % Second error plot
-%      subplot(2, 1, 2);
-%      plot(train_error2, 'b-');
-%      hold on;
-%      plot(test_error2, 'r-');
-      
-%      xlabel('Iteration');
-%      ylabel('Error');
-      
-%      legend('training error', 'test error');
-      return;
-   end
-      
-   iter = iter + 1;
-end
-
-
+iter = 1:length(test_err);
+plot(iter, test_err, 'r-');  hold on;
+plot(iter, train_err, 'b-');
+plot(iter, test_err2, 'c--');
+plot(iter, train_err2, 'm--');
+xlabel('iterations');  ylabel('error');
+legend('test error', 'training error', 'slow test error', ['slow training' ...
+		    ' error']);
