@@ -140,7 +140,7 @@ function var = load_variable(test, varname)
 global DATA_SAVE_PATH;  % We assume that it exists
 
 % Summary file name
-summaryfile = [DATA_SAVE_PATH '/' test '-summary.mat'];
+summaryfile = [DATA_SAVE_PATH '/' test '/' test '-summary.mat'];
 
 % Try to load in the named variable
 load_error = 0;

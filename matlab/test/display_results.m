@@ -18,63 +18,51 @@ function display_results(test, varargin)
 % Jeremy Barnes, 23/9/1999
 % $Id$
 
-global DATA_SAVE_PATH;
-
-if (isempty(DATA_SAVE_PATH))
-   error(['runtest: must set global variable DATA_SAVE_PATH before you' ...
-	  ' begin']);
-end
-
-% Summary file name
-summaryfile = [DATA_SAVE_PATH '/' test '-summary.mat'];
-
-% Load in our summary
-load_error = 0;
-eval('load(summaryfile);', 'load_error = 1;');
-
-if (load_error)
-   error('Could not load summary file.  Create it with summarise.');
-end
-
-% The final form of the summary is a 3-dimensional array.  The first
-% dimension is the noise values.  The second dimension is the p values.
-% The third dimension is the iteration numbers.
-
-% We also keep a second array that contains the number of values that
-% have been added together in the first array.  This is necessary as
-% training may abort, meaning that more make it to lower
-% iterations than to higher iterations.
-
-num_p_values = length(p);
-num_noise_values = length(noise);
+% How to lay out our pages
+plot_cols = 4;
+plot_rows = 4;
 
 % The counter variables
-currentfig = 1;
+current_fig = 0;
+current_subplot = plot_cols*plot_rows+1;
 
-num_noise_values
-num_p_values
-trials
+% Find out about the test that we are plotting
+test_info = get_test_info(test);
 
 % Go through and load all of our files
+train_mean = get_test_results(test, 'train_mean', 'all', 'all');
+train_std  = get_test_results(test, 'train_std',  'all', 'all');
 
-for noisevalue=1:num_noise_values
-   for pvalue=1:num_p_values
-      figure(currentfig);
-      currentfig = currentfig + 1;
+test_mean = get_test_results(test, 'test_mean', 'all', 'all');
+test_std  = get_test_results(test, 'test_std',  'all', 'all');
+
+
+for noisevalue=1:length(test_info.noise)
+   current_noise = test_info.noise(noisevalue);
+   for pvalue=1:length(test_info.p)
+      current_p = test_info.p(pvalue);
       
-      train_d = train_res(noisevalue, pvalue, :);
-      test_d = test_res(noisevalue, pvalue, :);
-      graphtitle = ['Training profile: noise=' num2str(noise(noisevalue))];
-      draw_training_profile(test_d, train_d, graphtitle, noise(noisevalue));
+      if (current_subplot > plot_rows*plot_cols)
+	 current_subplot = 1;
+	 current_fig = current_fig + 1;
+	 figure(current_fig);  clf;
+      end
+      
+      subplot(plot_rows, plot_cols, current_subplot);
+      current_subplot = current_subplot + 1;
+      
+      train_d = train_mean(noisevalue, pvalue, :);
+      test_d = test_mean(noisevalue, pvalue, :);
+      graphtitle = ['noise=' num2str(current_noise) ...
+		    ' p = ' num2str(current_p)];
+      draw_training_profile(test_d, train_d, graphtitle);
    end
 end
 
 
-function draw_training_profile(test_d, train_d, graphtitle, noise)
+function draw_training_profile(test_d, train_d, graphtitle)
 
 % Draws a graph
-
-clf;
 
 iter = 1:length(test_d);
 semilogx(iter, test_d, 'r-');  hold on;
@@ -82,12 +70,12 @@ semilogx(iter, test_d, 'r-');  hold on;
 iter = 1:length(train_d);
 semilogx(iter, train_d, 'b-');
 
-plot([1 length(train_d)], [noise noise], 'k--');
+grid on;
 
-xlabel('Iterations');
-ylabel('Error');
+%xlabel('Iterations');
+%ylabel('Error');
 
-legend('Test error', 'Training error');
+%legend('Test error', 'Training error');
 title(graphtitle);
 
 
