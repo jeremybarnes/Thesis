@@ -17,6 +17,9 @@
 
 #define OPTION_STR_LENGTH 50
 #define FASTMAP_SIZE 256
+#define MATLAB_REGEX_SYNTAX RE_INTERVALS | RE_CHAR_CLASSES \
+                          | RE_NO_BK_PARENS | RE_NO_BK_BRACES \
+                          | RE_NO_BK_VBAR | RE_BACKSLASH_ESCAPE_IN_LISTS
 
 mxArray_t *reg_to_matlab_string(char *s, struct re_registers *registers,
 				int num)
@@ -30,8 +33,10 @@ mxArray_t *reg_to_matlab_string(char *s, struct re_registers *registers,
 
     /* Sanity check */
     if ((num >= registers->num_regs) | (num < 0)) {
-	mexErrMsgTxt("regex: attempt to access invalid backreference");
-	return NULL;
+	out = mxCreateString("\0");
+	if (out == NULL)
+	    mexErrMsgTxt("regex: couldn't create empty string");
+	return out;
     }
 
     /* Find out the size of the string */
@@ -66,11 +71,13 @@ void mexFunction(int nlhs, mxArray_t *plhs[],
     mxArray_t *matched, *cells;
     char option_str[OPTION_STR_LENGTH];
     char *pattern_str, *string_str;
-    int res, individual = 0, boolean = 0, pattern_len, string_len, num_regs, i;
+    int res, boolean = 0, individual = 0, pattern_len, string_len, i;
     const char *error_msg;
     struct re_registers registers;
     struct re_pattern_buffer pattern_buf;
     char fastmap[FASTMAP_SIZE];
+    enum reg_output_type output_type;
+    int current_arg;
 
     /* No output arguments: just return */
     if (nlhs == 0) return;
@@ -80,8 +87,11 @@ void mexFunction(int nlhs, mxArray_t *plhs[],
     pattern = prhs[0];
     string = prhs[1];
 
-    if (nrhs == 3) {
-	option = prhs[2];
+    current_arg = 2;
+
+    while (current_arg < nrhs) {
+	/* Process all of the options */
+	option = prhs[current_arg];
 	res = mxGetString(option, option_str, OPTION_STR_LENGTH);
 	if (res != 0) mexErrMsgTxt("regex: invalid option argument");
 
@@ -90,9 +100,24 @@ void mexFunction(int nlhs, mxArray_t *plhs[],
 	else if (strncmp(option_str, "boolean", OPTION_STR_LENGTH) == 0) 
 	    boolean = 1;
 	else mexErrMsgTxt("regex: invalid option argument");
+
+	current_arg++;
     }
 
-    if (nrhs > 3) mexErrMsgTxt("regex: too many arguments");
+    /* Act on our options */
+    output_type = ROT_NONE;
+
+    if (!boolean) { /* [match, cells] | [match, reg1, reg2, ...] */
+	if (nlhs == 1) output_type = ROT_NONE;
+	else if (nlhs == 2) output_type = ROT_CELL;
+	else if (nlhs > 2) output_type = ROT_INDIVIDUAL;
+    } else {
+	if (nlhs == 2) output_type = ROT_NONE;
+	else if (nlhs == 3) output_type = ROT_CELL;
+	else if (nlhs > 3) output_type = ROT_INDIVIDUAL;
+    }
+
+    if (individual) output_type = ROT_INDIVIDUAL;
 
     /* Get the pattern string */
     pattern_len = mxGetNumberOfElements(pattern);
@@ -123,6 +148,8 @@ void mexFunction(int nlhs, mxArray_t *plhs[],
     pattern_buf.allocated = 0;
     pattern_buf.regs_allocated = REGS_UNALLOCATED;
     pattern_buf.fastmap = fastmap;
+    re_set_syntax(MATLAB_REGEX_SYNTAX);
+    registers.num_regs = 0;
 
     mexPrintf("Compiling regular expression...");
 
@@ -143,7 +170,14 @@ void mexFunction(int nlhs, mxArray_t *plhs[],
 
     mexPrintf("done.\n");
 
+    mexPrintf("There were %d backreferences\n", pattern_buf.re_nsub);
+
+    current_arg = 0;
+
     if (boolean) {
+	/* If boolean is set, then the very first output arg is a boolean
+	   value. */
+	
 	matched = mxCreateDoubleMatrix(1, 1, mxREAL);
 	if (matched == NULL)
 	    mexErrMsgTxt("regex: unable to allocate matched array");
@@ -155,48 +189,89 @@ void mexFunction(int nlhs, mxArray_t *plhs[],
 	    *mxGetPr(matched) = 1.0;
 	    mexPrintf("Match was found\n");
 	}
-	plhs[0] = matched;
+	plhs[current_arg++] = matched;
     }
-    
-    else {
+
+    /* Next output argument is the matched string */
+    if (current_arg < nlhs) {
 	matched = reg_to_matlab_string(string_str, &registers, 0);
-	plhs[0] = matched;
+	plhs[current_arg++] = matched;
     }	
 
-    /* Now, if we were called with LHS arguments, then we need to return
-       the contents of the backreference "registers" */
+    /* The rest of the output arguments are the registers */
+    if (output_type == ROT_CELL) {
+	int num_regs = pattern_buf.re_nsub;
 
-    if (individual) num_regs = nlhs;
-    else {
-	num_regs = pattern_buf.re_nsub;
+	if (current_arg >= nlhs)
+	    mexErrMsgTxt("regex: Not enough output arguments for cell array");
+
+	/* Cell matrix: create and populate */
 	cells = mxCreateCellMatrix(num_regs, 1);
 	if (cells == NULL)
 	    mexErrMsgTxt("regex: unable to create output cell array");
+
+	/* Populate */
+	for (i=1; i<=num_regs; i++) {
+	    mxArray_t *out;
+
+	    out = reg_to_matlab_string(string_str, &registers, i);
+	    if (out == NULL)
+		mexErrMsgTxt("regex: couldn't get register");
+
+	    else mxSetCell(cells, i-1, out);
+	}
+
+	plhs[current_arg++] = cells;
     }
 
-    mexPrintf("Number of output regs = %d\n", num_regs);
+    else if (output_type == ROT_INDIVIDUAL) {
+	/* Individual: fill in output arguments until we run out of
+	   them or things to put in them */
 
-    for (i=0; i<num_regs; i++) {
-	mxArray_t *out;
+	int num_regs = pattern_buf.re_nsub, current_reg = 1;
 
-	out = reg_to_matlab_string(string_str, &registers, i);
-	if (out == NULL)
-	    mexErrMsgTxt("regex: couldn't get register");
+	while ((current_arg < nlhs) && (current_reg <= num_regs)) {
+	    mxArray_t *out;
 
-	if (individual) plhs[i+1] = out;
-	else mxSetCell(cells, i, out);
+	    out = reg_to_matlab_string(string_str, &registers, current_reg);
+	    if (out == NULL)
+		mexErrMsgTxt("regex: couldn't get register");
+
+	    else plhs[current_arg] = out;
+	    current_reg++;
+	    current_arg++;
+	}
+	
+	/* If there are more output arguments, make them the empty string */
+	while (current_arg < nlhs) {
+	    mxArray_t *out;
+
+	    out = mxCreateString("\0");
+	    if (out == NULL)
+		mexErrMsgTxt("regex: couldn't create empty string");
+	    
+
+	    plhs[current_arg++] = out;
+	}
     }
 
-    if (!individual)
-	plhs[1] = cells;
+    /* Cause an error if there are the wrong number of output arguments */
+    if (current_arg != nlhs)
+	mexErrMsgTxt("regex: too many output arguments");
+
 
     /* Clean up */
     mexPrintf("Cleaning up registers...");
-    mxFree(registers.start);
-    mxFree(registers.end);
+    if (registers.num_regs > 0) {
+	mxFree(registers.start);	
+	mxFree(registers.end);
+    }
+
     mexPrintf("done.\nCleaning up pattern_buf...");
-    pattern_buf.fastmap = NULL;
-    regfree(&pattern_buf);
+    if (pattern_buf.buffer != NULL)
+	mxFree(pattern_buf.buffer);
+    pattern_buf.buffer = NULL;
+
     mexPrintf("done.\nCleaning up strings...");
     mxFree(string_str);
     mxFree(pattern_str);
