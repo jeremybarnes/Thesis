@@ -18,7 +18,7 @@ baselines = {'boost-50samples', 'boost-sonar', ...
 	     'boost-wpbc-test', 'boost-acacia'};
 	     
 tests = {'normboost-50samples', 'normboost2-50samples', 'p_boost-50samples';
-	 'normboost-sonar',     'normboost2-sonar',     'p_boost-sonar';
+	 'normboost-sonar2',    'normboost2-sonar2',    'p_boost-sonar';
 	 'normboost-wpbc',      'normboost2-wpbc',      '';
 	 'normboost-acacia',    'normboost2-acacia',    ''};
 

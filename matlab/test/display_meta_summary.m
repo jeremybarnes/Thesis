@@ -32,7 +32,7 @@ switch graph
 
       algcolors = {'r', 'b', 'k'};
       
-      datamarkers = {{'.', 'x', 'o', '*'}, {'p'}, {'^'}, {'d'}};
+      datamarkers = {{'.', 'x', 'o', '*'}, {'s'}, {'^'}, {'d'}};
 
       figure(1);  clf;  setup_figure;
       
@@ -58,8 +58,6 @@ switch graph
 		  baseline_mean = baseline.avg_err(k);
 		  baseline_stdev = baseline.std_err(k);
 		  
-		  style = ['k' datamarkers{j}{k}];
-		  plot(best_mean, baseline_mean, style);
 		  hold on;
 		  
 		  % Plot error bars
@@ -69,11 +67,24 @@ switch graph
 		  yl = baseline_mean - baseline_stdev;
 		  yu = baseline_mean + baseline_stdev;
 		  
-		  errorbar_style = ['k' ':'];
-		  plot([x xl], [y y], errorbar_style);
-		  plot([x xr], [y y], errorbar_style);
-		  plot([x x], [y yl], errorbar_style);
-		  plot([x x], [y yu], errorbar_style);
+		  errorbar_style = {'linewidth', 0.5, ...
+				    'color', [0.5 0.5 0.5]};
+		  plot([x xl], [y y], errorbar_style{:});
+		  plot([x xr], [y y], errorbar_style{:});
+		  plot([x x], [y yl], errorbar_style{:});
+		  plot([x x], [y yu], errorbar_style{:});
+		  
+		  if (datamarkers{j}{k} == '.')
+		     style = {['k' datamarkers{j}{k}], ...
+			      'MarkerFaceColor', [1 1 1], ...
+			      'MarkerSize', 15};
+		  else
+		     style = {['k' datamarkers{j}{k}], ...
+			      'MarkerFaceColor', ...
+			      [1 1 1]};
+		  end
+		  
+		  plot(best_mean, baseline_mean, style{:});
 	       end
 	    end
 	 end
@@ -117,22 +128,31 @@ switch graph
 		  baseline_mean = baseline.avg_iter(k);
 		  baseline_stdev = baseline.std_iter(k);
 		  
-		  style = ['k' datamarkers{j}{k}];
-		  loglog(best_mean, baseline_mean, style);
-		  hold on;
-		  
 		  % Plot error bars
 		  x = best_mean;  y = baseline_mean;
-		  xl = max(best_mean - best_stdev, 1);
-		  xr = max(best_mean + best_stdev, 1);
-		  yl = max(baseline_mean - baseline_stdev, 1);
-		  yu = max(baseline_mean + baseline_stdev, 1);
+		  xl = max(0.01, best_mean - best_stdev);
+		  xr = best_mean + best_stdev;
+		  yl = max(0.01, baseline_mean - baseline_stdev);
+		  yu = baseline_mean + baseline_stdev;
 		  
-		  errorbar_style = ['k' ':'];
-		  plot([x xl], [y y], errorbar_style);
-		  plot([x xr], [y y], errorbar_style);
-		  plot([x x], [y yl], errorbar_style);
-		  plot([x x], [y yu], errorbar_style);
+		  errorbar_style = {'linewidth', 0.5, ...
+				    'color', [0.5 0.5 0.5]};
+		  loglog([x xl], [y y], errorbar_style{:});  hold on;
+		  loglog([x xr], [y y], errorbar_style{:});
+		  loglog([x x], [y yl], errorbar_style{:});
+		  loglog([x x], [y yu], errorbar_style{:});
+
+		  if (datamarkers{j}{k} == '.')
+		     style = {['k' datamarkers{j}{k}], ...
+			      'MarkerFaceColor', [1 1 1], ...
+			      'MarkerSize', 15};
+		  else
+		     style = {['k' datamarkers{j}{k}], ...
+			      'MarkerFaceColor', ...
+			      [1 1 1]};
+		  end
+
+		  loglog(best_mean, baseline_mean, style{:});
 	       end
 	    end
 	 end
@@ -182,7 +202,8 @@ switch graph
 		  style = ['k' algmarkers{i}];
 
 		  plot(pvalues, this_mean, style);  hold on;
-		  plot(pvalues(best_index), best_mean, 'k.');
+		  plot(pvalues(best_index), best_mean, 'k.', 'markersize', ...
+		       10);
 		  plot([minp maxp], [baseline_mean baseline_mean], ...
 		       'k-', 'linewidth', 2);
 	       end

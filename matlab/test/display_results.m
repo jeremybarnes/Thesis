@@ -83,7 +83,6 @@ opt.showminimum = 0;
 opt.squareaxis = 0;
 opt.startletter = 'default';
 opt.startplot = 'default';
-opt.downsample = 0;
 
 % Parse our options
 for i=1:length(varargin)./2
@@ -139,8 +138,6 @@ for i=1:length(varargin)./2
 	 opt.startletter = opt_value;
       case 'startplot'
 	 opt.startplot = opt_value;
-      case 'downsample'
-	 opt.downsample = opt_value;
       otherwise,
 	 error(['Unknown option ''' opt_name '''.']);
    end
@@ -154,13 +151,10 @@ if (~isa(opt.test_err_style, 'cell'))
    opt.test_err_style = {opt.test_err_style};
 end
 
+
 % default status values
 if (strcmp(opt.startletter, 'default'))
-   if (strcmp(opt.startplot, 'default'))
-      opt.startletter = 'a'-1;
-   else
-      opt.startletter = opt.startplot + 'a' - 2;
-   end
+   opt.startletter = opt.startplot + 'a' - 1;
 end
 
 if (strcmp(opt.startplot, 'default'))
@@ -170,7 +164,7 @@ if (strcmp(opt.startplot, 'default'))
    status.axis_h = [];
 else
    status.current_fig = 1;
-   status.current_subplot = opt.startplot-1;
+   status.current_subplot = opt.startplot;
    status.current_letter = opt.startletter;
    status.axis_h = [];
 end
@@ -266,39 +260,26 @@ switch type
 	       train_d = train_d(1:stopat);
 	    end
 
-	    % Downsample if required
-	    if (opt.downsample)
-	       iter = floor(logspace(0, log10(length(test_d)), ...
-				     opt.downsample));
-	       iter = unique(iter);
-	       count_iter = floor(logspace(0, log10(length(count_d)), ...
-					   opt.downsample));
-	       count_iter = unique(count_iter);
-	       
-	       test_d = test_d(iter);
-	       train_d = train_d(iter);
-	       count_d = count_d(count_iter);
-	    else
-	       iter = 1:length(test_d);
-	       count_iter = 1:length(count_d);
-	    end
+	    iter = 1:length(test_d);
 	    
 	    % We need to mangle the hell out of it to get double axes
 	    if (opt.display_counts)
+	       iter = 1:length(count_d);
+
 	       if (strcmp(type, 'testtrain'))
-		  [ax, h1, h2] = plotyy(iter, test_d, count_iter, count_d);
+		  [ax, h1, h2] = plotyy(1:length(test_d), test_d, iter, count_d);
 		  hold on;
 		  set(ax(2), 'xscale', 'log');
 		  set(ax(1), 'xscale', 'log');
 		  set(ax(2), 'ylim', [0 test_info.trials]);
 		  delete(h1);
-		  semilogx(iter, test_d, opt.test_err_style{:});
-		  semilogx(iter, train_d, opt.train_err_style{:});
+		  semilogx(1:length(test_d), test_d, opt.test_err_style{:});
+		  semilogx(1:length(train_d), train_d, opt.train_err_style{:});
 	       elseif (~isempty(findstr(type, 'test')))
-		  [ax, h1, h2] = plotyy(iter, test_d, count_iter, count_d);
+		  [ax, h1, h2] = plotyy(iter, test_d, iter, count_d);
 		  hold on;
 	       elseif (~isempty(findstr(type, 'train')))
-		  [ax, h1, h2] = plotyy(iter, train_d, count_iter, count_d);
+		  [ax, h1, h2] = plotyy(iter, train_d, iter, count_d);
 		  hold on;
 	       end
 	       
@@ -316,10 +297,12 @@ switch type
 	    
 	    else
                if (~isempty(findstr(type, 'test')))
+		  iter = 1:length(train_d);
 		  semilogx(iter, test_d, opt.test_err_style{:});  hold on;
 	       end
 	       
 	       if (~isempty(findstr(type, 'train')))
+		  iter = 1:length(train_d);
 		  semilogx(iter, train_d, opt.train_err_style{:});
 	       end
 	    
