@@ -119,7 +119,7 @@ $i=1 \ldots m$
 	\begin{equation}
 	w_i|_{t+1} = \left\{
 	\begin{array}{cl}
-		w_i|_t / Z_t \exp \left{ b_t \right\}&	\qquad \qquad \mbox{if
+		w_i|_t / Z_t \exp \left\{ b_t \right\}&	\qquad \qquad \mbox{if
 		$f_t(x_i) = y_i$} \\
 		w_i|_t / Z_t \exp \left\{ -b_t \right\} & \qquad \qquad
 		\mbox{otherwise} \\
@@ -322,11 +322,19 @@ minimising the weighted empirical risk
 R_{\emp}^{w_{|t}} = \sum_{i:y_i \neq h(\bfx_i)}^{m} w_{i|t}
 \end{equation}
 %
-where $w_{|t}$ are the sample weights of boosting.
+where $w_{|t}$ are
+%
+\begin{equation}
+minus the derivative of the cost function
+\label{eqn:gradient sample weights}
+\end{equation}
+
 \proof See \cite{Mason99}.  We assume that our cost function is
 monotonically decreasing; the result follows easily from that
 assumption.
 \end{theorem}
+
+Note that these weights are the same that AdaBoost uses.
 
 Having chosen our direction, we now choose a step size $b_t$.
 AdaBoost uses a line search for the minimum of the cost functional
@@ -504,6 +512,28 @@ e main result of this section is a theorem that the empirical risk
 (training error) of boosting will converge to zero if the algorithm is
 trained for long enough.
 
+
+This is from \cite{Schapire97}.  We use it to prove a theorem below.
+
+\begin{theorem}[Weight update of AdaBoost]
+The weights $w_{i|t}$ in the $t$-th iteration are chosen such that the
+previous hypothesis has exactly a weighted training error $\epsilon$
+of $1/2$.
+\end{theorem}
+
+The following theorem shows that the total weight of the boosting
+algorithm is unbounded as the number of iterations increases.  It is
+used to prove results on the minimum margin and final training error
+of boosting.
+
+\begin{theorem}
+The size of the $b$ weight vector, $\|b\| \rightarrow \infty$
+as $t \rightarrow \infty$ (assuming the boosting algorithm doesn't
+terminate).
+
+\proof ?
+\end{theorem}
+
 \begin{theorem}[Boosting reaches zero training error]
 Given a weaklearner $\mathcal{L}$ and a training set $S$,
 then either:
@@ -543,9 +573,12 @@ I need to bring the training error < 1/2 into it somewhere.  I think
 that I can show that if
 \begin{itemize}
 \item	$\|b\|$ increases without bound; and
-\item	$\epsilon_t$ is always < 1/2, then
+\item	$\epsilon_t$ is always < 1/2, then we get there
 \end{itemize}
-I don't know!
+
+I should look at Schapire's paper (I don't have it...); but I do want
+to prove this in a way which uses the fact that the weight vector
+grows to infinity (because I want to talk about that later).
 
 \end{theorem}
 
@@ -600,71 +633,17 @@ scaled hypothesis $kF$ is equivalent to the unscaled hypothesis $F$.
 independent of a scaling of the $b$ values.
 \end{theorem}
 
+Not only the output but the margins also are invariant to scaling:
 
-
-
-* Guaranteed convergence to zero training error
-
-  * It modifies the weights at each iteration so the previous had
-    $\epsilon_t = 1/2$
-
-  * So we must keep on getting better
-
-  * So we must converge
-
-* Scale invariance
-
-  * The sign makes it not matter
-
-  * If we multiply $F_t$ by $k$ to get $F*_t$, then we get $b*_{t+1} = 1/k
-    b_{t+1}$
-
-* Converges to the solution that has the minimum margin
-	
-\subsection{Convergence of boosting}
-
-
-
-
-\subsection{Size of $b$}
-
-The following theorem shows that the total weight of the boosting
-algorithm is unbounded as the number of iterations increases.  It is
-used to prove results on the minimum margin and final training error
-of boosting.
-
-\begin{theorem}
-The size of the $b$ weight vector, $\|b\| \rightarrow \infty$
-as $t \rightarrow \infty$ (assuming the boosting algorithm doesn't
-terminate).
-
-\proof ?
+\begin{theorem}[Invariance of AdaBoost to margin scaling]
+If we scale the margins of AdaBoost by a particular constant amount
+$k$, it produces weights which are $1/k$ what they would be otherwise.
 \end{theorem}
 
+However, the size of the weights is important.
 
-\subsection{Minimum margin}
-
-The following proof shows that the solution that AdaBoost converges to
-is the one that maximises the minimum margin on the training samples.
-
-
-
-We denote this equivalence by writing
-\[
-kF \equiv F
-\]
-
-
-\subsection{Scale invariance of AdaBoost}
-
-The following theorem takes the previous result one step further,
-showing that is AdaBoost is given a scaled hypothesis $kF$ instead of
-$F$, it will choose a $b$ value that is also scaled by the same
-amount.
-
-this is not true... look at Gunnar's notes again
-
-\begin{theorem}
+\begin{theorem}[This theorem is not true -- I need to negate it
+(assume true, show contradiction)]
 Assume a strong hypothesis $F_t(\cdot) = b_1 f_1(\cdot) + \cdots + b_m
 f_m(\cdot)$.  Denote the training action of the AdaBoost algorithm as
 $F_t(\cdot) \Rightarrow F_{t+1}(\cdot) = F_t(\cdot) +
@@ -683,18 +662,9 @@ and thus
 \]
 
 \proof We show that the minimum of the cost function occurs at
-$kb_{t+1}$ instead of $b_{t+1}$.
+$kb_{t+1}$ instead of $b_{t+1}$ (which it doesn't) --> contradiction
 \end{theorem}
 
-
-
-These are from \cite{Ratsch98}:
-
-\begin{theorem}[Weight update of AdaBoost (Schapire \cite{Schapire97})]
-The weights $w_{i|t}$ in the $t$-th iteration are chosen such that the
-previous hypothesis has exactly a weighted training error $\epsilon$
-of $1/2$.
-\end{theorem}
 
 \subsection{Summary}
 

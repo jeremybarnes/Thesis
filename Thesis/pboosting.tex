@@ -64,7 +64,7 @@ weights $b$.  Denoting the classifier weight that AdaBoost would have
 used as $b'_t$, we use the formula
 %
 \begin{equation}
-b_t = b'_t^\frac{1}{p} = \left[ - 1/2 \log \left( \frac{\epsilon_t}{1
+b_t = (b'_t)^{\frac{1}{p}} = \left[ - 1/2 \log \left( \frac{\epsilon_t}{1
 - \epsilon_t} \right) \right]^\frac{1}{p}
 \end{equation}
 %
@@ -90,9 +90,9 @@ The first option yields the equation
 \begin{equation}
 w_i|_{t+1} = \left\{
 \begin{array}{cl}
-	w_i|_t / Z_t \exp \left\{ b'_t^{1/p} \right\} & \qquad \qquad \mbox{if
+	w_i|_t / Z_t \exp \left\{ (b'_t)^{1/p} \right\} & \qquad \qquad \mbox{if
 	$f_t(x_i) = y_i$} \\
-	w_i|_t / Z_t \exp \left\{ -b'_t^{1/p} \right\} 	& \qquad \qquad
+	w_i|_t / Z_t \exp \left\{ -(b'_t)^{1/p} \right\} 	& \qquad \qquad
 	\mbox{otherwise} \\
 \end{array} \right.
 \end{equation}
@@ -130,7 +130,8 @@ illustrated in figure \ref{fig:strict line search}.
 \end{center}
 \begin{capt}{Line search for strict $p$-boosting algorithm}
 The strict $p$-boosting algorithm confines its line search to the
-$p$-convex hull of points.
+$p$-convex hull of points, whereas AdaBoost searches orthogonal to the
+current hypothesis.
 \end{capt}
 \label{fig:strict line search}
 \end{linefigure}
@@ -141,16 +142,96 @@ Algebraicaly, we are seeking a minimum of the expression
 C(F_{t+1}) = \sum_{i=1}^{m} \exp \left\{ -y_i F_{t+1}(\bfx_i) \right\}
 \end{equation}
 %
-subject to the constraint
-Attempting to obtain a closed form solution for the minimum along this
-line
- 
+subject to the constraint that
+%
+\begin{equation}
+\| b \|_{p} = 1
+\end{equation}
+
+Substituting in the constraint, and performing some manipulations, we
+are looking for
+%
+\begin{equation}
+b_{t+1} = \frac{\alpha}{\left( 1 + \alpha^p \right) ^ {1/p}}
+\end{equation}
+%
+where
+%
+\begin{equation}
+\alpha = \argmin_{\alpha} \sum_{i=1}^{m} \exp \left\{ -y_i \left(
+\frac{F_{t}(\bfx_i) + \alpha h_{t+1}(\bfx_i)}{\left( 1 + \alpha ^p
+\right) ^{1/p}} \right) \right\}
+\label{eqn:strict minimise function}
+\end{equation}
+
+Unfortunately, it is not possible to minimise this algeberically as
+for AdaBoost; we instead have to be content with a numerical
+optimisation.  The method chosen is Newton-Raphson iteration, which
+searches for $\partial C(F) / \partial \alpha = 0$ by repeatedly
+approximating it with a parabola until a tolerance is reached.
+
+What we have \emph{not} done is to consider whether or not a solution
+to (\ref{eqn:strict minimise function}) exists.  The following theorem
+does so.
+
+\begin{theorem}[Existance of a minimum for strict boost cost]
+I sure hope that I can come up with something.  I know that it always
+finds a minimum for $p \geq 1$ (from observations); it sometimes works
+for $p < 1$; the cutoff seems to be at approximately $p = 0.8$.
+Whether this is dependent upon the data or the weaklearner I don't
+know; I suspect that it has something to do with how well the
+weaklearner works.
+
+The reason a solution doesn't exist is that it is for $\alpha < 0$,
+which means we are trying to optimise a hill instead of a valley (so
+we get to the top).
+\end{theorem}
+
+Finally, we need to consider the sample weight updates.  The gradient
+descent theory gives us the sample weights (\ref{eqn:gradient sample
+weights}).
 
 \subsection{Sloppy algorithm}
 
+L1 and L2 algorithms are special cases of this algorithm.
+
+\begin{linefigure}
+\begin{center}
+\includegraphics{figures/sloppy_search.epsg}
+\end{center}
+\begin{capt}{Line search for sloppy $p$-boosting algorithm}
+Comparison between the line search for the sloppy and strict
+algorithms.  The strict alrogithm searches directly along the
+$p$-convex hull.  The sloppy algorithm searches along the same line as
+AdaBoost, and then normalises to put the point back onto the
+$p$-convex hull.
+\end{capt}
+\label{fig:strict line search}
+\end{linefigure}
 
 
 \subsection{Gravity algorithm}
+
+  Another possibility is to adjust the cost function
+(\ref{eqn:theory:cost function}) to be of the form
+%
+\begin{equation}
+C(F) = \frac{1}{l} \sum_{i=1}^{l} \exp
+\left\{ -\bfy_iF(\bfx_i) \right\} \quad + \quad \lambda \|b\|_p
+\label{eqn:regularisation}
+\end{equation}
+%
+where $\lambda$ indicates how important a small $p$-norm is.  One
+obvious problem with this method is that there are now \emph{two}
+parameters to optimise ($p$ and $\lambda$).  The sharp ``corners'' of a
+$p$-convex hull with $p \rightarrow 0$ may also introduce practical
+problems with gradient descent (it may get stuck in a corner).
+
+A further refinement of this solution would be to choose a much larger
+universe \calX\ (such as $\|\mathbf{b}\|_2 < 1$) without the corners,
+and again use the cost function (\ref{eqn:regularisation}).
+
+Problems with this algorithm
 
 \subsection{Summary}
 
