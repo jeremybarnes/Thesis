@@ -80,17 +80,6 @@ if ((numcategories(obj) == 2) & (option ~= 'slow'))
    train_margins = update_margins(obj, train_margins, wl_train_y);
    test_margins  = update_margins(obj, test_margins,  wl_test_y);
    
-   % Debugging
-%   trainy_ = trainy'
-%   wl_train_y_ = wl_train_y'
-%   train_margins_ = train_margins'
-%   sgn_train_margins = (train_margins > 0)'
-   
-%   testy_ = testy'
-%   wl_test_y_ = wl_test_y'
-%   test_margins_ = test_margins'
-%   sgn_test_margins = (test_margins > 0)'
-   
    % Calculate errors
    train_err(iter) = sum((train_margins > 0) ~= trainy) / length(trainy);
    test_err (iter) = sum((test_margins  > 0) ~= testy) / length(testy);
