@@ -53,7 +53,7 @@ void optimal_split(double *x, int *y, double *w, int dimensions,
 {
     int i, j, k;
 
-    double best_Q = mxGetInf();
+    double best_Q;
 
     double this_w;
     int this_y;
@@ -67,6 +67,7 @@ void optimal_split(double *x, int *y, double *w, int dimensions,
     int tmp_var, tmp_left, tmp_right;
     double tmp_val, left_max, right_max, Qleft, Qright, this_Q;
 
+    double minus_infinity;
 
     /* Allocate memory */
     xyw = mxCalloc(data_length, sizeof(struct xyw));
@@ -77,6 +78,9 @@ void optimal_split(double *x, int *y, double *w, int dimensions,
     *val = 0.5;
     *left_cat = 0;
     *right_cat = 1;
+
+    best_Q = mxGetInf();
+    minus_infinity = -mxGetInf();
 
     for (i=0; i<dimensions; i++) {
 
@@ -107,39 +111,39 @@ void optimal_split(double *x, int *y, double *w, int dimensions,
 	for (j=0; j<cat; j++)
 	    left_total[j] = 0.0;
 	left_sum = 0.0;
+	left_index = -1;
+	left_max = minus_infinity;
 
 	category_weight(xyw, cat, data_length, right_total);
 	right_sum = w_sum;
+	right_index = xyw[0].y; /* force update at start */
+	right_max = minus_infinity;
 
 	for (j=0; j<(data_length-1); j++) {
 
 	    this_y = xyw[j].y;
 	    this_w = xyw[j].w;
-	    /*	    mexPrintf("   point %d: x = %g, y = %d, w = %g\n", j,
-		    xyw[j].x, this_y, this_w	); */
 	    
 	    left_total[this_y] += this_w;
+	    if (left_total[this_y] > left_max) {
+		left_max = left_total[this_y];
+		left_index = this_y;
+	    }
 	    left_sum += this_w;
 
 	    right_total[this_y] -= this_w;
-	    right_sum -= this_w;
-
-	    /* Now to calculate max(left_total) and max(right_total) */
-	    left_max = -1.0;
-	    right_max = left_max;
-	    
-	    for (k=0; k<cat; k++) {
-
-		if (left_total[k] > left_max) {
-		    left_max = left_total[k];
-		    left_index = k;
-		}
-
-		if (right_total[k] > right_max) {
-		    right_max = right_total[k];
-		    right_index = k;
+	    /*	    mexPrintf("right_index = %d, this_y = %d\n", right_index, this_y); */
+	    if (right_index == this_y) {
+		/* We have to find our maximum value again */
+		right_max = minus_infinity;
+		for (k=0; k<cat; k++) {
+		    if (right_total[k] > right_max) {
+			right_max = right_total[k];
+			right_index = k;
+		    }
 		}
 	    }
+	    right_sum -= this_w;
 
 	    /* Calculate individial and combined impurities */
 	    Qleft  = 1.0 - left_max / left_sum;
