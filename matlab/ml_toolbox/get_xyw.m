@@ -1,13 +1,15 @@
-function [x, y, w] = get_xyw(obj, s, varargin)
+function [x, y, w] = get_xyw(obj, s, args)
 
 % GET_XYW versatile parameter handling for (x, y, w) function
 %
 % SYNTAX:
 %
-% [x, y, w] = get_xyw(obj, s, dataset, [w])
-% [x, y, w] = get_xyw(obj, s, x, y, [w])
+% [x, y, w] = get_xyw(obj, s, {dataset, [w]})
+% [x, y, w] = get_xyw(obj, s, {x, y, [w]})
 %
 % S is the string that describes the name of the function
+%
+% Designed to be called as [x, y, w] = get_xyw(obj, 'name', varargin)
 %
 % FIXME: comment
 
@@ -16,29 +18,29 @@ function [x, y, w] = get_xyw(obj, s, varargin)
 % $Id$
 
 
-if (length(varargin) == 0)
+if (length(args) == 0)
    error([s ': not enough arguments given']);
 
-elseif (length(varargin) == 1)
+elseif (length(args) == 1)
    % Must be just a dataset.  Check that this is so, and extract our x
    % and y parameters from it.
 
-   d = varargin{1}{1};
+   d = args{1};
 
    [x, y] = check_dataset(obj, s, d);
 
    w = ones(length(y), 1);
    
-elseif (length(varargin) == 2)
+elseif (length(args) == 2)
    % Either we have a dataset followed by weights, or a {x, y} set.  We
    % can determine which case by looking at the type of the first
    % parameter.
    
-   if (isa(varargin{1}{1}, 'double'))
+   if (isa(args{1}, 'double'))
       % We have an {x, y} pair
       
-      x = varargin{1}{1};
-      y = varargin{2}{1};
+      x = args{1};
+      y = args{2};
       
       check_x(obj, s, x);
       check_y(obj, s, x, y);
@@ -48,21 +50,21 @@ elseif (length(varargin) == 2)
    else
       % We have a dataset followed by weights
       
-      d = varargin{1}{1};
+      d = args{1};
       
       [x, y] = check_dataset(obj, s, d);
       
-      w = varargin{2}{1};
+      w = args{2};
       
       check_w(obj, s, x, y, w);
    end
    
-elseif (length(varargin) == 3)
+elseif (length(args) == 3)
    % We have a x, then a y, then a w
    
-   x = varargin{1}{1};
-   y = varargin{2}{1};
-   z = varargin{3}{1};
+   x = args{1};
+   y = args{2};
+   z = args{3};
    
    check_x(obj, s, x);
    check_y(obj, s, x, y);
