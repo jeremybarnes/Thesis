@@ -25,14 +25,10 @@ function y = classify(obj, x)
 %
 % This may take a long time.
 
-
-% PRECONDITIONS
-% none
-
 % Initialise our votes matrix.  Cumulative totals for each category are
 % across each row; the datapoints are down each column.
 xs = size(x);
-votes = zeros(xs(1), numcategories(obj.categories));
+votes = zeros(xs(1), numcategories(obj));
 y = zeros(xs(1), 1);
 
 % Normalise our voting weights.  This is particularly important, as these
@@ -44,8 +40,7 @@ b = obj.b ./ sum(obj.b);
 % adding its votes up for each datapoint.
 
 for i = 1:obj.iterations
-   this_struct = obj.classifiers{i};
-   this_classifier = this_struct.classifier;
+   this_classifier = obj.classifiers(i);
    this_y = classify(this_classifier, x) + 1; % +1 converts cat to col
 
    for j=1:xs(1)
@@ -63,9 +58,3 @@ for i=1:xs(1)
 
    y(i) = max_index - 1; % -1 because categories go from 0 to n-1
 end
-
-% POSTCONDITIONS
-check_invariants(obj);
-
-return;
-
