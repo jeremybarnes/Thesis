@@ -1,13 +1,3 @@
-function disp_info(obj)
-
-% DISP_INFO method for CLASSIFIER object
-
-% @boost/disp.m
-% Jeremy Barnes, 19/8/1999
-% $Id$
-
-disp(['      dimensions    = ' int2str(dimensions(obj))]);
-disp(['      numcategories = ' int2str(numcategories(obj))]);
 function disp_info(obj, inherited)
 
 % DISP_INFO method for CLASSIFIER object
