@@ -1,0 +1,71 @@
+\input{commands}
+
+\chapter{Development of algorithms}
+
+\section{Scale invariance}
+
+The boosting algorithm is sensitive only to the relative magnitude of
+the classifier weights $b_i$, not to the absolute magnitude.
+
+To see this, consider the linear combination of weights
+%
+\begin{equation}
+y = \sign(F(\bfx)) = \sign(b_1 f_1(\bfx) + b_2 f_2(\bfx) + \cdots +
+b_T f_T(\bfx)
+\end{equation}
+%
+Now as
+%
+\begin{equation}
+\sign(\alpha x) = \sign(x) \qquad \qquad \mbox{for $\alpha \neq 0$}
+\end{equation}
+%
+a linear combination that is scaled by an $\alpha \neq 0$
+%
+\begin{equation}
+y = \sign(F(\bfx)) = \sign(\alpha b_1 f_1(\bfx) + \alpha b_2 f_2(\bfx)
++ \cdots + \alpha b_T f_T(\bfx)
+\end{equation}
+%
+is exactly the same as before.
+
+For this reason, normalising of the weight vector is unnecessary.  It
+also means that normalising to \emph{any} norm is equivalent to any
+other norm; in particular, we will get equivalent behaviour by
+normalising in a $p$-norm as we will in a $1$-norm.
+
+\section{Refinement of gradient descent}
+
+Once we have chosen $f_{t+1}$, we need to choose $w_{t+1}$.  This is
+chosen to minimise the cost functional along the line given by the
+direction $f_{t+1}$.  We can write the value of this cost functional
+as
+%
+\begin{equation}
+C = \sum_{i=1}^{m} c \left( y_i F_t(\bfx_i) + y_i w_{t+1}
+f_{t+1}(\bfx_i) \right)
+\end{equation}
+Substituting in $c(f(x)) = e^{-yf(x)}$, we obtain
+%
+\begin{equation}
+C = \sum_{i=1}^{m} \exp \left\{ y_i F_t(\bfx_i) + y_i w_{t+1}
+f_{t+1}(\bfx_i) \right\}
+\end{equation}
+%
+Now we need to differentiate this expression with respect to
+$w_{t+1}$.   This task is simplified considerably by noting that only
+the second half of the exponential term is variable with $w_{t+1}$.
+The result is that
+%
+\begin{eqnarray}{ll}
+\frac{\partial C}{\partial w_{t+1}} &
+= & \sum_{i=1}^{m} \frac{\partial}{\partial w_{t+1}}
+\exp \left\{ y_i F_t(\bfx_i) + y_i w_{t+1}
+f_{t+1}(\bfx_i) \right\} \nonumber \\
+& = & \sum_{i=1}^{m} y_i \exp \left\{ y_i F_t(\bfx_i) + y_i w_{t+1}
+f_{t+1}(\bfx_i) \right\} 
+\end{eqnarray}
+
+
+
+

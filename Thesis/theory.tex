@@ -1,0 +1,1059 @@
+\input{commands}
+
+\chapter{Background Theory}
+
+This chapter explores the theoretical background behind the
+boosting algorithm.  The main aim of the chapter is to develop a
+theoretical framework that can be used in later chapters to generate
+bounds on the performance of the $p$-boosting algorithm.
+
+This chapter also serves as a literature review.  Several papers were
+included into this chapter, and the relevant contributions are
+included in this section.
+
+The first section defines the ``machine learning'' problem and
+the classification problem, including some definitions that are
+followed throughout the rest of the thesis.  The pace is slow,
+allowing a reader with little previous exposure to grasp the context
+of the work.  It can probably be skipped by readers who are familiar
+with this field.
+
+The second section introduces the topic of statistical learning theory,
+upon which the important theoretical results of this thesis are based.
+The treatment is by necessity brief, and only the main results are
+stated.
+
+The third section introduces the two main classifiers that are used:
+decision stumps and a modification of the CART algorithm.  The CART
+algorithm is viewed as an extension of the decision stumps algorithm,
+and is covered in little detail.
+
+The fourth section defines and analyses the boosting algorithm, of
+which $p$-boosting is a variant.  Several results are included from
+previous work that has attempted to bound the generalisation error of
+the boosting algorithm using the classical statistical learning theory
+results.
+
+The fifth section introduces the concept of the ``margin'', which has
+been used by some authors to explain the performance of the boosting
+algorithm.  Two related concepts, those of the ``fat-shattering
+dimension'' and ``covering numbers'' are also discussed.
+
+The chapter concludes with results from various papers that use the
+fat-shattering dimension or covering numbers to generate bounds on the
+performance of the boosting algorithm.  These bounds are compared with
+those developed earlier using straight statistical learning theory.
+
+
+
+
+\section{Formulation of machine learning}
+
+A ``learning method'' is described in Cherkassky and Mulier
+\cite{Cherkassky98} as
+%
+\begin{quote}
+	\ldots an algorithm (usually implemented in software) that
+	estimates an unknown mapping (dependency) between a system's
+	inputs and outputs from the available data, namely from known
+	(input, output) samples.
+\end{quote}
+%
+This definition motivates the concept of \emph{supervised learning},
+which is illustrated in figure \ref{fig:supervised learning}.  The generator
+produces samples $\mathbf{x}$ drawn from a fixed (but unknown)
+probability distribution $p(x)$.  These samples are presented both to
+a supervisor (which produces the ``correct'' result $\mathbf{y}$) and to the
+learning algorithm (which produces its estimate $\hat{\mathbf{y}}$).  The
+learning algorithm can use the difference between these two results
+($\bfyh - \bfy$) as feedback to improve its approximation.  The goal
+is for the learning machine to always generate the correct
+estimate, such that $\mathbf{\hat{y} - y = 0}$ for all samples $\mathbf{x}$.
+
+\begin{figure}
+\begin{center}
+\begin{picture}(270,155)(30,20)
+\put(30,110){\framebox(60, 60){\parbox{55pt}{\center{Sample generator}}}}
+\put(150,110){\framebox(60, 60){\parbox{55pt}{\center{Learning machine
+$\hat{h}(\mathbf{x})$}}}}
+\put(150,30){\framebox(60, 40){\parbox{55pt}{\center{Supervisor
+$h(\mathbf{x})$}}}}
+\put(90, 140){\vector(1,0){60}}
+\put(120,140){\line(0,-1){90}}
+\put(120,50){\vector(1,0){30}}
+\put(120,150){\framebox(0,0){$\mathbf{x}$}}
+\put(210,50){\line(1,0){30}}
+\put(240,130){\line(0,-1){80}}
+\put(250,90){\framebox(0,0){$\mathbf{y}$}}
+\put(240,130){\vector(-1,0){30}}
+\put(210,150){\vector(1,0){60}}
+\put(280,150){\framebox(0,0){$\hat{\mathbf{y}}$}}
+\end{picture}
+\end{center}
+\caption{Supervised learning}
+\label{fig:supervised learning}
+\end{figure}
+
+Each component of figure \ref{fig:supervised learning} will now be
+described.
+
+
+\subsubsection{Sample generator}
+\label{sec:sample generator}
+
+The sample generator drives the learning process, by generating a
+series of samples $\mathbf{x}_1, \ldots$ for the learning machine to
+operate on.  Each $\mathbf{x}_i \in \mathcal{I}$ where $\mathcal{I}$
+is the ``input space'', and $\mathcal{I} \subseteq \mathbb{R}^n$ where
+$n$ is the dimensionality of the sample space.
+
+The input set depends upon number and range of input variables in the
+problem; in the ``toy'' datasets considered in this thesis, usually
+$\mathcal{I} = [0,1] \times [0,1] \subset \mathbb{R}^2$.
+
+
+\subsubsection{Supervisor}
+\label{sec:supervisor}
+
+The supervisor is a function
+%
+\begin{equation}
+\mathbf{y} = h(\mathbf{x}) \qquad \mbox{where} \qquad \mathbf{x} \in
+\mathcal{I} \qquad \mbox{and} \qquad \mathbf{y} \in \mathcal{O}
+\label{eqn:supervisor}
+\end{equation}
+%
+that always generates the ``correct'' answer
+$\mathbf{y}$\footnote{Correct \emph{answer} or drawn from correct
+\emph{distribution}?} given an input $\mathbf{x}$.  The ``output set''
+$\mathcal{O}$ is similar to the input set; it is defined as $\mathcal{I}
+\subseteq \mathbb{R}^m$ where $m$ is the dimensionality of the output
+space (or the number of output variables).
+
+In almost all cases, there is only one output variable ($m=1$) or the
+multiple output variables are independent and can each
+be generated by a separate learning machine with $m=1$.
+Thus it is reasonable to restrict our attention to the case where
+$m=1$ for the rest of this thesis.
+
+The distinction between \emph{classification} and \emph{regression}
+problems is made on the size of $\mathcal{O}$.  This distinction is 
+considered further in sections \ref{sec:regression} (regression) and
+\ref{sec:classification} (classification).
+
+
+\subsubsection{Learning machine}
+\label{sec:learning machine}
+
+The output of the learning machine is a function with a form very
+similar to that of the supervisor:
+%
+\begin{equation}
+\mathbf{\hat{y}} = \hat{h}(\mathbf{x}) \qquad \mbox{where} \qquad
+\mathbf{x} \in \mathcal{I} \qquad \mbox{and} \qquad \mathbf{y} \in
+\mathcal{O}
+\label{eqn:learning machine formulation}
+\end{equation}
+%
+The major difference is that the learning machine also includes
+learning behaviour (not shown in equation \ref{eqn:learning machine
+formulation}, whereby the function $\hat{h}(\cdot)$ is updated
+based upon the ``correct'' value $\mathbf{y}$ generated by the
+supervisor (refer back to figure \ref{fig:supervised learning}.
+\emph{The focus of machine learning theory is on generating learning
+machines that operate as close as possible to the supervisor.}
+
+
+
+\subsection{Regression}
+\label{sec:regression}
+
+The regression problem is defined as one where the size of the output
+space $\|\mathcal{O}\|$ is infinite.  Usually, this means that
+$\mathcal{O}$ is some interval on $\mathbb{R}$.  An example of the
+output of a regression problem (where $\mathcal{I} = [0,1]$) is shown
+in figure \ref{fig:regression problem}.
+
+\begin{figure}
+\begin{center}
+\includegraphics{figures/regression_problem.epsg}
+\end{center}
+\caption{A regression problem}
+\label{fig:regression problem}
+\end{figure}
+
+
+
+\subsection{Classification}
+\label{sec:classification}
+
+In the classification problem, the size $c = \| \mathcal{O} \|$ is
+finite.  Thus, our permissible
+$y$ values are now a finite number of discrete values (``categories)):
+%
+\begin{equation}
+\mathcal{I} = \{y_1, y_2, \ldots, y_c\}, \qquad \mbox{where} \qquad y_1, y_2,
+\ldots, y_c \in \mathbb{R}^m
+\end{equation}
+%
+A sample classification problem is shown in
+figure \ref{fig:classification problem}.
+
+Thus, the classification problem involves splitting the input space
+into a set of disjoint regions $\{ \mathcal{R}_1 \ldots \mathcal{R}_c
+\}$ which correspond to the category values.  A useful representation
+of these regions is gained by constructing the ``decision boundaries''
+as illustrated in figure \ref{fig:classification problem}.
+
+\begin{figure}
+\begin{center}
+\includegraphics{figures/classification_problem.epsg}
+\end{center}
+\caption{A classification problem}
+\label{fig:classification problem}
+The $\times$ symbol represents $y=-1$ and the $\circ$ symbol $y=1$.
+The dotted line is the ``decision boundary'', which is the boundary of
+adjacent regions of different symbols.  Note that in the data shown,
+there are many possible decision boundarys which classify the data correctly.
+\end{figure}
+
+For the remainder of this thesis, only classification problems will be
+considered.  Unless otherwise specified, these will be \emph{binary}
+classification problems (two categories) where $\mathcal{O} = \{-1,
+1\}$.
+
+\subsection{Sign formulation}
+To aid analysis, equation \ref{eqn:learning machine formulation}
+can be recast into the form
+%
+\begin{equation}
+y = \sign \left( f(\mathbf{x}) \right)
+\label{eqn:marginal classification formulation}
+\end{equation}
+%
+where $f : \mathbb{R}^n \mapsto \mathbb{R}$ and
+%
+\begin{equation}
+\sign (x) = \left\{ \begin{array}{rl}
+1	& \qquad \mbox{if $x \geq 0$} \\
+-1	& \qquad \mbox{otherwise}
+\end{array} \right.
+\end{equation}
+%
+It is from this definition that the concept of a ``margin'' is
+developed.  This is explored further in section \ref{sec:the margin}.
+
+
+\subsection{Empirical risk minimisation}
+\label{sec:erm}
+
+Now that we have defined what we mean by a ``learning algorithm'' (and
+in particular, what we mean by a ``classifier'', we need a way of
+comparing two classifiers to determine which is ``better''.
+
+
+\subsubsection{Loss function}
+
+In order to make such a comparison, we need to introduce the concept
+of a ``loss function''.  The input to a loss function is a triple
+$(\bfx, \bfyh, \bfy)$ where \bfx\ is a sample, \bfyh\ is the
+output of the classifier (learning machine), and \bfy\ is the correct output (that generated by the supervisor).  See figure \ref{fig:supervised
+learning}.  The output of the loss function is a single number $q$
+which describes how ``bad'' this estimate is.  In symbols, the loss
+function can be described as
+%
+\begin{equation}
+q = Q(\bfx, \bfyh, \bfy) \qquad \mbox{where} \qquad q \in \mathbb{R};
+\bfx \in \calI; \mbox{ and }\bfyh, \bfy \in \calO
+\end{equation}
+%
+where all symbols have their previously defined meanings.
+
+In this thesis, only one loss function will be considered.  This is
+known as the ``misclassification loss function'', and is defined as
+%
+\begin{equation}
+Q(\bfx, \bfyh, \bfy) = Q(\bfyh, \bfy) = \left\{
+\begin{array}{ll}
+	0	&	\qquad \mbox{if $\bfyh = \bfy$} \\
+	1	&	\qquad \mbox{if $\bfyh \neq \bfy$}
+\end{array}
+\right.
+\label{eqn:misclassification loss function}
+\end{equation}
+%
+which does \emph{not} depend upon the position in the input space \bfx.
+
+This loss function is very easy to understand: given a series of input
+samples, the sum of the loss functions will be equal to the number of
+samples that were misclassified.  If the performance of two
+classifiers are compared using this loss function, then the one with
+the lowest risk will be the one that makes the least ``mistakes''.
+
+
+\subsubsection{True risk}
+Given our loss function $Q(\cdot)$, we are now in the position to be
+able to compare the performance of a number of classifiers over the
+entire input space.  We define the \emph{true risk} of a classifier
+$\hat{h}(\bfx)$ given a supervisor $h(\bfx)$ as
+%
+\begin{equation}
+R(\hat{h}) = \int_{\calI} Q(\bfx, \bfyh, \bfy) \: d\bfx
+\label{eqn:true risk}
+\end{equation}
+%
+Using our loss function \ref{eqn:misclassification loss function}, the
+value of $R$ is easily seem to be the proportion of samples that are
+misclassified.
+
+The goal of machine learning theory is generate learning
+machines that minimise the true risk \ref{eqn:true risk}.
+Unfortunately, this is impossible for at least two reasons:
+%
+\begin{enumerate}
+\item	Generally, \ref{eqn:true risk} cannot be solved analytically,
+	or in finite time, making the minimisation of it impossible.
+%
+\item	In practice, there are only a finite number of observations
+	$(\bfx_1, \bfy_1), \ldots, (\bfx_l, \bfy_l)$ available.  Thus
+	it is impossible to evaluate \ref{eqn:true risk}.
+\end{enumerate}
+%
+For this reason, we are reliant on the concept of \emph{empirical
+risk}.
+
+\subsubsection{Empirical risk}
+Empirical risk is a weaker version of true risk, that is actually able
+to be calculated in practice.  Given a set of $l$ observations
+$\{(\bfx_1, \bfy_1), \ldots, (\bfx_l, \bfy_l)\}$ and setting $\bfyh_i
+= \hat{h}(\bfy_i)$ as the output of our learning machine $h(\cdot)$,
+we can define our empirical risk as 
+%
+\begin{equation}
+R_{\emp} = \frac{1}{l} \sum_{i=1}^{l} Q(\bfx_i, \bfy_i, \bfyh_i)
+\end{equation}
+%
+The following observations can be made on the empirical risk:
+%
+\begin{itemize}
+\item 	As $l \rightarrow \infty$, and assuming that $\bfx$ is evenly
+	distributed over \calI\, (and that $Q$ is reasonably well
+	behaved), we would expect that $R_{\emp}(\cdot) \rightarrow
+	R(\cdot)$.
+
+\item	$R_{\emp}$ is the ``best that we can do'', in that it uses all
+	available observations.  However, there is further scope for
+	\emph{a priori} knowledge of the system to be used via the
+	selection of an appropriate model.
+
+\item	Section \ref{sec:slt} explores the rate of convergence of
+	empirical risk $R_{\emp}$ to true risk $R$.
+\end{itemize}
+
+\subsubsection{Empirical risk minimisation}
+
+Until this point, we have been concerned with a \emph{single} learning
+machine $\hat{h}(\bfx)$.  We are really concerned with a set of such
+learning machines $\hat{h} \in \calH$, from which we choose the
+optimal learning machine $\hat{h}^{\ast}$.  This is
+formalised in the ``empirical risk minimisation'' inductive principle:
+
+Assume that we have a set of learning machines
+%
+\begin{equation}
+\hat{h}_i \in \calH \qquad \mbox{where} \qquad h_i : \calI \mapsto
+\calO
+\end{equation}
+%
+and a loss function $Q$.
+
+Then the principle of \emph{empirical risk minimisation} selects the
+optimal learning machine $\hat{h}^{\ast} \in \calH$ in the sense that
+the empirical risk is minimised:
+%
+\begin{equation}
+\hat{h}^{\ast} = \arg \min_{\hat{h} \in \calH} R_{\emp}(\hat{h})
+\label{eqn:erm}
+\end{equation}
+
+In order to comment further on this principle, we need to develop some
+ideas from statistical learning theory.  This is covered in the next
+section.
+
+
+
+
+
+
+\section{Statistical learning theory}
+\label{sec:slt}
+
+This section develops important results from statistical learning
+theory (SLT).  SLT provides a mathematically rigorous and sound
+conceptual framework in which to evaluate the many empirical results.
+This theory is covered in much greater detail by Vapnik
+\cite{Vapnik98} and Cherkassky \& Mulier \cite{Cherkassky98}.  Results
+are also taken from Bartlett et al. \cite{Bartlett98a}.
+
+
+\subsection{Convergence of ERM}
+
+The goal of this section is to determine under which conditions the
+empirical risk minimisation inductive pronciple defined in section
+\ref{sec:erm} will converge to the true risk \ref{eqn:true risk}.
+This theorem, which is known as the ``key theorem of learning theory''
+appears in \cite{Cherkassky98}.
+
+\subsubsection{Key theorem of learning theory}
+
+For bounded loss functions, the ERM principle is consistent if and
+only if the empirical risk converges uniformly to the true risk in the
+following sense:
+%
+\begin{equation}
+\lim_{l \rightarrow \infty} \Pr \left( \sup_{\hat{h} \in \calH} 
+| R(\hat{h}) - R_{\emp}(\hat{h}) | > \epsilon \right) = 0,
+\qquad \forall \epsilon > 0
+\end{equation}
+%
+The most important result of this theory in a practical sense is the
+assertion that consistency is governed by the \emph{worst case}
+scenario (selected by the $\sup$ operator).
+
+This theorem is not useful for developing constructive procedures.  A
+more useful theorem is developed by considering the \emph{entropy} of
+a set of functions.
+
+Consider a loss function $Q(\bfx, \bfyh, \bfy)$, our set of
+classifiers $\calH$, and a given set of samples $Z_n = \{ (\bfx_1,
+\bfy_1), \ldots, (\bfx_n, \bfy_n) \}$ where $n$ now denotes the number
+of samples in $Z_n$.  We would expect that different classifiers
+$\hat{h} \in \calH$ would split these data points into different
+partitions (see figure \ref{fig:dichotomy}).
+
+\begin{figure}
+\begin{center}
+\includegraphics{figures/dichotomy.epsg}
+\end{center}
+\caption{Two classifiers $\hat{h}_1$ and $\hat{h}_2$ partitioning a
+dataset into two dichotomies.}
+\label{fig:dichotomy}
+\end{figure}
+
+We denote the number of such dicotomies that can be generated by a
+particular set of classifiers $\calH$ on a sample $Z_n$ by $N(Z_n)$.
+This is known as the \emph{diversity} of the set of functions $\calH$.
+
+\subsubsection{Random entropy}
+
+The random entropy can then be defined as
+%
+\begin{equation}
+H(Z_n) = \log N(Z_n)
+\end{equation}
+
+\subsubsection{VC entropy}
+
+Averaging this quantity over all possible samples of length $n$
+generated from the sample distribution leads to the \emph{VC entropy}
+of the set of classifiers:
+%
+\begin{equation}
+H(n) = E(\log N(Z_n))
+\end{equation}
+
+\subsubsection{Growth function}
+
+The final quantity that we need to define is that of the growth
+function.  This is a distribution-independent quantity (independent of
+the distribution that the training samples are drawn from), and is
+defined as
+%
+\begin{equation}
+G(n) = \log \max_{Z_n} N(Z_n)
+\end{equation}
+%
+where the samples $Z_n$ are taken over \emph{all} possible samples of
+size $n$ regardless of the distribution.  The growth function is the
+maximum number of dichotomies that can be deduced on a sample of size
+$n$ using the classifiers $\hat{h}$ in a set $\calH$.
+
+Due to the $\max$ function, the growth function will always be at
+least as large as the VC entropy function.  The growth function will
+also be bounded above by $2^n$, the maximum number of dichotomies that
+can be generated on $n$ samples.  Thus, the following inequality holds:
+%
+\begin{equation}
+H(n) \leq G(n) \leq n \log 2
+\end{equation}
+
+\subsubsection{ERM consistency}
+
+A useful, distribution-independent, necessary \emph{and} sufficient
+condition for the consistent convergence of ERM is
+given by
+%
+\begin{equation}
+\min_{n \rightarrow \infty} \frac{G(n)}{n} = 0
+\label{eqn:growth function ERM consistency}
+\end{equation}
+%
+This condition requires that at some point, the growth function $G(n)$
+must flatten out (by adding another sample, we don't double the number
+of dichotomies that can be generated).
+
+Equation (\ref{eqn:growth function ERM consistency}) also guarantees
+that the rate of convergence is \emph{fast}, in that for any $n >
+n_0$ the following exponential bound holds true: 
+\begin{equation}
+\Pr \left( R(\hat{h}) - R(\hat{h}^{\ast}) < \epsilon \right) =
+e^{-cn\epsilon^2}
+\end{equation}
+ 
+
+
+\subsection{Vapnik-Chervonenkis Dimension}
+\cite{Cherkassky98} section 4.2 and \cite{Bartlett98a}
+
+\subsubsection{VC upper bound}
+
+Let $H$ be a class of functions mapping from a set $X$ to $\{-1, 1\}$
+and having VC-dimension $h$.  For any probability distribution on $X
+\times \{-1,1\}$, with probability $1-\delta$ over $l$ random examples
+$\mathbf{x}$, any hypothesis $f$ in $H$ has generalisation error no
+more than
+\begin{equation}
+2\mathrm{Er}_{\mathbf{x}}(f) + \frac{1}{l} \left[ 4 \ln 
+\left( \frac{4}{\delta} \right) + 4 h \ln \left( \frac{2 e l}{h}
+\right) \right]
+\end{equation}
+provided $h \leq l$.
+
+\subsubsection{VC lower bound}
+
+Let $H$ be a hypothesis space with finite VC dimension $h \geq 1$.
+Then for any learning algorithm there exist distributions such that
+with probability at least $\delta$ over $l$ random examples, the error
+of $f$ is at least
+\begin{equation}
+\max \left[ \frac{h-1}{32l}, \frac{1}{l} \ln \left( \frac{1}{\delta}
+\right) \right]
+\end{equation}
+
+\noindent Notes:
+
+\begin{itemize}
+
+\item	The upper bound holds for all distributions, whereas the lower
+	bound only holds for points that can be ``shattered'' by the
+	hypothesis space.
+
+\item	The upper bounds appear to be very pessimistic in practice.
+	Possibly real-world data does not behave like the worst-case
+	distributions used to prove the lower bounds.
+
+\end{itemize}
+
+\subsubsection{Structural risk minimisation}
+
+Suppose that $X$ is the ball of radius $R$ in $\mathbb{R}^n$,
+$X = \left\{ \mathbf{x} \in \mathbb{R}^n : \| \mathbf{x} \| \leq R
+\right\} $, and that $X_0 \subset X$.  Consider the set
+\begin{equation}
+\mathcal{F} = \left\{ \mathbf{x} \mapsto \mathbf{w} \cdot \mathbf{x} :
+\|\mathbf{w}\| \leq 1, \mathbf{x} \in X \right\}
+\end{equation}
+and let $\mathrm{sign}(\mathcal{F}) = \left\{ \mathbf{x} \mapsto
+\mathrm{sign}(f(\mathbf{x})) : f \in \mathcal{F} \right\}$ be the set of
+classifiers defined by thresholding functions in $\mathcal{F}$ that
+satisfy $|f(\mathbf{x})| \geq \gamma$ for all $\mathbf{x}$ in $X_0$.
+Then the restriction of $\mathrm{sign}(\mathcal{F}_0)$ to the points
+in $X_0$ has VC dimension no more than
+\begin{equation}
+\min \{R^2/\gamma^2, n\} + 1
+\end{equation}
+
+
+\subsection{Bounds on Generalisation Error}
+\cite{Cherkassky98} section 4.3
+
+Let us assume that we have been given the following information:
+
+\begin{itemize}
+
+\item	A sample $\{\mathbf{x}_i, y_i\} = \{\mathbf{z}_i\}$ of size
+	$i=1 \ldots n$;
+
+\item	A classification function $y = f(\mathbf{x}, \omega)$ where
+	$\omega$ is a parameter which distinguishes a particular
+	instance of the classifier from the whole family;
+
+\end{itemize}
+
+Now consider the loss function $Q(\mathbf{z}, w^* | n)$ minimising the
+empirical risk.  Let $R_{\mathrm{emp}}(\omega^* | n)$ denote this
+minimum empirical risk, and let $R(\omega^* | n)$ denote the true risk
+corresponding to this loss function.  Then we can say the following:
+
+\begin{itemize}
+
+\item	In a binary classification problem, the generalisation ability
+	of a learning machine that implements ERM holds with a
+	probability of \emph{at least} $1-\eta$ simultaneously for
+	all functions $Q(\mathbf{z}, \omega)$ including the function
+	$Q(\mathbf{z}, \omega^*)$ then minimises the empirical risk:
+
+	\begin{equation}
+	R(\omega) \leq R_{\emp}(\omega) + \frac{\epsilon}{2} \left(
+	1 + \sqrt{1 + \frac{4 R_{\emp}(\omega)}{\epsilon}} \right)
+	\end{equation}
+
+	where
+
+	\begin{equation}
+	formula
+	\end{equation}
+
+\end{itemize}
+
+
+\subsection{Structural Risk Minimisation}
+\cite{Cherkassky98} section 4.4
+
+
+
+
+\section{Decision stumps and CART}
+
+Both of the unboosted learning algorithms used in this thesis are
+tree-based algorithms.  A tree-based algorithm splits the input space
+$\calI$ into a number of disjoint regions.  Each of these regions may
+again be split, and the algorithm continues in this recursive manner
+until a termination condition is met.  Thus a tree structure is built
+up.
+
+\subsection{Decision stumps}
+
+The decision stumps algorithm divides the input space into exactly two
+regions, each of which is assigned a category.  The tree created is
+very small, with only two nodes (hence the name ``decision
+\emph{stumps}''.
+
+\subsubsection{Classification}
+
+An example of a decision boundary generated by a decision stumps
+classifier is shown in figu
+
+
+\subsubsection{Training}
+
+
+
+The algorithm for the training of a decision stump is given below
+
+\subsection{CART}
+
+\subsubsection{Classification}
+
+The CART algorithm splits its input space into 
+
+
+  This is then repeated recursively to refine
+the classification.
+
+Both 
+
+\subsubsection{Training}
+
+
+
+
+
+
+
+
+\section{The boosting algorithm}
+
+The boosting algorithm will markedly improve the performance of most
+learning machines.  It does this by 
+
+* increases the hypothesis space by using a vote among many weak
+  learners
+
+* Even very poor weak learners are useful when boosted (for example,
+  decision stumps)
+
+* Seems quite resistant to over-fitting
+
+* Arcing is a variant; usually outperforms ``bagging''.
+
+* A very hot topic recently
+
+
+Key features of the boosting algorithm:
+
+* Cannot stand alone -- relies on another algorithm (the ``weak
+  learning algorithm''.
+
+* Hypothesis space is increased by adding more learning algorithms
+  (rather than making the existing learning algorithms more complex).
+
+* Many versions of the weak learning algorithm are trained, \emph{but
+  each on different data}.
+
+* Uses a weighted voting scheme amongst the weak learners to make a
+  decision, with the weight depending upon how well each weak learner
+  classified the training data.
+
+* Data points that are often misclassified or misclassified by a weak
+  learner that performs well are given a higher weight.  In this way,
+  the boosting algorithm forces the weak learning algorithm to
+  concentrate on the ``hard'' datapoints.
+
+
+\subsection{Description of the boosting algorithm}
+
+
+
+The key features of the boosting algorithm are as follows
+
+The boosting algorithm works as follows:
+
+\begin{enumerate}
+
+\item	Several ``weak'' learning algorithms are trained, and each of
+	these has its performance evaluated.  Those that perform well
+	have a higher ``weight'' when the final decision is ``voted''
+	on.
+
+\item	Within the training data set, each example is given a weight
+	which decides how ``hard'' to classify that example is.  This
+	weight is determined by how often the weak learner gets it
+	wrong and how well that particular weak learner performed on
+	the overall dataset.  For example, an example point that was
+	classified incorrectly by a 
+
+\end{enumerate}
+
+The algorithm may be written as in Ratsch et al. \cite{Ratsch98}
+
+The input to the algorithm is $l$ examples $\mathbf{Z} = \langle
+(\mathbf{x}_1, y_1), \ldots, (\mathbf{x}_l, y_l) \rangle$ where
+$\mathbf{x}$ is the independent variable and $y$ is the category
+class.
+
+The weight vector for step $t=1$ is initialised to $w_1(\mathbf{z}_i)
+= 1/l$ for all $i=1 \ldots l$
+
+Do for $t=1 \ldots T$:
+
+
+\begin{enumerate}
+
+\item	Train weak learner on the weighted sample set $\{\mathbf{Z},
+	\mathbf{w}\}$ and obtain ``weak'' hypothesis $h_t : \mathbf{x}
+	\mapsto \{\pm 1\}$
+
+\item	Calculate the training error $\epsilon_t$ of $h_t$:
+	
+	\begin{equation}
+	\epsilon_t = \sum_{i=1}^l w_t (\mathbf{z}_i)
+	I \left( h_t(\mathbf{x}_i) \neq y_i\right)
+	\end{equation}
+
+	If $\epsilon_t = 0$ (a single weak learner can correctly learn
+	the relationship) or $\epsilon_t \geq \phi - \Delta$ (where
+	$\Delta$ is a small positive constant, and thus the weak
+	learner is performing worse than random guessing) then abort
+	the training process.
+
+\item	Calculate how well this weak learner performed:
+
+	\begin{equation}
+	b_t = \log \frac{\epsilon_t (1 - \phi)}{\phi(1 - \epsilon_t)}
+	\end{equation}
+
+\item	Update our weights $\mathbf{w}_t$:
+
+	\begin{equation}
+	w_{t+1}(\mathbf{z}_i) = w_t(\mathbf{z}_i) \exp 
+	\left\{ -b_t I \left( h_t(\mathbf{x}_i) = y_i \right) \right\}
+	/ Z_t
+	\end{equation}
+
+	where $Z_t$ is a normalisation constant, such that
+	$\sum{i=1}{l} w_{t+1}(\mathbf{z}_i) = 1$.
+
+\end{enumerate}
+
+
+
+\subsection{Facts about boosting}
+
+
+These are from \cite{Ratsch98}:
+
+\begin{enumerate}
+
+\item 	The weights $w_t(\mathbf{z}_i)$ in the $t$-th iteration
+	are chosen such that the previous hypothesis has exactly a
+	weighted training error $\epsilon$ of $1/2$ (from
+	\cite{Schapire97}).
+
+\item 	The weight $c_t$ of a hypothesis is chosen such that it
+	minimises the function
+
+	\begin{equation}
+	G(b_t, \mathbf{b}^{t-1}) = \sum_{i=1}^l \exp 
+	\left\{ d(\mathbf{z}_i, \mathbf{b}^t) - \phi | \mathbf{b}^t |
+	\right\}
+	\end{equation}
+
+	where $\phi$ is a constant.  This function depends upon the
+	rate of incorrect classification of all patterns.
+
+	This functional can be minimised analytically by setting
+	$\frac{\partial G(\mathbf{b}^t)}{\partial \mathbf{b}^t}=0$ and
+	is described in references that I don't have (page 4 of
+	\cite{Schapire97}).
+
+	The final equation that we end up with is our familiar
+
+	\begin{equation}
+	b_t = \log \frac{\epsilon_t (1-\phi)}
+	{\phi (1 - \epsilon_t)}
+	\end{equation}
+
+	where in my paper, $\phi=1/2$.
+
+\end{enumerate}
+ 
+
+
+
+
+
+
+
+\section{The margin}
+\label{sec:the margin}
+
+The margin of a classification using the notation of \ref{eqn:marginal
+classification formulation} is given by
+%
+\begin{equation}
+m_{\mathbf{x}} = \left\{ \begin{array}{rl}
+yf(\mathbf{x})	& \qquad \mbox{if $y = \hat{y}$} \\
+-yf(\mathbf{x})	& \qquad \mbox{if $y \neq \hat{y}$}
+\end{array} \right.
+\label{eqn:margin definition}
+\end{equation}
+
+Geometrically, this may often be considered as the distance between a
+point and the decision boundary at that particular point\footnote{Need
+to point out under what circumstances this is true and untrue, eg for
+``well behaved'' functions which include all? that we are talking
+about here}.  This is illustrated in figure \ref{fig:margin
+illustration}.
+
+\begin{figure}
+\begin{center}
+\includegraphics{figures/margin_illustration.epsg}
+\end{center}
+\caption{The margin of a sample}
+\emph{The dotted line denotes the decision boundary and the $\times$ the
+point for which we wish to define a margin.}
+\label{fig:margin illustration}
+\end{figure}
+
+The margin of an entire dataset $\mathbf{X} = \{ \mathbf{x}_1, \ldots,
+\mathbf{x}_l \}$ is defined as the minimum margin over all
+samples:\footnote{Is this true?  Is it useful?}
+%
+\begin{equation}
+m_{\mathbf{X}} = min \left( m_{\mathbf{x}_1}, \ldots, m_{\mathbf{x}_l}
+\right)
+\label{eqn:dataset margin}
+\end{equation}
+%
+
+There are two definitions of a margin commonly used in a
+classification problem:
+
+\subsubsection{Minimum distance margin}
+Consider a classifier that generates margins using a ``voting''
+mechanism.  The $c$ votes $v_1, \ldots, v_c$ are, and the classifier
+selects the category with highest vote $v^{\ast}$ as the result of the
+classification.   Then the minimum distance margin is the difference
+between the votes of the two kinds of margins:
+%
+\begin{equation}
+mdm = v^{\ast} - max_{v_i \in \mathbf{v} - v^{\ast}} v_i \qquad
+\mbox{where} \qquad v^{\ast} = max_{v_i \in \mathbf{v}} v_i
+\end{equation}
+%
+or in other words, the difference between the vote $v^{\ast}$ that the
+highest category got, and  the vote that the next-highest category
+got.
+
+Unfortunately, the discontinuity introduced by the $\max$ function
+makes it difficult to solve
+problems analytically using the minimum distance margin.  The other
+margin provides a similar measure, but is more suited to analysis.
+
+\subsubsection{The other margin}
+Consider the same margin problem.  Then the other margin is generated
+by the formula
+%
+\begin{equation}
+otm = function
+\end{equation}
+%
+etc. 
+
+
+\subsection{Fat-shattering dimension}
+These are copied verbatim from Bartlett et al. \cite{Bartlett98a}.
+
+Let \calF\ be a set of real values functions.  We say that a set of
+points $X$ is \emph{$\gamma$-shattered by \calF} if there are real
+numbers $r_x$ indexed by $x \in X$ such that for all binary vectors
+$b$ indexed by $X$, there is a function $f_b \in \calF$ satisfying
+\begin{equation}
+f_b(x)  \left\{
+	\begin{array}{ll}
+		\geq r_x + \gamma & \mbox{if $b_x = 1$} \\
+		\leq r_x - \gamma & \mbox{otherwise}
+	\end{array}
+\right.
+\end{equation}
+The \emph{fat shattering dimension} $\fat_{\calF}$ of the set \calF\ is
+a function from the positive real numbers to the integers which maps a
+value $\gamma$ to the size of the largest $\gamma$-shattered set (if
+this is finite), or infinity otherwise.
+
+
+\subsection{Margin bounds}
+The following theorem gives generalisation error bounds for large
+margin classifiers.
+
+Consider a class \calF\ of real-valued functions.  With probability at
+least $1 - \delta$ over $l$ independently generated examples
+$\mathbf{z}$, if a classifier $\sign (f) \in \sign (\calF)$ has margin
+at least $\gamma$ on $\mathbf{z}$, then the error of $\sign (f)$ is no
+more than
+\begin{equation}
+\frac{2}{l} \left[ h \log_2 \left( \frac{8 e l}{h} \right) \log_2(32l)
++ \log_2 \left( \frac{8l}{\delta} \right) \right]
+\end{equation}
+where $h = \fat_{\calF}(\gamma / 16)$.
+
+Furthermore, with probability at least $1 - \delta$, every classifier
+$\sign (f) \in \sign (\calF)$ has error no more than
+\begin{equation}
+b/l + \sqrt{\frac{2}{l} \left[ h \ln(34el/h) \log_2(578l) +
+\ln(4/\delta) \right] }
+\end{equation}
+where $b$ is the number of labelled training examples with a margin
+less than $\gamma$.
+
+See the explanation of this in \cite{Bartlett98a} pages 5-6.
+
+\subsection{Application to boosting}
+The preceding ideas can be applied to the boosting algorithm.  Let us
+take in particular the boosted classifier of the form
+\begin{equation}
+x \mapsto \sign \left( \sum_{i=1}^{N} w_i f_i(x) \right)
+\end{equation}
+that have large margins on the training examples, where $w_i > 0$,
+$\sum_i w_i = 1$, and $f_i$ are classifiers in some class $H$.  A
+VC-dimension analysis would suggest that the generalisation error
+would of these classifiers would increase with $N$, the number of base
+hypotheses $f_i$ that are combined.  The following result, which
+follows easily from techniques developed in \cite{Bartlett98}, shows
+that the fat-shattering dimension of the class of convex combinations
+of classifiers is independent of the number of base hypotheses.
+
+\subsection{Bounds on fat-shattering dimension in boosting}
+
+There is a constant $c$ so that for all classes $H$ of functions
+mapping from $X$ to $\{-1, 1\}$, the class of convex combinations of
+functions from $H$,
+\begin{equation}
+\calF = \left\{
+	x \mapsto \sum_{i=1}^N w_i f_i(x) : f_i \in H, w_i > 0, \sum_i
+	w_i = 1
+\right\}
+\end{equation}
+satisfies
+\begin{equation}
+\fat_{\calF} \leq c \frac{h}{\gamma^2} \ln (1/\gamma)
+\end{equation}
+
+where $h$ is the VC-dimension of the class $H$ of base hypotheses.
+
+\subsection{Bounds on error in boosting}
+
+There is a constant $c$ such that, for the class \calF\ of convex
+combinations of classifiers from a class $H$ with VC-dimension $h$,
+for all probability distributions, with probability at least
+$1-\delta$ over $l$ independently generated training examples, every
+classifier $\sign(f) \in \sign(\calF)$ has error no more than
+\begin{equation}
+b/l + \sqrt{\frac{c}{l} \left[ \frac{h \ln^2 (l/h)}{\gamma^2} +
+\ln(1/\gamma) \right] }
+\end{equation}
+where $b$ is the number of labelled training examples with margin less
+that $\gamma$.
+
+
+
+
+
+\section{Covering numbers and other stuff}
+At the moment, this whole section is copied pretty much verbatim from
+\cite{Williamson99}.
+
+The p-convex hull (strictly speaking, the p-absolutely convex hull) of
+a set $S$ of functions (where $p>0$) is defined as
+%
+\begin{equation}
+\cop (S) =
+ \bigcup _{n \in \mathbb{N}}
+\left\{
+ \sum_{i=1}^{n}
+ \alpha _i
+f_i : f_1, \ldots, f_n \in F,
+ \alpha _1, \ldots, \alpha _n \in \mathbb{R},
+ \sum_{i=1}^{n} | a_i |^p \leq 1
+\right\}
+\end{equation}
+
+Thus the $p$-convex hull is a subset of the set of all possible linear
+combinations of functions of a class $F$, where the members of the
+subset are those where $\sum_{i=1}^n |\alpha_i| \leq 1$.  The
+following remarks concern $p$-convex hulls:
+%
+\begin{itemize}
+\item	If $0 < p_1 \leq p_2 \leq \cdots \leq p_z \leq 1$, then
+	$\cop 1 \subseteq \cop 2 \subseteq \cdots \subseteq \cop z$
+	\marginpar{\em Make sure this is true!}.  That is to say, the
+	higher that $p$ is, the richer the set of functions in
+	$\cop{F}$.
+\item	In general, it is very hard to visualise the \emph{convex} hull
+	of a set of functions, let alone the $p$-convex hull.  The
+	convex hull is always richer than function class.
+\item	As an example (from Williamson et al. \cite{Williamson99}), the convex
+	hull of the Heaviside functions on $[0, 1]$ is the set of
+	functions of ``bounded variation''.\marginpar{Need a diagram}
+\end{itemize}
+
+
+
+
+
+
+
+
+
+

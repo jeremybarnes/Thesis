@@ -1,0 +1,20 @@
+\chapter{Abstract}
+
+Boosting is a method used to improve the generalisation ability of a
+``weak'' learning algorithm.  It is implemented by generating many
+instances of the algorithm, each trained with differently weighted
+data.  These weights are chosen so that the ``hard'' examples (those
+that are often misclassified) are emphasised.  This forces the
+learning algorithm to work well with the difficult data, and results
+in an improved overall performance.
+
+Adjusting the capacity of a learning algorithm controls the size of
+the set of possible generalisations.  It is important to control
+capacity to avoid overfitting (fitting the \emph{noise} rather than
+the underlying distribution).  Although boosting is particularly good
+at avoiding overfitting in the \emph{low-noise} case, capacity control
+may avoid overfitting in high noise samples (which many real-world
+datasets are).
+
+This thesis invloves modifying the normal norm function where $p=1$ to
+an adjustable norm function where $p$ is specified by the user.

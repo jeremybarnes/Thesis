@@ -1,0 +1,81 @@
+\documentclass[a4paper,11pt,oneside]{book}
+
+\usepackage{graphics}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+
+% Get a decent page width
+\oddsidemargin 0.1 in      %   Left margin on odd-numbered pages.
+\evensidemargin 0.15 in    %   Left margin on even-numbered pages.
+\marginparwidth 1 in       %   Width of marginal notes.
+\oddsidemargin 0.125 in    %   Note that \oddsidemargin = \evensidemargin
+\evensidemargin 0.125 in
+\marginparwidth 0.75 in
+\textwidth 6.125 in % Width of text line.
+
+\title{Capacity Control in Boosting using a $p$-Convex Hull}
+\author{Jeremy Peter Barnes}
+
+\titlepage
+
+\begin{document}
+
+\frontmatter
+
+\maketitle
+\tableofcontents
+\listoffigures
+\listoftables
+
+% According to the thesis rules, spacing must be at least 1.2 times normal
+\renewcommand{\baselinestretch}{1.2}
+
+\include{abstract}
+
+
+
+
+\mainmatter
+
+\include{intro}
+
+%\include{litsurvey}
+
+\include{theory}
+
+\include{development}
+
+\include{testing}
+
+\include{discussion}
+
+\include{conclusion}
+
+\appendix
+
+
+% Put it back to normal for the non-body parts of the thesis.
+\renewcommand{\baselinestretch}{1.0}
+
+
+\include{acronyms}
+
+\include{notation}
+
+\include{implementation}
+
+\include{proposal}
+
+
+
+\backmatter
+
+\nocite{*}
+
+\bibliography{../Bibliography/biblio}
+\bibliographystyle{plain}
+
+\end{document}
+
+
