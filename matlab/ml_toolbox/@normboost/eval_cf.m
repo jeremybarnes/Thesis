@@ -45,50 +45,56 @@ else
    results = ones(size(y_data));
 end
 
-% Use the variables a and b (obtained from alpha) to make our formula
-% simpler to write (see notebook, page 116 for more details).
-p = obj.p;
-beta = (1 - alpha.^p).^(1/p);
-a = alpha .^ p;
-b = 1 - a;
+y = y_data*2-1;
+
+% a = alpha, just to save typing
+a = alpha;
+p = norm(obj);
+
+% This factor normalises to ||b||p = 1
+normfac = (1 + a.^p).^(1/p);
 
 % Calculate margins
-y = y_data*2-1;
-%[(1:length(y))' y obj.margins results]
-margins = (1-a)^(1/p) .* obj.margins + y .* results .* a^(1/p);
+margins = (obj.margins + y .* results .* a) / normfac;
 
 % Evaluate sample costs
 sample_costs = exp(-margins);
 
-% Evaluate derivative of sample costs
-%d_sample_costs = (b.^(1/p - 1) .* obj.margins ...
-%		  - y .* results .* a.^(1/p-1)) ...
-%                 .* sample_costs;
-
-% This doesn't match up with the numerically calculated curve... use a
-% less simplified expression which will hopefully match the maple
-% expression a lot better...
-
-factor_1 = obj.margins .* b.^(1/p - 1)/p;
-factor_2 = y .* results .* a.^(1/p - 1)/p;
+% Derivative of sample costs
+factor_1 = ((obj.margins + y.*results.*a).*a.^p) ./ ...
+    (normfac .* a .* (1 + a.^p));
+factor_2 = (y.*results) ./ normfac;
 d_sample_costs = (factor_1 - factor_2) .* sample_costs;
 
-% Second derivative of sample costs
-%d2_sample_costs = (b.^(1/p - 2) .* (p*(1 + b) - 1) .* obj.margins ...
-%		   + a.^(1/p - 2) .* (p*(1 - a) - 1) .* y .* results) ...
-%                  .* sample_costs;
+% Second derivative
+% NOTE: This code is obtained from MAPLE's 'C' command (viz:)
+% cost := ...
+% >> readlib(C);
+% >> d2cost = diff(cost, a$2);
+% >> C(d2cost, optimized);
+% Note also that you have to replace "pow" with "power", replace "*" with
+% ".*", and put in obj.margins for y*F(x[i]) and results for f(x[i]).
 
-% Last method gave same answer as d_sample_costs, this one is more
-% explicit and hopefully more right...
-
-F_bit = b^(1/p) .* obj.margins;
-f_bit = y .* a^(1/p) .* results;
-
-factor_1 = F_bit .* (1/(p * b.^2) - 1/(p.^2 * b.^2));
-factor_2 = f_bit .* (1/(p*a.^2) - 1/(p.^2 * a.^2));
-factor_3 = (F_bit ./ (p*b) - f_bit ./ (p*a)).^2;
-d2_sample_costs = (factor_1 + factor_2 + factor_3) .* sample_costs;
-
+t1 = power(a,p);
+t2 = 1.0+t1;
+t4 = power(t2,1/p);
+t6 = 1/t4;
+t8 = results;
+t11 = t6.*(obj.margins+y.*a.*t8);
+t12 = t1.*t1;
+t13 = a.*a;
+t14 = 1/t13;
+t15 = t12.*t14;
+t16 = t2.*t2;
+t17 = 1/t16;
+t20 = t6.*y.*t8;
+t23 = 1/t2;
+t24 = t1/a.*t23;
+t37 = exp(-t11);
+t41 = power(t11.*t24-t20,2.0);
+t43 = (-t11.*t15.*t17+2.0.*t20.*t24+t11.*t1.*p.*t14.*t23-t11.*t1.*t14.* ...
+       t23-t11.*t15.*t17.*p).*t37+t41.*t37;
+d2_sample_costs = t43;
 
 % Add up to get totals
 cost = sum(sample_costs);
