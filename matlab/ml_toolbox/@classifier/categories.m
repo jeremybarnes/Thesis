@@ -1,26 +1,27 @@
-function n = classes(obj)
-% CLASSES classlabels of a classifier
+function n = categories(obj)
+
+% CATEGORIES category list of a classifier
 %
 % SYNTAX:
 %
-% n = classes(obj)
+% lst = categories(obj)
 %
 % RETURNS:
 %
-% N is the number of dimensions of the independent variable that the
-% classifier OBJ expects.  This is specified in the constructor of the
-% classifier.
+% LST is an object of type CATEGORY_LIST that describes the catagories
+% that the dependent variable can range over.
 
-% @classifier/classes.m
+% @classifier/categories.m
 % Jeremy Barnes, 4/4/1999
 % $Id$
+
 
 % PRECONDITIONS
 % none
 
-n = obj.classes;
+
+n = obj.categories;
+
 
 % POSTCONDITIONS
 check_invariants(obj);
-
-return;
