@@ -18,12 +18,12 @@ function label = categorynum(obj, n)
 
 
 % PRECONDITIONS
-if ((n < 0) | (n > numlabels(obj)-1))
+if ((n < 0) | (n > numcategories(obj)-1))
    error('labelnum: index n is out of range');
 end
 
 
-label = obj.labels{n+1};
+label = obj.categories{n+1};
 
 
 % POSTCONDITIONS
