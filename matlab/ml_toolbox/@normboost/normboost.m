@@ -21,13 +21,19 @@ function obj = normboost(weaklearner, norm)
 % Jeremy Barnes, 15/8/1999
 % $Id$
 
-                    if (nargin == 1)
+if ((nargin == 1) & isa(weaklearner, 'normboost'))
    % One parameter --> make a copy
    obj = weaklearner;
    return
+elseif (nargin == 0)
+   norm = 1.0;
+   parent = boost;
+elseif (nargin == 1)
+   norm = 1.0;
+   parent = boost(weaklearner);
+else
+   parent = boost(weaklearner);
 end
-
-parent = boost(weaklearner);
 
 obj.p = norm;
 
