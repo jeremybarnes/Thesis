@@ -21,10 +21,36 @@ function obj_r = train(obj, x, y)
 
 
 % PRECONDITIONS
-% none
+if (isa(x, 'dataset'))
+   if (numcategories(categories(x)) ~= numcategories(obj.categories))
+      error(['train: numcategories in dataset and classifier don''t' ...
+	     ' match']);
+   end
+   if (dimensions(x) ~= obj.dimensions)
+      error(['train: dimensionality of dataset and classifier don''t' ...
+	     ' match']);
+   end
+   [x, y] = data(x); % extract the data
+elseif (~(isa(x, double)))
+   error('train: first parameter must be dataset or array');
+else
+   s = size(x);
+   if (length(s) ~= 2)
+      error('train: incorrect dimensionality for x vector');
+   elseif (length(y) ~= s(1))
+      error('train: length of x and y do not match');
+   end
+   m = max(y);
+   if (m >= numcategories(obj.categories))
+      error('train: too many categories in y for this classifier');
+   end
+   if (fix(y) ~= y)
+      error('train: fractional category values in y');
+   end
+end
+ 
 
 % Find the domain of the independent variable.
-
 x_max = max(x); % Returns a row vector with the max of each column
 x_min = min(x);
 
@@ -32,26 +58,26 @@ x_range = [x_max; x_min];
 
 % Training is best done as a recursive procedure.  As this method is
 % inefficient to call recursively, recursively call the one below.
-
-obj.tree = recursive_train(x, y, x_range, 1, maxdepth);
+obj.tree = recursive_train(x, y, x_range, 1, obj.maxdepth, obj.cost_fn, ...
+			   numcategories(obj.categories));
 
 % The second part of training is pruning.  Again, this is done
 % recursively.
-
 obj.tree = recursive_prune(obj.tree, x, y);
 
 % And there we have it!
 
+obj_r = obj;
 
 % POSTCONDITIONS
-check_invariants(obj);
+check_invariants(obj_r);
 
 
 
 
 
 
-function tree = recursive_train(x, y, domain, depth, maxdepth, cost_fn)
+function tree = recursive_train(x, y, domain, depth, maxdepth, cost_fn, cat)
 
 % RECURSIVE_TRAIN generate a tree to recursively train our classifier.
 %
@@ -84,13 +110,16 @@ function tree = recursive_train(x, y, domain, depth, maxdepth, cost_fn)
 % DEPTH specifies the current recursion depth.  If this number is greater
 % than MAXDEPTH, then the function automatically returns 'null'.
 %
+% CAT specifies the number of categories.
+%
 % The node will also be marked terminal if all of the data belongs to one
 % class.
 
 % Check for the end of recursion.  In this case, simply choose the
 % category with the greatest number of samples in y.
+
 if (depth > maxdepth)
-   cats = category_count(y);
+   cats = category_count(y, cat);
 
    max_count = max(cats);
    max_index = find(cats == max_count);
@@ -101,21 +130,21 @@ if (depth > maxdepth)
    end
 
    % Terminal node
-   tree = category;
+   tree = category-1;
    return;
 end
 
 % We also end our recursion if all of our data samples belong to one
 % category.
-e = (y = y(1));
+e = (y == y(1));
 if (sum(e) == length(y)) % if all elements of e are one (true)
    tree = y(1);
    return;
 end
 
 % Find where to split our data
-[tree.splitvar, tree.splitval, no_optimal] = 
-   optimal_split(x, y, cost_fn);
+[tree.splitvar, tree.splitval, no_optimal] = ...
+   optimal_split(x, y, cost_fn, cat);
 
 % If no split decreases the loss function, then recursion is finished.
 % In that case, again select the most populous classifier as our terminal
@@ -123,7 +152,7 @@ end
 % have a hunch that the previous two cases will preclude this case ever
 % being true.
 if (no_optimal)
-   cats = category_count(y);
+   cats = category_count(y, cat);
 
    max_count = max(cats);
    max_index = find(cats == max_count);
@@ -134,12 +163,12 @@ if (no_optimal)
    end
 
    % Terminal node
-   tree = category;
+   tree = category-1;
    return;
 end
 
 % Split our data about the split point
-[left_x, left_y, right_x, right_y] = 
+[left_x, left_y, right_x, right_y] = ...
    split_data(x, y, tree.splitvar, tree.splitval);
 
 % Recalculate our domain matrices
@@ -153,11 +182,11 @@ left_domain  = [left_domain_max; domain(2, :)];
 right_domain = [domain(1, :); right_domain_min];
 
 % Recursively call ourself to calculate the left and right trees
-tree.left  = recursive_train(left_x,  left_y,  left_domain,
-                             depth+1, maxdepth, cost_fn);
+tree.left  = recursive_train(left_x,  left_y,  left_domain, ...
+                             depth+1, maxdepth, cost_fn, cat);
 
-tree.right = recursive_train(right_x, right_y, right_domain,
-                             depth+1, maxdepth, cost_fn);
+tree.right = recursive_train(right_x, right_y, right_domain, ...
+                             depth+1, maxdepth, cost_fn, cat);
 
 % Finished!
 
@@ -166,7 +195,7 @@ tree.right = recursive_train(right_x, right_y, right_domain,
 
 
 
-function [var, val, no_optimal] = optimal_split(x, y, cost_fn)
+function [var, val, no_optimal] = optimal_split(x, y, cost_fn, cat)
 
 % OPTIMAL_SPLIT calculate variable and value to split on
 %
@@ -194,23 +223,30 @@ var = 0; val = 0.0; no_optimal = 1;
 % In order to calculate an increase/decrease in Q, we need to be know its
 % value before we made any split.  This is calculated here.
 
-y_dens = category_count(y) ./ length(y);
+y_dens = category_count(y, cat) ./ length(y);
 eval(['best_Q = ' cost_fn '(y_dens);']);
 
 for i=1:dimensions
 
-   % Find candidate split points.
+   % Find candidate split points.  Remove the highest one.
    candidate_points = x(:, i);
+   point_to_remove = find(candidate_points == max(candidate_points));
+   if length(point_to_remove) > 1
+      point_to_remove = point_to_remove(1);
+   end
+   candidate_points(point_to_remove) = [];
 
-   for point=candidate_points
+
+   for j=1:length(candidate_points)
+      point = candidate_points(j);
       
       % Split up our data
       [left_x, left_y, right_x, right_y] = split_data(x, y, i, point);
 
       % Calculate the probability of samples being in each
       % category.
-      left_dens = category_count(left_y) ./ length(left_y);
-      right_dens = category_count(right_y) ./ length(right_y);
+      left_dens = category_count(left_y, cat) ./ length(left_y);
+      right_dens = category_count(right_y, cat) ./ length(right_y);
 
       % Calculate our left and right Q functions
       eval(['Qleft = '  cost_fn '(left_dens);']);
@@ -221,8 +257,8 @@ for i=1:dimensions
 	       length(y);
 
       % If our new impurity is better, then we can be happy and joyous.
-      if (this_Q < best_q + eps)
-	 var = i; val = point; best_Q = this_q; no_optimal = 0;
+      if (this_Q < best_Q + eps)
+	 var = i; val = point; best_Q = this_Q; no_optimal = 0;
       end
    end
 end
@@ -268,6 +304,7 @@ function Q = gini(prob)
 
 Q = 1 - sum(prob.^2);
 
+%disp(['gini loss = ' num2str(Q)]);
 
 
 
@@ -281,20 +318,20 @@ function Q = entropy(prob)
 
 Q = - sum(prob .* log(prob));
 
+%disp(['entropy loss = ' num2str(Q)]);
 
 
 
 
 
-function cats = category_count(y)
+function cats = category_count(y, cat)
 
 % CATEGORY_COUNT return the number of y elements in each category
 % FIXME: comment
 
-num_categories = max(y);
-cats = zeros(1, num_categories+1);
+cats = zeros(1, cat);
 
-for i=0:num_categories
+for i=0:cat-1
    cats(i+1) = sum(y == i);
 end
 
@@ -303,7 +340,8 @@ end
 
 
 
-function [left_x, left_y, right_x, right_y] = split_data(x, y, splitvar, splitval);
+function [left_x, left_y, right_x, right_y] = split_data(x, y, splitvar, ...
+						  splitval);
 % SPLIT_DATA separate a dataset by splitting value of one variable
 %
 % This function takes a dataset {X,Y} and splits it into two disjoint
