@@ -8,10 +8,10 @@ function c = numcategories(obj)
 %
 % RETURNS:
 %
-% C is the number of categories in the CATEGORY_LIST of the object.
+% C is the number of categories in output space of OBJ.
 
 % @classifier/numcategories.m
 % Jeremy Barnes, 18/8/1999
 % $Id$
 
-c = numcategories(categories(obj));
+c = obj.numcategories;

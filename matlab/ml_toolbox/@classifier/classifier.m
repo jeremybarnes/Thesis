@@ -1,4 +1,4 @@
-function obj = classifier(categories, dimensions)
+function obj = classifier(numcategories, dimensions)
 
 % CLASSIFIER abstract ancestor class for a classification machine
 %
@@ -6,15 +6,15 @@ function obj = classifier(categories, dimensions)
 %
 % SYNTAX:
 %
-% obj = classifier(categories, dimensions)
+% obj = classifier(numcategories, dimensions)
 %
 % Creates a classifier.
 %
 % DIMENSIONS specifies the number of dimensions that the independent
 % variable will have.
 %
-% CATEGORIES is a CATEGORY_LIST object that specifies the categories to be
-% used in the data.
+% CATEGORIES is a number that specifies the number of labels in the
+% output space.
 %
 % RETURNS:
 %
@@ -26,13 +26,13 @@ function obj = classifier(categories, dimensions)
 
 % 0 arguments -- make a default version
 if (nargin == 0)
-   categories = category_list;
+   numcategories = 2;
    dimensions = 2;
 end
 
 % 1 argument -- just make a copy
-if ((nargin == 1) & (isa(categories, 'classifier')))
-   obj = categories;
+if ((nargin == 1) & (isa(numcategories, 'classifier')))
+   obj = numcategories;
    return
 end
 
@@ -41,15 +41,10 @@ if (dimensions <= 0)
    error('classifier: DIMENSIONS must be >= 1');
 end
 
-if (~isa(categories, 'category_list'))
-   error('classifier: CLASSES needs to be a CATEGORY_LIST');
-end
-
-
 % initialisation of variables in obj
 obj.initialised = 1;
 obj.dimensions = dimensions;
-obj.categories = categories;
+obj.numcategories = numcategories;
 obj.trained_samples = 0;
 
 % construct class and define superior/inferior relationship
