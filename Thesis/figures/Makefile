@@ -27,7 +27,7 @@ working_dir 	= $(shell pwd)
 		echo "EPSFILENAME = '$@'" >> tmpcommand
 		echo $(basename $@) >> tmpcommand
 		matlab < tmpcommand
-#		rm tmpcommand
+		rm tmpcommand
 
 else
 # Windows 95 target -- use MATLABscript
@@ -64,4 +64,4 @@ all:		b_func.epsg classification_problem.epsg \
 		adaboost_margins.epsg
 
 clean:		
-		-rm *.epsg *.mscript *~
+		-rm *.epsg *.mscript *~ tmpcommand
