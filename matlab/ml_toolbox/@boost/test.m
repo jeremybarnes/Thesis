@@ -154,7 +154,7 @@ if ((numcategories(obj) == 2) & (~strcmp(option, 'slow')))
       iter = iter + 1;
    end
 
-   end_weights = obj.classifier_weights;
+   end_weights = classifier_weights(obj);
    end_margins = train_margins;
    
 else
