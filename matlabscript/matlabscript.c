@@ -387,7 +387,7 @@ void run_file(const char *filename)
 }
 
 
-void main(int argc, char **argv)
+int main(int argc, char **argv)
 {
     struct command *this_command;
 
@@ -454,4 +454,6 @@ void main(int argc, char **argv)
 
     /* Free our output buffer */
     free(output_buffer);
+
+    return(0);
 }
