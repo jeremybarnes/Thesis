@@ -50,9 +50,9 @@ for name_num=1:length(usernames)
 
 	    disp(filename);
 	    
-	    exec_error = 0;
-	    exec('img = load_pgm(filename);', 'exec_error = 1');
-	    if (~exec_error)
+	    eval_error = 0;
+	    eval('img = load_pgm(filename);', 'eval_error = 1');
+	    if (~eval_error)
 	       xvalues = [xvalues; img(:)];
 	       yvalues = [yvalues; name_num-1 dir_num-1 expression_num-1 ...
 			  eyes_num-1];
