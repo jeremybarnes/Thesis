@@ -1,4 +1,4 @@
-function obj_r = trainagain(obj)
+function [obj_r, context] = trainagain(obj)
 
 % TRAINAGAIN perform another training iteration of the boosting algorithm
 %
@@ -11,6 +11,11 @@ function obj_r = trainagain(obj)
 % used to determine the initial relative importance of each training
 % sample in the dataset.
 %
+% [obj_r, context] = trainagain(obj)
+%
+% This form returns information designed to make the testing process more
+% efficient.  It is a struct array, with (at least) the fields 
+%
 % RETURNS:
 %
 % A classifier that has had one more iteration of "boosting" performed on it
@@ -21,7 +26,7 @@ function obj_r = trainagain(obj)
 
 if (aborted(obj))
    obj_r = obj;
-   warning('trainagain: attempt to train when training is aborted');
+   warning('trainagain: attempt to train when training aborted');
    return;
 end
 
@@ -77,7 +82,7 @@ else
    if (DEBUG_TRAIN == 1)
       % DEBUGGING CODE -- draw a graph so that we can follow the progress
 
-      alphas = linspace(0.01, 20);
+      alphas = linspace(0.01, 0.5);
       all_c = zeros(size(alphas));
       all_d = zeros(size(alphas));
       all_d2 = zeros(size(alphas));
@@ -126,14 +131,22 @@ else
    % Initialisation
    new_alpha = 0.5 / iterations(obj);
    d = 1;
-
+   min_d = inf;
+   max_d = -inf;
+   last_c = 1000000;
+   tolerance = 0.001;
+   
+   
    % Iterate
 
-   while (abs(d) >= 0.001)
+   iter = 0;
+   while ((abs(d) >= tolerance) & (iter < 1000))
       alpha = new_alpha;
       
-      [c, d, d2, marg] = eval_cf(obj, new_c, alpha);
-
+      [c, d, d2] = eval_cf(obj, new_c, alpha);
+      min_d = min([d min_d]);
+      max_d = max([d max_d]);
+      
       if (DEBUG_TRAIN == 1)
 	 % DEBUGGING
 	 
@@ -150,21 +163,55 @@ else
 	 plot(alpha, c, 'rx');
       end
       
-      % FIXME: need to gracefully handle d2 = 0
+      % Handle d2=0 in a very crude manner, which allows us to continue
+      if (d2 < eps)
+	 d2 = 0.01;
+      end
       
-      new_alpha = alpha - (d / d2)
+      new_alpha = alpha - (d / d2);
+      
+      % Never let alpha move more than half the distance to zero.  This
+      % can lead to alpha < zero, which causes all kinds of problems.
+      min_alpha = alpha / 2;
+      new_alpha = max([min_alpha new_alpha]);
+      
+      % This stopping rule is designed to detect the situation where there
+      % is no solution as dc/dalpha > 0 for all alpha.  It halts the
+      % training if there is no change in the cost function, and we have
+      % not found a zero crossing of the derivative.
+      if ((abs(c - last_c) < tolerance) & (min_d*max_d > 0))
+	 break;
+      end
+      last_c = c;
+      
       if (DEBUG_TRAIN)
 	 new_alpha
 	 pause;
       end
+   
+      iter = iter + 1;
    end
 
+   % Test for lack of convergence
+   if (iter >= 100)
+      warning('trainagain: failed to converge after 100 iterations');
+   end
+   
+   % Test for minimum/maximum at our found point.  We do this on the sign
+   % of the second derivative: if positive, we found a minimum; if
+   % negative we found a maximum.
+   [c, d, d2, marg] = eval_cf(obj, new_c, alpha);
+   
+   if (d2 <= 0.0)
+      alpha = 0;
+      obj = abort(obj);
+   end
+   
+   
    old_b = classifier_weights(obj);
    new_b = [old_b alpha] ./ pnorm([old_b alpha], p);
-   pnorm(new_b, p)
 
 end
-
 
 % Update the sample weights.  These are calculated as the derivatives
 % of the cost _function_ (not functional) and then normalised with a
@@ -177,9 +224,14 @@ new_w = exp(-marg);
 new_w = new_w ./ sum(new_w);
 
 
-% Update our boosting algorithm
+% Update our weights
 obj = add_iteration(obj, new_c, new_b, new_w);
 obj.margins = marg;
 
 obj_r = obj;
 
+context.wl_y = new_y;
+context.wl_instance = new_c;
+context.b = new_b;
+context.alpha = alpha;
+context.first_iter = (iterations(obj) == 1);
