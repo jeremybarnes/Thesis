@@ -19,63 +19,42 @@ function obj_r = trainagain(obj)
 % Jeremy Barnes, 25/4/1999
 % $Id$
 
-% PRECONDITIONS
-% none
 
-if (obj.aborted)
+if (aborted(obj))
    obj_r = obj;
    warning('trainagain: attempt to train when training is aborted');
    return;
 end
 
-
 % create and train a new classifier
 
-new_c = train(obj.weaklearner, obj.x, obj.y, obj.w);
+x_data = x(obj);
+y_data = y(obj);
+w_data = w(obj);
+
+new_c = train(weaklearner(obj), x_data, y_data, w_data);
 
 % find the training error
 new_error = training_error(new_c);
 
 % see what this algorithm does to our data
-new_y = classify(new_c, obj.x);
+new_y = classify(new_c, x_data);
 
 % find if we need to abort
 if ((new_error == 0) | (new_error > 0.5 - eps))
-   obj.maxiterations = obj.iterations;
-   obj.aborted = 1;
-   obj_r = obj;
+   obj_r = abort(obj);
    return;
 end
 
 
-% This section updates the weights.  This is done...
-% FIXME: comment
+% This section updates the weights.
 
-phi = 0.5;
-bt = log((new_error * (1 - phi)) / (phi * (1 - new_error)));
+bt = - 0.5 * log(new_error / (1 - new_error));
 
-
-new_w = obj.w .* exp(bt .* (new_y == obj.y));
+new_w = obj.w .* exp(bt .* ((new_y == obj.y)*2-1));
 new_w = new_w ./ sum(new_w);
 
-% create a structure for our new classifier
-s.w = obj.w;
-s.classifier = new_c;
-s.error = new_error;
+obj = add_iteration(obj, new_c, [obj.b bt], new_w);
 
-% Update everything for our next cycle
-obj.classifiers{obj.iterations+1} = s;
-obj.b(obj.iterations+1) = bt;
-obj.w = new_w;
-obj.iterations = obj.iterations + 1;
 
 obj_r = obj;
-
-% POSTCONDITIONS
-check_invariants(obj_r);
-
-return;
-
-
-
-
