@@ -6,4 +6,5 @@ function obj_r = classifier(obj)
 % Jeremy Barnes, 18/8/1999
 % $Id$
 
+obj = boost(obj);
 obj_r = obj.classifier;
