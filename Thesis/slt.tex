@@ -207,7 +207,13 @@ $y_i \in \calO$, and outputs a hypothesis $h(\cdot) : \calI \rightarrow
 \calO$ chosen according to some known principle.
 
 It is often convenient to represent learning machines by the universal
-set $\calH = \{h : \left( \exists X : \bbW(X) = h \right) \}$.  This set
+set
+%
+\begin{equation}
+\calH = \{h : \left( \exists X : \bbW(X) = h \right) \}
+\end{equation}
+%
+This set
 contains all hypotheses that the learning machine $\bbW$ could
 generate; note however that the \emph{rule} through which a $h$ is
 selected from $\calH$ is not explicit in this formulation. 
@@ -387,6 +393,7 @@ $X$ are not equally important (or reliable), by giving each sample a
 weight $w_i$.
 
 \begin{definition}[Weighted empirical risk]
+\label{def:weighted empirical risk}
 Given $m$ observations $X = ((\bfx_1, y_1), \ldots, (\bfx_m,
 y_m))$ a normalised vector of weights $W = (w_1, \ldots, w_m) \in
 \bbR^m$ where $\sum_{i} w_i = 1$ and a hypothesis $h \in
@@ -541,7 +548,6 @@ points in the plane by the set of lines in the plane.
 \begin{center}
 \includegraphics{figures/shattering.epsg}
 \end{center}
-\label{fig:shattering}
 \begin{capt}{Shattering a set of points}{fig:shattering}
 The $\times$ symbols are data points; the lines are decision boundaries.
 Part (a) shows how three points on $\bbR^2$ can be shattered by linear
@@ -558,9 +564,11 @@ dimension of the class is defined as
 %
 \begin{equation}
 \VCdim{\calH} = \max_{h} : \exists S = \{\bfx_1, \ldots, \bfx_h\},
-i \neq j \rightarrow \bfx_i \neq \bfx_j,
 \qquad \mbox{where} \qquad \mbox{\calH\ shatters $S$}
 \end{equation}
+%
+where $S$ contains no repetitions ($i \neq j \Rightarrow \bfx_i \neq
+\bfx_j$).
 \end{definition}
 
 In other words, $\VCdim(\calH)$ is the largest number $p$ of distinct
@@ -629,11 +637,10 @@ class of functions $\calH$ at a given scale $\epsilon$, and only
 in the vicinity of ``interesting'' points.%
 \footnote{Generally, we use the $\bfx$ part of our training samples as
 the ``interesting'' points as we know nothing about our distribution
-at other points.}
-We formalise ``interesting points'' in the following definition.  (We
-follow Anthony and Bartlett \cite{Anthony98}).
+at other points.}  We formalise ``interesting points'' as follows.
 
-\begin{definition}[Restriction of a function]
+
+\begin{definition}[Restriction of a function \cite{Anthony98}]
 \label{def:restriction}
 Consider a set of points $X = \{\bfx_1, \ldots, \bfx_k\} \in \calI^k$,
 and a function $u$ where $u : \mathbb{R}^n \rightarrow \mathbb{R}$.  Then
@@ -916,7 +923,7 @@ performance in section \ref{sec:slt}, which all have the properties
 in figure \ref{fig:generalisation bound form}.
 
 \begin{linefigure}
-Given a set of $m$ training samples $X$ and a classifier $\hat{f} \in \calH$
+Given a set of $m$ training samples $X$ and a classifier $\hat{h} \in \calH$
 that minimises empirical risk,
 \begin{equation*}
 \hat{f} = \argmin_{f \in
@@ -925,9 +932,9 @@ that minimises empirical risk,
 with probability of at least $1 - \delta$,
 %
 \begin{equation}
-\underbrace{\Pr(\mathrm{error}|\hat{f})}_{\mbox{\small{true risk}}}
+\underbrace{\Pr(\mathrm{error}|\hat{h})}_{\mbox{\small{true risk}}}
 \quad \leq \quad
-\underbrace{R_{\emp}(\hat{f})}_{\mbox{\small{empirical risk}}}
+\underbrace{R_{\emp}(\hat{h})}_{\mbox{\small{empirical risk}}}
 \quad + \quad
 \underbrace{b(\delta, |\calH|, m)}_{\mbox{\small{confidence interval}}}
 \label{eqn:general bound}

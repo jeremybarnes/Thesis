@@ -2,7 +2,7 @@
 % Jeremy Barnes, 22/9/1999
 % $Id$
 
-\chapter{$p$-boosting}
+\chapter{Development of $p$-boosting algorithms}
 \label{chapter:pboosting}
 
 This chapter describes the concepts behind and a theoretical
@@ -10,32 +10,85 @@ justification of \emph{$p$-boosting}, a generalisation of the boosting
 algorithm.  The treatment is somewhat abstract; further chapters will
 be more concrete as practical issues are considered.
 
-\section{Motivation: avoiding overfitting}
+\section{Avoiding overfitting of boosting algorithms}
 
+Issues of overfitting have been addressed several times in this
+thesis.  Recall that when given an algorithm, we avoid overfitting by
+halting training at the point where the generalisation error is at a
+minimum (figure \ref{fig:overfitting}).  Theoretically, we see that
+guaranteed generalisation performance is the sum of the empirical risk
+(which \emph{decreases} as $t \rightarrow \infty$) and a confidence
+interval (which \emph{increases} as $t \rightarrow \infty$); figure
+\ref{fig:boosting generalisation bound form} provides more detail.
 
+\begin{linefigure}
+Given a set of $m$ training samples $X$, a classifier $F \in \calX$
+chosen by a boosting algorithm  with probability of at least $1 - \delta$,
+%
+\begin{equation}
+\underbrace{\Pr(\mathrm{error}|\hat{f})}_{\mbox{\small{true risk}}}
+\quad \leq \quad
+\underbrace{R_{\emp}^{\gamma}(\hat{f})}_{\mbox{\small{empirical risk}}}
+\quad + \quad
+\underbrace{b(\delta, |\calH|, m)}_{\mbox{\small{confidence interval}}}
+\label{eqn:boosting general bound}
+\end{equation}
+%
+where the function $b(\delta, |\calH|, m)$ has the following
+properties:
+\begin{enumerate}
+\item	$b(\delta, \cdot, \cdot)$ is nonincreasing with $\delta$;
+\item	$b(\cdot, |\calH|, \cdot)$ is nondecreasing with $|\calH|$;
+\item	$b(\cdot, \cdot, m)$ is nonincreasing with $m$.
+\end{enumerate}
+\caption{Form of generalisation performance bounds for boosting (after
+figure \ref{fig:generalisation bound form})}
+\label{fig:boosting generalisation bound form}
+\end{linefigure}
 
-\subsection{Qualitative arguments}
+We attack the problem by concentrating on the confidence interval.
+It was shown in chapter \ref{chapter:booosting} that this confidence
+interval increases with the complexity of the hypothesis class
+$\calX$.  One obvious way, therefore, to avoid overfitting is to limit
+the complexity of the class of hypotheses that our learning algorithm
+can choose.  This process is known as \emph{capacity control}.
+Specifically, instead of choosing $\calX = \co (\calH)$ as AdaBoost
+does, we choose $\calX = \co_p(\calH)$ for some $p > 0$.%
+\footnote{For $p=1$, the hypothesis space matches that of Boosting.}
+Then, for $p < 1$, we have $|\co_p (\calH)| < |\co (\calH)|$.  In
+effect, we have added a parameter $p$ to our algorithm which can be
+adjusted to tune the capacity of $\calX$.  Using the language of
+section \ref{sec:srm}, the $p$ parameter allows us to define a
+structure on $\calX$.
 
-Choo
+By decreasing $p$, we decrease our confidence interval.  However, the
+empirical risk is likely to \emph{increase} as $p \rightarrow 0$.
+We have a tradeoff between the two terms; we need to use structural
+risk minimisation to find the optimal $p$ value.  Figure
+\ref{fig:optimal p value} illustrates this point.
 
-\subsection{Quantitative arguments}
-* By reducing covering numbers we get a better bound
-* Thus use a $p$-convex hull instead of a $1$-convex hull
-* Trade off: minimum margin may be reduced
-* Thus, we would expect to see a curve (draw a graph, shaped like a parabola)
-* Optimal $p$ value there, gives us the best error
-* Draw a picture of the classes being smaller
+\begin{linefigure}
+\begin{center}
+\includegraphics{figures/optimal_p_value.epsg}
+\end{center}
+\begin{capt}{The effect of $p$ on true risk}{fig:optimal p value}
+The true risk (thick line) is bounded by the sum of the empirical risk
+(solid line) and confidence interval (dashed line).  The point chosen
+by the SRM principle is indicated; this is the optimal $p$ value in
+the sense that it leads to the best generalisation performance.
+\end{capt}
+\end{linefigure}
 
-\subsection{Summary}
+\subsection{Generalisation performance of $p$-convex boosting
+algorithms}
 
-\section{Generalisation performance of hypotheses in $\co_p(\calH)$}
-
-Combining the covering-number generalisation performance bound
+We now combine the covering-number generalisation performance bound
 (\ref{eqn:covering number bound}) with the approximate values of
 covering numbers for $p$-convex hulls (\ref{eqn:approx p-convex
-bound}), we obtain the following theorem
+bound}), to obtain the following theorem on the generalisation
+performance of classifiers over $p$-convex hulls.
 
-\begin{theorem}[Approximate bound on generalisation performance]
+\begin{theorem}[Generalisation performance over $p$-convex hulls]
 The generalisation error of a hypothesis $F \in \co_p(\calH)$ where
 $\calH$ has VC dimension???????? $d$ over a set of $m$ independent training
 samples with probability at least $1 - \delta$ can be approximated by
@@ -50,9 +103,31 @@ where $c(p)$ is a constant that depends upon $p$.
 \end{theorem}
 
 This result is necessarily an approximation, due to the approximate
-nature of the theorems it is based upon.
+nature of the theorems it is based upon.  However, it is clear from
+the formulation that the confidence interval will decrease as $p
+\rightarrow 0$.
+
 
 \section{Development of algorithms}
+
+Having established that boosting algorithms which operate on
+$p$-convex hulls have desireable property of a tunable capacity via
+the $p$ parameter, we turn to
+questions of how to modify AdaBoost to operate on a $p$-convex hull.
+We first descrive a ``naive $p$-boosting'' algorithm, which attempts
+to directly modify the classifier weights to produce this effect.
+After considering shortcomings of the naive algorithm, we derive a	
+gradient descent algorithm ``strict $p$-boosting'', using a restricted
+domain $\calX = \co_p (\calH)$.  Unfortunately, the cost space
+optimised by this algorithm has undesirable properties which leads to
+the algorithm getting ``stuck'' for $p < 1$.  As a result, we develop
+the ``sloppy $p$-boosting'' algorithm which sacrifices theoretical
+integrity for practical viability.  Finally, we briefly consider a
+different type of $p$-boosting algorithm (still based on gradient
+descent) that uses regularisation to achieve $\calX \approx
+\co_p(\calH)$.  This algorithm is called the ``gravity $p$-boosting
+algorithm''.
+
 
 \subsection{Naive algorithm}
 
@@ -185,6 +260,9 @@ The reason a solution doesn't exist is that it is for $\alpha < 0$,
 which means we are trying to optimise a hill instead of a valley (so
 we get to the top).
 \end{theorem}
+
+
+
 
 Finally, we need to consider the sample weight updates.  The gradient
 descent theory gives us the sample weights (\ref{eqn:gradient sample

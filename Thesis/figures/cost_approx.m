@@ -14,6 +14,9 @@ yvalues = exp(-xvalues);
 plot(xvalues, yvalues, 'k-');  hold on;
 plot([-1 0 0 1], [1 1 0 0], 'k:');
 
+xlabel('Margin \it{\gamma}');
+ylabel('Cost \it{c(\gamma)}');
+
 set(1, 'paperposition', [0 0 6 2.5]);
 
 print(EPSFILENAME, '-f1','-depsc');
