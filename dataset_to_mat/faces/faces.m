@@ -50,10 +50,15 @@ for name_num=1:length(usernames)
 
 	    disp(filename);
 	    
-	    img = load_pgm(filename);
-	    xvalues = [xvalues; img(:)];
-	    yvalues = [yvalues; name_num-1 dir_num-1 expression_num-1 ...
-		       eyes_num-1];
+	    exec_error = 0;
+	    exec('img = load_pgm(filename);', 'exec_error = 1');
+	    if (~exec_error)
+	       xvalues = [xvalues; img(:)];
+	       yvalues = [yvalues; name_num-1 dir_num-1 expression_num-1 ...
+			  eyes_num-1];
+	    else
+	       disp('ERROR: skipped');
+	    end
 	 end
       end
    end
