@@ -25,6 +25,6 @@ cat = obj.categories;
 
 
 % POSTCONDITIONS:
-check_invarients(obj);
+check_invariants(obj);
 
 

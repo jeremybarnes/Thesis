@@ -22,7 +22,7 @@ function dim = dimensions(obj)
 dim = obj.dimensions;
 
 % POSTCONDITIONS:
-check_invarients(obj);
+check_invariants(obj);
 
 return;
 
