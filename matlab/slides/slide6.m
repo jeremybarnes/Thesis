@@ -10,12 +10,11 @@ function slide6
 maxiterations = 1000;
 numpoints = 20;
 
-b = category_list('binary');
-wl = decision_stump(b, 2);
+wl = decision_stump(2, 2);
 myboost = p_boost(wl, 1);
 
 % Generate our training and test data
-d = dataset(b, 2);
+d = dataset(2, 2);
 d = datagen(d, 'ring', numpoints, 0, 0);
 [x, y] = data(d);
 

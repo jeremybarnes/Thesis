@@ -4,8 +4,7 @@ function slide1
 % Jeremy Barnes, 25/7/1999
 % $Id$
 
-b = category_list('binary');
-d = dataset(b, 2);
+d = dataset(2, 2);
 d = datagen(d, 'ring', 50, 0, 0);
 
 figure(1);  clf;

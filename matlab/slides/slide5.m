@@ -6,7 +6,6 @@ function slide5
 
 figure(1);  clf;
 
-
 a = linspace(0, 1, 101);
 
 pvalues = [0.5 1 2];
