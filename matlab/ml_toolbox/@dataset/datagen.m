@@ -35,12 +35,13 @@ function obj_r = datagen(obj, type, n, sigma_x, Pe)
 % Jeremy Barnes, 2/4/1999
 % $Id$
 
+if (numcategories(obj) ~= 2)
+   error('datagen: only operates on binary datasets');
+end
 
-
-% PRECONDITIONS
-assert(obj, 'obj.initialised == 1');
-assert(obj, 'numcategories(obj.categories) == 2'); % only generates binary data
-assert(obj, 'obj.dimensions == 2'); % only generates 2D data
+if (dimensions(obj) ~= 2)
+   error('datagen: only operates on two-dimensionsal data');
+end
 
 % Generate our real position vector.  This may be different from the
 % observed position vector if we specify position noise.
@@ -99,13 +100,6 @@ for i=1:n
 end
 
 % Add these samples to our dataset
-
 obj = addsamples(obj, x, y);
 
-
 obj_r = obj;
-
-% POSTCONDITIONS
-check_invariants(obj_r);
-
-return;
