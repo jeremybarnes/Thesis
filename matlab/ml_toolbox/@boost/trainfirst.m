@@ -1,4 +1,4 @@
-function [obj_r, wl_y] = trainfirst(obj, varargin)
+function [obj_r, context] = trainfirst(obj, varargin)
 
 % TRAINFIRST perform first training iteration of the boosting algorithm
 %
@@ -31,7 +31,7 @@ function [obj_r, wl_y] = trainfirst(obj, varargin)
 % Normalise our w vector
 obj.w = w ./ sum(w);
 
-[obj, wl_y] = trainagain(obj);
+[obj, context] = trainagain(obj);
 
 obj_r = obj;
 

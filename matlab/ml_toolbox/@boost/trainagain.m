@@ -1,4 +1,4 @@
-function [obj_r, wl_y] = trainagain(obj)
+function [obj_r, context] = trainagain(obj)
 
 % TRAINAGAIN perform another training iteration of the boosting algorithm
 %
@@ -23,10 +23,9 @@ function [obj_r, wl_y] = trainagain(obj)
 % Jeremy Barnes, 25/4/1999
 % $Id$
 
-
 if (aborted(obj))
    obj_r = obj;
-   warning('trainagain: attempt to train when training is aborted');
+   warning('trainagain: attempt to train when training aborted');
    return;
 end
 
@@ -62,4 +61,7 @@ new_w = new_w ./ sum(new_w);
 obj = add_iteration(obj, new_c, [obj.b bt], new_w);
 
 obj_r = obj;
-wl_y = new_y;
+
+context.wl_y = new_y;
+context.wl_instance = new_c;
+context.bt = bt;

@@ -17,6 +17,12 @@ function [trained, test_err, train_err] = test(obj, traind, testd, iterations,op
 % The function does not necessarily do things in the order which an
 % external function would, and may be considerably faster.
 %
+% test(..., 'slow') disables all speedups.
+%
+% test(..., 'nosave') allows even more speedups, by not saving
+% weaklearners.  This results in an invalid object being returned in
+% trained (don't try to use it!)
+%
 % RETURNS:
 %
 % TRAINED is OBJ trained ITERATIONS times
@@ -64,7 +70,10 @@ train_err = [];
 
 iter = 1;
 
-if ((numcategories(obj) == 2) & (option ~= 'slow'))
+nosave = strcmp(option, 'nosave');
+obj.nosave = nosave;
+
+if ((numcategories(obj) == 2) & (~strcmp(option, 'slow')))
    % Binary classifier
 
    % Initialisation
@@ -72,13 +81,15 @@ if ((numcategories(obj) == 2) & (option ~= 'slow'))
    test_margins = zeros(size(testy));
    
    % First round of training
-   [obj, wl_train_y] = trainfirst(obj, trainx, trainy);
-   this_wl = wl_instance(obj, iter);
+   [obj, context] = trainfirst(obj, trainx, trainy);
+   
+   this_wl = context.wl_instance;
+   wl_train_y = context.wl_y;
    wl_test_y = classify(this_wl, testx);
    
    % Update the margins
-   train_margins = update_margins(obj, train_margins, wl_train_y);
-   test_margins  = update_margins(obj, test_margins,  wl_test_y);
+   train_margins = update_margins(obj, train_margins, wl_train_y, context);
+   test_margins  = update_margins(obj, test_margins,  wl_test_y, context);
    
    % Calculate errors
    train_err(iter) = sum((train_margins > 0) ~= trainy) / length(trainy);
@@ -90,13 +101,15 @@ if ((numcategories(obj) == 2) & (option ~= 'slow'))
       end
       
       % Continue training
-      [obj, wl_train_y] = trainagain(obj);
-      this_wl = wl_instance(obj, iter+1);
+      [obj, context] = trainagain(obj);
+   
+      this_wl = context.wl_instance;
+      wl_train_y = context.wl_y;
       wl_test_y = classify(this_wl, testx);
-      
+   
       % Update the margins
-      train_margins = update_margins(obj, train_margins, wl_train_y);
-      test_margins  = update_margins(obj, test_margins,  wl_test_y);
+      train_margins = update_margins(obj, train_margins, wl_train_y, context);
+      test_margins  = update_margins(obj, test_margins,  wl_test_y, context);
       
       % Calculate errors
       train_err(iter) = sum((train_margins > 0) ~= trainy) / length(trainy);
