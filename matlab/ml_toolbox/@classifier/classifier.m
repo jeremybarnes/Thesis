@@ -26,7 +26,6 @@ function obj = classifier(categories, dimensions)
 % $Id$
 
 
-% PRECONDITIONS
 if (dimensions <= 0)
    error('classifier: DIMENSIONS must be >= 1');
 end
@@ -45,9 +44,3 @@ obj.trained_samples = 0;
 % construct class and define superior/inferior relationship
 obj = class(obj, 'classifier');
 superiorto('double');
-
-
-% POSTCONDITIONS
-check_invariants(obj);
-
-return;
