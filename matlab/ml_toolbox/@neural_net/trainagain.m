@@ -61,6 +61,10 @@ function obj_r = trainagain_guts(obj, x_data, y_data)
 % descent (ie, calculating gradient based on all training samples
 % provided).  Stochastic can be simulated by passing in only one training
 % sample.
+%
+% OBJ is the NEURAL_NET object to be trained.  The X_DATA is the
+% sample(s) to be trained, the Y_DATA is the labels of those
+% samples (integers).  The trained network is returned in OBJ_R.
 
 % First, we need to translate our output data into the "required" output
 % data.  For example, 3 --> [0.1 0.1 0.1 0.9 0.1] if numcategories = 5.

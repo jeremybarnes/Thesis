@@ -2,20 +2,26 @@ function obj = neural_net(hidden, dimensions, numcategories)
 
 % NEURAL_NET classifier based upon a neural network
 %
+% SYNTAX:
+%
+% obj = neural_net(hidden, dimensions, numcategories)
+% 
 % This is the constructor.
 %
 % This class encapsulates a two-layer perceptron neural network
 % classifier.
 %
 % The number of input units is equal to DIMENSIONS.  There are HIDDEN
-% nodes in the hidden layer.  CATEGORIES is a CATEGORY_LIST object.
+% nodes in the hidden layer.  NUMCATEGORIES indicates the size of
+% the output space.
 %
 % The network is constructed with one output node for each possible
 % class.
 %
-% RETURNS:
-% OBJ is the new boost object.
+% obj = neural_net(nn)
 %
+% This form, where NN is itself a neural network object, simply
+% makes a copy of NN and returns it in OBJ.
 
 % @neural_net/neural_net.m
 % Jeremy Barnes, 2/10/1999
@@ -25,6 +31,8 @@ function obj = neural_net(hidden, dimensions, numcategories)
 if ((nargin == 1) & (isa(hidden, 'neural_net')))
    obj = hidden;
    return
+
+% Fill in default values for arguments
 elseif (nargin == 2)
    numcategories = 2;
 elseif (nargin == 1)
