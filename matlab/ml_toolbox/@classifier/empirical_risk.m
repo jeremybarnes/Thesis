@@ -19,18 +19,7 @@ function Pe = empirical_risk(obj, x, y)
 % Jeremy Barnes, 4/4/1999
 % $Id$
 
-% PRECONDITIONS
-% none
-
-
 this_y = classify(obj, y);
 errors = (this_y ~= y);
 
 Pe = sum(errors) ./ length(y);
-
-
-% POSTCONDITIONS
-check_invariants(obj);
-
-return;
-
