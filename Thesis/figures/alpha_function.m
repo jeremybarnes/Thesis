@@ -8,7 +8,7 @@ function alpha_function
 global EPSFILENAME
 
 
-alpha = logspace(-2, 2, 101);
+alpha = logspace(-2, 2, 101);  setup_figure;
 
 figure(1);  clf;  
 
@@ -24,34 +24,41 @@ for i=1:length(allp)
    cwr = calc_cost(alpha, -1,  1, p);
    crw = calc_cost(alpha,  1, -1, p);
    crr = calc_cost(alpha,  1,  1, p);
-      
+
+   ctot = 7*crr + cwr + 2*crw;
+   
    style = ['k' styles{i}];
    
    lw = linewidths{i};
    
-   subplot(1, 4, 1);  setup_axis;
+   subplot(1, 5, 1);  setup_axis;
    semilogx(alpha, cww, style, 'linewidth', lw);
-   title('(a) \sl{(wrong, wrong)}');  grid on;  hold on;
+   title('(a) \sl{(-1 \Rightarrow -1)}');  grid on;  hold on;
    axis square;  xlabel('\alpha');  ylabel('Sample cost \it{c}');
    
-   subplot(1, 4, 2);  setup_axis;
+   subplot(1, 5, 2);  setup_axis;
    semilogx(alpha, cwr, style, 'linewidth', lw);
-   title('(b) \sl{(wrong, right)}');  grid on;  hold on;
+   title('(b) \sl{(-1 \Rightarrow +1)}');  grid on;  hold on;
    axis square;  xlabel('\alpha');
    
-   subplot(1, 4, 3);  setup_axis;
+   subplot(1, 5, 3);  setup_axis;
    semilogx(alpha, crw, style, 'linewidth', lw);
-   title('(c) \sl{(right, wrong)}');  grid on;  hold on;
+   title('(c) \sl{(+1 \Rightarrow -1)}');  grid on;  hold on;
    axis square;  xlabel('\alpha');
    
-   subplot(1, 4, 4);  setup_axis;
+   subplot(1, 5, 4);  setup_axis;
    semilogx(alpha, crr, style, 'linewidth', lw);
-   title('(d) \sl{(right, right)}');  grid on;  hold on;
+   title('(d) \sl{(+1 \Rightarrow +1)}');  grid on;  hold on;
+   axis square;  xlabel('\alpha');
+
+   subplot(1, 5, 5);  setup_axis;
+   semilogx(alpha, ctot, style, 'linewidth', lw);
+   title('(e) \sl{Cost functional}');  grid on;  hold on;
    axis square;  xlabel('\alpha');
 end
 
 
-set(1, 'paperposition', [0 0 6 2.5]);
+set(1, 'paperposition', [0 0 7 2.5]);
 
 print(EPSFILENAME, '-f1','-deps2');
 

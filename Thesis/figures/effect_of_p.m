@@ -9,6 +9,6 @@ global EPSFILENAME
 display_meta_summary('perror');
 
 
-set(1, 'paperposition', [0 0 6 9]);
+set(1, 'paperposition', [0 0 7 9]);
 
 print(EPSFILENAME, '-f1','-deps');

@@ -193,16 +193,17 @@ in this direction and moves to that point; whereas the naive algorithm
 also searches for that point \emph{and then purposely avoids it!}
 Experiments with this algorithm prove to have indifferent performance.
 
-\subsection{Strict algorithm}
+\section{Strict algorithm}
 
 The strict algorithm is the purest of all $p$-boosting algorithms
-considered in this thesis.  It performs gradient descent, using the
+considered in this thesis (although not the best performing).  It
+performs gradient descent, using the 
 same cost function and inner product as AdaBoost, but uses the the
 universal set $\calX = \co_p(\calH)$.  It is called the ``strict''
-algorithm because it also performs its line searches along lines
-$\ell$ where each point $p$ on $\ell$, $p \in \calX$.  In other words,
-it confines its line search to the $p$-convex hull.  This idea is
-illustrated in figure \ref{fig:strict line search}.
+algorithm because it confines its line search to the $p$-convex hull
+(AdaBoost performs its line search along a line orthogonal to the
+combined hypothesis $F_{t}$).  This idea is illustrated in figure
+\ref{fig:strict line search}. 
 
 \begin{linefigure}
 \begin{center}
@@ -211,13 +212,15 @@ illustrated in figure \ref{fig:strict line search}.
 \begin{capt}{Line search for strict $p$-boosting algorithm}{fig:strict line search}
 The strict $p$-boosting algorithm confines its line search to the
 $p$-convex hull of points, whereas AdaBoost searches orthogonal to the
-current hypothesis.
+current combined hypothesis.
 \end{capt}
 \end{linefigure}
 
 \subsection{Classifier weights}
 
-Algebraicaly, we are seeking a minimum of the expression
+We derive an expression for the classifier weights, using the gradient
+descent framework of chapter \ref{chapter:boosting}.  Algebraicaly, we
+are seeking a minimum of the expression 
 %
 \begin{equation}
 \label{eqn:classifier weight cost function approximation}
@@ -326,47 +329,96 @@ otherwise.  The denominator $(1 + \alpha^p)^{\frac{1}{p}}$ is equal to
 $1$ at $\alpha=0$ and approaches $\alpha$ as $\alpha \rightarrow
 \infty$.
 
-When applied to our simple simulation, this analysis yields some
-insight into the processes that are occurring.  The margin
-$m_{(\bfx_i, y_i), 1}$ will have one of two values: $+1$ if
-$h_1(\bfx_i) = y_i$ and $-1$ otherwise.  Thus, the per-sample cost
-cost function $c_{(\bfx, y), 1}$ for a given $p$ and $\alpha$ will
-have one of four forms, depending the history of the sample:
+When applied to our simple example, this analysis yields some
+insight into the processes that are occurring.  Of the ten samples,
+seven were classified correctly by both weaklearning hypotheses; one
+was classified wrongly on the first iteration but correctly on the
+second; and two were classified correctly at first but wrongly on the
+second.
+
+When performing the Netwon-Raphson search for $t=2$, the margin
+$m_{(\bfx_i, y_i), 1}$ will evaluate to one of two values: $+1$ if 
+$h_1(\bfx_i) = y_i$ and $-1$ otherwise.  Likewise, the margin of the
+weaklearning hypothesis $h_2$ will be $\pm 1$ depending upon whether
+it classified the sample correctly or not.  As a result, there are
+four possibilities for the sample cost function, depending upon the
+history of the first two weak learning hypotheses:
 %
-\providecommand{\ra}{\rightarrow}
+\providecommand{\ra}{\Rightarrow}
 \providecommand{\Pn}{(1 + \alpha^p)^{\frac{1}{p}}}
 \begin{equation}
 \begin{array}{rclrcl}
-c_(-1 \ra -1),i & = & \exp \left\{ \frac{ 1 + \alpha}{\Pn} \right\} &
-c_(-1 \ra +1),i & = & \exp \left\{ \frac{ 1 - \alpha}{\Pn} \right\} \\
-c_(+1 \ra -1),i & = & \exp \left\{ \frac{-1 + \alpha}{\Pn} \right\} &
-c_(+1 \ra +1),i & = & \exp \left\{ \frac{-1 - \alpha}{\Pn} \right\}
+c_{(-1 \ra -1),i}(p,\alpha) & = & \exp \left\{ \frac{ 1 + \alpha}{\Pn} \right\} &
+c_{(-1 \ra +1),i}(p,\alpha) & = & \exp \left\{ \frac{ 1 - \alpha}{\Pn} \right\} \\
+c_{(+1 \ra -1),i}(p,\alpha) & = & \exp \left\{ \frac{-1 + \alpha}{\Pn} \right\} &
+c_{(+1 \ra +1),i}(p,\alpha) & = & \exp \left\{ \frac{-1 - \alpha}{\Pn} \right\}
 \end{array}
 \end{equation}
 %
-where the subscript to $c$ gives the history of the correctness of
-weaklearners $h_1$ and $h_2$ in classifying the sample $(\bfx_i,
-y_i)$.  These functions are plotted against alpha in figure
-\ref{fig:alpha function}.
+where the subscript to $c$ gives the history: $(u \ra v)$ means that
+hypothesis $H_1 = \sign(F_1)$ had margin $yF_1(\bfx) = u$, and that
+the weak learning hypothesis $h_{2}$ had margin $yh_2(\bfx) = v$. These
+functions are plotted against alpha in figure \ref{fig:alpha
+function}.
 
 \begin{linefigure}
 \begin{center}
-\includegraphics{figures/alpha_function.epsg}
+\hspace*{-1cm}\includegraphics{figures/alpha_function.epsg}
 \end{center}
 \begin{capt}{Sample cost contributions}{fig:alpha function}
 Parts (a) through (d) show the sample cost at iteration $t=2$ as a
-function of the history of the sample through weaklearners $h_1$ and
-$h_2$.
+function of the history of the margins through weaklearners $h_1$ and
+$h_2$.  The dashed line indicates $p=0.5$, the thick line $p=1$, and
+the thin solid line $p=2$.  Part (e) plots the cost \emph{functional}
+for the examples (10 samples) described in the text (in the example,
+$p=0.5$ is used; the other curves are plotted for reference).
 \end{capt}
 \end{linefigure}
 
 The shape of the $(-1, +1)$ and $(+1, -1)$ curves is
 sensible: as $\alpha$ increases, samples which were wrong and are now
 classified correctly decrease in weight, while the opposite occurs for
-samples which were right and are now wrong.
+samples which were right and are now wrong.  The main qualitative
+difference between $p=0.5$ and $p=1$ is the shape of the $(-1 \ra -1)$
+and $(+1 \ra +1)$ curves: these are flat for $p=1$ (indicating that
+the algorithm is indifferent to samples which do not change their
+margin), but form a hill for $p < 1$.
 
+* $(+1 \ra -1)$ has $\frac{\partial c(\alpha)}{\partial \alpha} > 0$
+  always.
 
-\subsection{Sloppy algorithm}
+Part (d) of figure \ref{fig:alpha function} displays the cost
+functional 
+\begin{equation}
+C(\alpha,p) = \sum_{i=1}^{10} c_{(\bfx, y)}(\alpha, p) 
+= 7c_{(1 \ra 1)} + 2c_{(1 \ra -1)} + c_{(-1 \ra 1)}
+\end{equation}
+for different values of $p$.  Note that a well-defined minimum exists
+for $p \geq 1$, but the cost function is monotonic increasing for $p =
+0.5$.  It is clear that the contribution of $2c_{(+1 \ra -1)}$
+prevents a minima from occurring.
+
+While this analysis is by no means complete, some general observations
+can be made on likely reasons for the strict algorithm terminating
+early.  Choosing $p < 1$ appears to produce a \emph{maxima} in the
+per-sample cost functional for samples that had a positive margin on
+iteration $t$ and were again classified correctly on iteration $t+1$.
+
+We have already seen from chapter \ref{chapter:boosting} that as $t
+\rightarrow \infty$, the ``easy'' samples tend to be classified
+correctly very often (this result is true for AdaBoost, and by
+extrapolation true also for the strict algorithm, as both update their
+sample weights in the same manner).  As a result, we would expect that
+many samples would have a cost function of the shape shown in figure
+\ref{fig:alpha function} (d).  On the other hand, samples that are
+``hard'' tend to oscillate: as a result, there are few samples with a
+cost function in the shape of figure \ref{fig:alpha function} (a)
+(which could balance out the effect).  The net result is that as the
+number of training iterations increases, the cost functional becomes
+less and less likely to have a minima, and thus training terminates
+early.
+
+\section{Sloppy algorithm}
 
 Given the problems with the strict boost algorithm, it is reasonable
 to consider using an algorithm with a similar effect but a simpler
@@ -400,7 +452,7 @@ generalisation of the normed boosting algorithms surveyed in chapter
 \ref{chapter:boosting}.
 
 
-\subsection{Gravity algorithm}
+\section{Gravity algorithm}
 
 The final variant of $p$-boosting considered in this thesis is
 somewhat different to the other two.  This algorithm is less direct in

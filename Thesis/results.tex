@@ -10,6 +10,13 @@ chapter \ref{chapter:method}, discusses their features, and compares
 them with the results expected from the theory in chapters
 \ref{chapter:slt} and \ref{chapter:slt}.
 
+An opening observation is that Boosting algorithms are very erratic in
+their behaviour.  As a result, it is difficult to make conclusive
+judgements based on individual observations; at the very least
+statistical measures need to be used, and even so a huge amount of
+computing resources are required to have a high confidence in results
+obtained.
+
 \section{Generalisation performance}
 
 Figure \ref{fig:test err summary} is a high-level summary of the
@@ -23,17 +30,18 @@ AdaBoost, only in a few cases is difference significant.  The only
 dataset upon which the strict algorithm generalises significantly better
 than AdaBoost is \ds{acacia}.  The sloppy algorithm generalises
 significantly better on \ds{ring10}, \ds{ring20}, \ds{ring30} and
-\ds{acacia}; while the na\"{\i}ve algorithm never significantly
-outperforms AdaBoost.
+\ds{acacia}; while the na\"{\i}ve algorithm always outperforms
+AdaBoost by a small (never statistically significant) amount.
 
 Thus, the sloppy algorithm appears to outperform AdaBoost on the noisy
 datasets considered (recall that the \ds{acacia} dataset was chosen as
-a difficult dataset).  This result was expected--the algorithm was
+a difficult dataset).  This behaviour was expected--the algorithm was
 specifically designed to implement capacity control.  It also appears
 that the na\"{\i}ve algorithm has little effect on generalisation
 performance (a somewhat surprising result--the discussion in chapter
 \ref{chapter:pboosting} concluded that the algorithm should be
 \emph{worse} than AdaBoost.  We shall return to this result shortly).
+
 
 \begin{linefigure}
 \begin{center}
@@ -47,99 +55,23 @@ that the $p$-boosting algorithm generalises better than AdaBoost.  The
 light bars indicate the spread of the trials, and are one standard
 deviation in length either side of the mean.
 
-\noindent\bf{Key:} $\bullet$ \ds{ring0}, $\times$ \ds{ring10}, $\circ$
+\noindent{\bf Key:} $\bullet$ \ds{ring0}, $\times$ \ds{ring10}, $\circ$
 \ds{ring20}, $\ast$ \ds{ring30}, $\Box$ \ds{sonar}, $\bigtriangleup$
 \ds{wpbc}, $\Diamond$ \ds{acacia}.
 \end{capt}
 \end{linefigure}
 
 
-\section{Effect of $p$ value on generalisation performance}
-
-Figure \ref{fig:effect of p} shows the effect of 
-
-\begin{linefigure}
-\begin{center}
-\includegraphics{figures/effect_of_p.epsg}
-\end{center}
-\begin{capt}{Effect of $p$ on generalisation error}{fig:effect of p}
-Average test error of each algorithm: AdaBoost (thick line), strict
-(thin solid), sloppy (dash-dot) and na\"{\i}ve (dotted) is shown for
-each dataset.  The bullets $\bullet$ indicate the best value of $p$
-which is used in figure \ref{fig:test err summary}.
-\end{capt}
-\end{linefigure}
-
-\section{Training curves}
-
-* For low $p$ values, they are almost the same
-* Strict algorithm terminates early for $p < 1$
-* Sloppy algorithm thrashes about a nearly constant line before
-  converging
-
-
-\begin{linefigure}
-\begin{center}
-\includegraphics{figures/training_curves_strict.epsg}
-\includegraphics{figures/training_curves_sloppy.epsg}
-\end{center}
-\begin{capt}{Selected training curves}{fig:training curves} 
-Here is some text that describes this beautiful figure.
-\end{capt}
-\end{linefigure}
-
-\section{The training process}
-
-Figure \ref{fig:weight distribution} is a more detailed look at the
-training process.
-
-* AdaBoost: early weights are slightly larger; once zero error is
-  reached they level off;
-* This is not a contradiction: remember that classifier weights are
-  based upon the weighted error of the weak hypothesis.
-
-* Strict: $p=0.5$ terminates early; $p=1$ doesn't generalise much at
-  all, looking at training weights we see that they are fit well by a
-  straight line, which implies that $b_t = \frac{1}{t^\lambda}$ where
-  $\lambda$ is negative of slope obtained from the graph.  Drop is
-  quite significant: only the first few hypotheses are significant.
-* $p=1.5$ shows similar behaviour to boosting, except for sudden
-  decrease at about 2000 iterations (and it takes ten times longer to
-  converge).
-
-* Sloppy: We get the opposite behaviour: initial weights are
-  insignificant ($10^{-300}$), gradually increase, get a ``break
-  point'' where all of a sudden it stops oscillating around a constant
-  error and trains quite rapidly (watch out for log scale, though).
-* Would suggest that starting point is bad (gradually inching towards
-  a better solution), possibly due to bad direction being chosen,
-  maybe something similar to annealing would help (multiple starting
-  points).
-* Before it reaches zero error, only the last few hypotheses are
-  significant; after it reaches zero it then drops off linearly as we
-  saw before.
-* We expect for low $p$ to take longer to train, as we have a less
-  rich hypothesis space; not for $p \geq 1$, however.
-
-\begin{linefigure}
-\begin{center}
-\includegraphics{figures/weight_distributions.epsg}
-\end{center}
-\begin{capt}{Weight distribution of algorithms}{fig:weight distribution}
-Each was trained to 10000 iterations; note log scale on classifier
-weight graph.  Classifier weights are plotted above \emph{training}
-errors.  The black line is $p=1$, the dark grey is $p=0.5$, the light
-gray is $p=1.5$.  Note that the top panel of (c) contains the same
-data plotted on two different scales.  The curves closest to the right
-are on the right hand scale.
-\end{capt}
-\end{linefigure}
-
-
 \section{Training time}
 
-Figure \ref{fig:test iter summary} details how the training times
-compare with AdaBoost.  We can see that the...
+Figure \ref{fig:test iter summary} details how the training times of
+$p$-boosting algorithms compare with AdaBoost.  It is quite clear that
+the sloppy and strict algorithms require slightly to substantially
+more training iterations than AdaBoost.  Thus, the improved
+generalisation performance of these algorithms comes at the cost of
+increased training time.  In section \ref{sec:training curves} we will
+examine the mechanisms that cause the increased training time, and
+suggest remedies.
 
 \begin{linefigure}
 \begin{center}
@@ -150,18 +82,192 @@ times}{fig:test iter summary}
 Both axes measure numbers of iterations.  The $y$ axis measures the
 average number of iterations required for AdaBoost to reach the
 minimum of the test error; the $y$ axis is the same statistic for the
-$p$-boosting variant \emph{at the optimal value of $p$}.  Points above
-the line indicate that AdaBoost requires more iterations to train than
-the other algorithm.  Marker symbols indicate datasets; see figure
-\ref{fig:test err summary} for a legend.
+$p$-boosting variant (at $p^{\ast}$).  Points above the line indicate
+that AdaBoost requires more iterations to train than the $p$-boosting
+algorithm.  Marker symbols indicate datasets:
+
+\noindent{\bf Key:} $\bullet$ \ds{ring0}, $\times$ \ds{ring10}, $\circ$
+\ds{ring20}, $\ast$ \ds{ring30}, $\Box$ \ds{sonar}, $\bigtriangleup$
+\ds{wpbc}, $\Diamond$ \ds{acacia}.
 \end{capt}
 \end{linefigure}
 
-\subsection{Possible remedy to inefficient training}
 
-It may be possible to accelerate the training of the sloppy algorithm
-by choosing a more aggressive cost function.  We modify the cost
-function to be of the form
+\section{Effect of $p$ value on generalisation performance}
+
+Figure \ref{fig:effect of p} expands on figure \ref{fig:test err
+summary} to include information on \emph{all} values of $p$ (not just
+$p^{\ast}$).
+
+Consider first the sloppy algorithm (dashed line on figure
+\ref{fig:test err summary}).  When trained on the noisy \ds{ring}
+datasets, this algorithm appears to be implementing capacity control
+as expected, with the generalisation error reaching a minimum at an
+optimal value of $p$ (compare with \ref{fig:optimal p value} on page
+\pageref{fig:optimal p value}).  The results on other datasets are
+less clear: the low-noise datasets \ds{ring0} and \ds{sonar} show a
+straight curve with no obvious minima (the slope indicating that such
+a minima may exist for $p > 2$); whereas the curves for \ds{wpbc} and
+\ds{acacia} both appear to involve a random process.
+
+The performance of the strict algorithm is very poor for $p < 1$ (due
+to the algorithm terminating training after few iterations); for $1
+\leq p < 2$ it appears to reach a reasonable hypothesis (and a
+particularly good one in the case of the \ds{wpbc} and \ds{acacia}
+datasets).  It shares the sloppy algorithm's general down-sloping
+characteristic on low-noise datasets, and also appears to reach a
+minimum on the higher noise datasets.  It is interesting to note that
+the $p^{\ast}$ value differs substantially between the strict and
+sloppy algorithms.  This is a counter-intuitive result: the optimal
+capacity should be an intrinsic property of the \emph{dataset}, not
+the algorithm, when both algorithms are operating from the same
+hypothesis class $\calX = \co_p(\calH)$.
+
+The performance of the na\"{\i}ve algorithm does not deviate
+significantly from that of AdaBoost.  The $p$ parameter appears to
+have little effect on this algorithm.
+
+In summary, it appears that the strict and sloppy algorithms match the
+expected behaviour of an optimal $p$ value minimising test error for
+the noisy datasets, but not for low-noise datasets (although there is
+an indication that maybe $p^{\ast} > 2$, and thus is off the scale of
+figure \ref{fig:effect of p}).
+
+\begin{linefigure}
+\begin{center}
+\hspace*{-1cm}\includegraphics{figures/effect_of_p.epsg}
+\end{center}
+\begin{capt}{Effect of $p$ on generalisation error}{fig:effect of p}
+Average test error of each algorithm over all trials: AdaBoost (thick
+line), strict (thin solid), sloppy (dash-dot) and na\"{\i}ve (dotted)
+is shown for each dataset.  The bullets $\bullet$ indicate the value
+$p^{\ast}$ which is used in figure \ref{fig:test err summary}.
+\end{capt}
+\end{linefigure}
+
+\section{Training curves}
+\label{sec:training curves}
+
+Figure \ref{fig:training curves} shows a selection of training curves
+from the strict and sloppy algorithms, all training on the \ds{ring30}
+dataset.  There are three interesting observations concerning these
+curves.  Firstly, part (a) shows that the training error for the
+strict algorithm, $p=0.5$ is actually \emph{increasing} with the number
+of iterations!  This behaviour often recurs immediately before
+training is aborted.  Thus, there is an indication of instability of
+the (boost, decision stumps) combination; the mechanism behind it is
+unclear.
+
+Secondly, for $p=0.5$ (parts (a) and (d)), the test error and training
+error curves follow each other quite closely.  This behaviour has a
+theoretical explanation: for low values of $p$, the covering numbers
+of $\co_p(\calH)$ (and thus the confidence interval of figure
+\ref{fig:boosting generalisation bound form}) are small.  We would
+therefore expect the test and training curves to match closely--which
+they do.
+
+The third observation concerns the training of the sloppy algorithm.
+For $p \in \{0.5, 1\}$ the behaviour is quite erratic on a fine scale,
+but steady on average (random oscillations about a steady average
+value).  It appears that this algorithm is ``thrashing around'' in the
+cost space, unable to find a direction (hypothesis) which will
+significantly reduce the cost functional.
+
+\begin{linefigure}
+\begin{center}
+\includegraphics{figures/training_curves_strict.epsg}
+\includegraphics{figures/training_curves_sloppy.epsg}
+\end{center}
+\begin{capt}{Selected test/training error curves}{fig:training curves}
+The curves show training error (dotted line) and test error (solid
+line) against iteration number.  Each point of both curves is
+averaged over all trials that had not aborted at the specified
+iteration number.
+\end{capt}
+\end{linefigure}
+
+Figure \ref{fig:weight distribution} is a more detailed look at the
+mechanics of the training process for the AdaBoost algorithm (as a
+reference) and the strict and sloppy algorithms.
+
+We first describe the behaviour of AdaBoost, to provide a basis for
+comparison with the other algorithms.  The first observation on the
+AdaBoost algorithm is that the classifier weights decrease as a
+constant power of $t$ (note the logarithmetic scale) until training
+error reaches zero, and then oscillate about this same value.  Thus,
+the early weights are slightly larger than the later weights, but all
+play a significant role.
+
+Contrast this behaviour with that of the strict algorithm in part (b).
+Considering the $p=1$ curve in part (b)%
+\footnote{The $p=0.5$ curve aborted training after 2 iterations.}
+it is clear than these weights continue decreasing as $b_t =
+t^{-\lambda}$.  The nearly flat training error curve is thus explained
+by the classifier weights getting too small for the weak hypotheses
+$h_t$ as $t$ increases to have any effect on the combined hypothesis
+$H_t$.  The $p=1.5$ curve in part (c) matches the shape of the
+AdaBoost curve until approximately 2000 iterations, where the weights
+also begin to drop off.  The magnitude of the weights in the flat
+section are however much smaller than those of AdaBoost; consequently
+the strict algorithm takes about 10 times longer to converge.
+
+Part (c) contains some very interesting behaviour which goes some way
+towards explaining the noisy part of the training error curve.  Noting
+that the scale on the $y$ axis reaches $10^{-300}$, it is clear that
+most of the classifier weights are so small as to be practically
+zero.  The second obvious feature is the ``kink'' in the $p=1$ and
+$p=0.5$ curves at approximately 800 iterations; this kink corresponds
+to the end of the noisy sections of part (f) and a (comparatively)
+rapid decrease in training error.  The magnified curves on the right
+of part (c) (where we see the iterations with high weights for $p \in
+\{1, 1.5\}$) show that only a few hypotheses $h_t$ have significant
+weight in $H_t$, as designed.
+
+In summary, these results indicate that the \emph{concept} of using a
+$p$-convex hull is a good one: we saw in figure \ref{fig:test err
+summary} that the final hypotheses generated by the sloppy algorithm
+often generalise better than AdaBoost, and figure \ref{fig:weight
+distribution} shows that this final hypothesis is indeed sparse in
+its parameter weights.  The problem is in the \emph{implementation}:
+a very large number of iterations are required to generate this sparse
+hypothesis; when the weights of hypotheses generated by most
+iterations are several \emph{hundred} orders of magnitude below being
+significant.
+
+\begin{linefigure}
+\begin{center}
+\hspace*{-1cm}\includegraphics{figures/weight_distributions.epsg}
+\end{center}
+\begin{capt}{Details of the training process}{fig:weight distribution}
+The above graphs detail a \emph{single} training run (not average
+behaviour).  All three algorithms were trained to 10000 iterations,
+using the \ds{ring30} distribution, for $p=1$ (black), $p=0.5$
+(dark gray) and $p=1.5$ (light grey).  Parts (a) to (c) show
+classifier weights; parts (d) through (f) are the corresponding
+training error curves.  Note that (c) contains the \emph{same} data
+plotted on two different scales--the two steep curves belong to the
+right hand scale.  (Note log scale on classifier weight graph).
+\end{capt}
+\end{linefigure}
+
+\subsection{Remedies for inefficient training}
+
+These observations would suggest that the starting point for the
+gradient descent algorithm is particularly bad; as a result a lot of
+iterations are wasted in getting to a good starting point (the kink in
+part (c)) from where the optimisation can converge quite quickly.
+Another optimisation strategy that is less sensitive to starting point
+may prove to be more efficient (such as annealing); this algorithm
+would prove to be \emph{very} useful if the slow initial training
+could be avoided.
+
+Of course, it is not at all clear \emph{how} to ``start at a different
+point'', as the algorithms as currently implemented start in a
+$1$-dimensional space and add one dimension per iteration.
+
+Alternatively, it may be possible to accelerate the training of the
+sloppy algorithm by choosing a more aggressive cost function.  We
+modify the cost function to be of the form
 %
 \begin{equation}
 c(\alpha) = e^{-\alpha t^\lambda}
@@ -173,19 +279,25 @@ cost function gets steeper as the number of iterations increases.
 Insufficient time was available to perform experiments using this cost
 function, however.
 
+\section{Further observations}
 
+The following discussion concerns noteworthy features that were
+observed but have not been described previously.
 
+\subsection{Hard datasets}
 
-\section{Other observations}
-
-* All algorithms had trouble with the \ds{acacia} dataset.  Appendix
-  \ref{appendix:allgraphs} shows that all of the algorithms (except
-  for a couple of stricts) dropped out before 100 iterations.
-
-* \ds{wpbc} dataset was also hard... all algorithms had some
-  dropouts... not as bad as acacia
-
-* Apart from that, only strict dropped out, for $p < 1$.
+The full set of training curves in appendix \ref{appendix:allgraphs}
+show that very rarely were the learning machines considered here
+(including AdaBoost) able to train for more than about 100 iterations
+on this dataset.  In the case of AdaBoost and the strict algorithm,
+the weak learner was not sufficiently good to continue generating
+hypotheses with a training error of less than $\frac{1}{2}$.  The
+\ds{wpbc} dataset was difficult also, with only about one half of the
+trials making it through 1000 training iterations without
+terminating.  A stronger weak learning algorithm (such as a deeper
+decision tree), or a method of restarting training after it has
+aborted (one such is described in \cite{Bauer99}) could be used to
+avoid termination of the algorithm.
 
 \subsection{Naive $p$-boost}
 
@@ -198,9 +310,17 @@ shown that the na\"{\i}ve algorithm systematically chooses a
 \emph{less than optimal solution} by modifying distance chosen by the
 line search.
 
-Thus, we observe that modifications to the \emph{classifier}
-weights has little influence on the generalisation ability of the
-AdaBoost algorithm, and therefore it must be the \emph{sample} weights
-that cause the success of the algorithm.  This phenomena has also been
-observed by Breiman \cite{Breiman96}, who came to the same conclusion.
+Thus, we observe that AdaBoost is quite robust to modifications to the
+\emph{classifier} weights (of course, these modifications were in the
+specific form of a monotonic transform--arbitrary modifications would
+likely have an adverse effect).  It would be expected, therefore, that
+the \emph{sample} weights must cause the success of the algorithm.
+This assertion was also made by Breiman:
+
+\begin{quotation}
+After testing [an algorithm equivalent to AdaBoost] I suspected that
+its success lay not in its specific form but in its adaptive
+resampling property, where increasing weight was placed on those cases
+more frequently misclassified.  \cite{Breiman96}
+\end{quotation}
 

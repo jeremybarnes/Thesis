@@ -6,8 +6,32 @@
 \label{appendix:cdrom}
 
 The attached disk is a standard 650MB cd-recordable that should be
-readable in any CD-ROM player.  It contains a Microsoft Joliet file
+readable in any CD-ROM drive.  It contains a Microsoft Joliet file
 system, readable by the Windows 95 and Linux%
 \footnote{With the appropriate kernel options installed.}
 operating systems.
 
+The root directory of the CD-ROM contains the following subdirectories
+and files:
+%
+\begin{itemize}
+\item	{\tt cvsroot} contains the CVS repository for all software
+	developed.
+\item	{\tt datasets} contains \MATLAB\ versions of all datasets
+	used.  By setting the {\tt DATASET_SAVE_PATH} global variable
+	in \MATLAB\ to point to this directory, the {\tt dataset}
+	class will be able to find these datasets.
+\item	{\tt data} contains the test and summary files for all of the
+	tests that were completed (the raw data was in the order of
+	2.5 Gigabytes compressed and could not be included).
+\item	{\tt thesis} contains a checked-out version of the {\tt
+	thesis} CVS module (this document).
+\item	{\tt matlab} contains a checked-out version of the {\tt
+	matlab} CVS module.  By adding this directory and all of its
+	subdirectories that do not begin with an \@ character to the
+	\MATLAB\ search path, it should be possible to execute this
+	code.
+\item	{\tt license.txt} describes the conditions under which the
+	information on the CD-ROM may be used, modified and
+	distributed.
+\end{itemize}

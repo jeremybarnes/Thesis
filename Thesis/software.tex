@@ -14,3 +14,212 @@
 
 \section{Classes and functions}
 
+\subsection{Dataset}
+The {\tt dataset} class encapsulates a dataset with several input
+attributes and one output 
+
+\begin{tabular}{ll}
+\hline
+dataset 	& Create a dataset object \\
+\hline
+numcategories 	& Return number of categories (binary=2)\\
+numsamples 	& Return number of samples \\
+dimensions	& Return number of dimensions (attributes) \\
+\hline
+data		& Return samples and labels \\
+x\_values	& Return samples \\
+y\_values	& Return labels \\
+\hline
+datagen		& Generate data from a distribution \\
+load		& Load a dataset \\
+addsamples	& Add data to the dataset \\
+\hline
+partition	& Split dataset into two parts \\
+randomize	& Randomly permute the order samples \\
+\hline
+dataplot	& Generate a plot of the dataset \\
+\hline
+\end{tabular}
+
+\subsection{Classifier}
+
+\begin{tabular}{ll}
+\hline
+classifier		& Create a classifier object \\
+\hline	
+dimensions		& Return dimensions of input space \\		
+numcategories		& Return number of categories \\
+\hline
+train			& Train a classifier \\
+classify		& Classify a set of samples \\
+empirical\_risk		& Return the empirical risk over a dataset \\
+\hline
+trained\_samples		& Return the samples trained over \\
+training\_error		& Return the empirical risk over training dataset \\
+\hline
+marginplot		& Plot margins of a dataset \\
+plot\_classification	& Plot how samples get classified \\
+plot\_decision\_boundary	& Approximate and plot decision boundary from margins \\
+\hline
+\end{tabular}{ll}
+
+
+\subsection{CART}
+
+\begin{tabular}{ll}
+\hline
+cart			& Create a CART classifier \\
+\hline
+classify		& Classify some data \\
+classification\_error	& Return error of previous classify operation \\
+\hline
+train			& Train CART classifier \\
+training\_error		& Return empirical risk over training dataset \\
+\hline
+plotboundary		& Equivalent to plot\_decision\_boundary \\
+plottree		& Divide plane into coloured areas \\
+printtree		& Print textual representation of tree \\
+treesize		& Return number of leaf nodes in tree \\
+\hline
+\end{tabular}
+
+\subsection{Decision stump}
+
+\begin{tabular}{ll}
+\hline
+decision\_stump		& Create a decision stump classifier \\
+\hline
+classify		& Classify some data \\
+classification\_error	& Return error of previous classify operation \\
+\hline
+train			& Train decision stump classifier \\
+training\_error		& Return empirical risk over training dataset \\
+\hline
+margins			& Return margins \\
+marginplot		& Plot margins \\
+\hline
+plotboundary		& Fast version of plot\_decision\_boundary \\
+plottree		& Graphical representation of decision tree \\
+printtree		& Textual representation of decision tree \\
+treesize		& Return number of leaf nodes (always 2) \\
+\hline
+\end{tabular}
+
+\subsection{Neural network}
+
+\begin{tabular}{ll}
+\hline
+neural\_net		& \\
+\hline
+classify		& \\
+\hline
+train			& \\
+trainagain		& \\
+trainfirst		& \\
+training\_data		& \\
+training\_error		& \\
+training\_labels	& \\
+training\_samples	& \\
+\hline
+test			& \\
+\hline
+get			& \\
+set			& \\
+\hline
+hidden\_units		& \\
+learning\_rate		& \\
+momentum		& \\
+\hline
+hidden\_weights		& \\
+output\_weights		& \\
+iterations		& \\
+\hline
+\end{tabular}
+
+\subsection{Boost}
+
+abort
+aborted
+add\_iteration
+as\_boost
+as\_classifier
+boost
+classifier\_weights
+classify
+iterations
+margins
+sample\_weights
+test
+train
+trainagain
+trained\_samples
+trainfirst
+training\_error
+update\_margins
+w
+weaklearner
+weight\_density\_plot
+wl\_instance
+x
+y
+
+\subsection{Strict $p$-boosting algorithm}
+
+eval\_cf
+norm
+normboost
+trainagain
+update\_margins
+
+\subsection{Sloppy $p$-boosting algorithm}
+
+eval\_cf
+normboost2
+trainagain
+update\_margins
+
+\subsection{Na\"{\i}ve $p$-boosting algorithm}
+
+as\_boost
+b\_plot
+boost
+cvs
+disp
+disp\_info
+get\_p
+p\_boost
+trainagain
+
+
+\subsection{Visualisation functions}
+
+density\_plot
+load\_pgm
+plot\_domain
+plot\_margin\_distribution
+plot\_region
+twoclass\_colormap
+twoclass\_density\_to\_color
+uniform\_color\_cube
+
+
+\section{Testing and experiments}
+
+\begin{tabular}{ll}
+\hline
+maketest		& \\
+\hline
+runtest			& \\
+\hline
+summarise		& \\
+summarise\_boost	& \\
+meta\_summarise		& \\
+\hline
+get\_test\_info		& \\
+get\_test\_results	& \\
+\hline
+display\_meta\_summary	& \\
+display\_results	& \\
+plot\_results		& \\
+\hline
+\end{tabular}

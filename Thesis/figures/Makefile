@@ -65,7 +65,8 @@ all:		b_func.epsg classification_problem.epsg \
 		effect_of_p.epsg margin_distribution.epsg \
 		adaboost_margins.epsg training_curves_strict.epsg \
 		training_curves_sloppy.epsg training_curves_boost.epsg \
-		alpha_function.epsg weight_distributions.epsg
+		alpha_function.epsg weight_distributions.epsg \
+		alpha_function_sum.epsg ring_distribution.epsg
 
 clean:		
 		-rm *.epsg *.mscript *~ tmpcommand tmpfile

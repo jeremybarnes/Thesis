@@ -5,13 +5,137 @@
 \chapter{Description of datasets used}
 \label{appendix:datasets}
 
-We include a description of the datasets.
+This appendix contains a brief description of the datasets used in the
+experiments.  Details of the problem domain, descriptions of the
+attributes, and the results of previous studies using these datasets
+are given.
 
 \section{Ring dataset}
 
+The \ds{ring} dataset is generated from a two dimensional mathematical
+distribution on the unit square.  The sample probability density is
+constant within the unit square:
+%
+\begin{equation}
+p((x_1, x_2)) = \left\{ \begin{array}{rr}
+1	& \qquad \mbox{if $(x_1, x_2) \in [0,1]^2$} \\
+0	& \qquad \mbox{otherwise}
+\end{array} \right.
+\end{equation}
+%
+and the label value is $+1$ within a circle of radius $\sqrt{1/8}$
+centred at $(\frac{1}{2},\frac{1}{2})$, or $-1$ otherwise.  The
+decision boundary of this dataset is plotted in figure \ref{fig:ring
+distribution}.
+
+\begin{linefigure}
+\begin{center}
+\includegraphics{figures/ring_distribution.epsg}
+\end{center}
+\begin{capt}{The \ds{ring} distribution}{fig:ring distribution}
+The markers are sample data points ($\times=+1$, $\bullet=-1$).  The
+decision boundary is plotted in the dashed line.
+\end{capt}
+\end{linefigure}
+
+The \ds{ring10}, \ds{ring20} and \ds{ring30} datasets have noise added
+artificially: a proportion of samples $n$ is selected \emph{without
+replacement} from the generated data, and each of these samples has
+its label ``flipped''.
+
+No previous experiments have been performed using this data.  However,
+as no noise is added to the \emph{test} datasets used, it is possible
+for the test error to reach 0 if the algorithm generalises perfectly.
+
 \section{Acacia dataset}
+
+The \ds{acacia} dataset is an example of ecological/geographical
+data.  The attributes of the dataset are listed in table
+\ref{tbl:acacia attributes}; there were 204 samples.  The intended
+application of the dataset was to generate a learning machine that
+could detect the presence or otherwise of certain species from site
+and satellite data.
+
+The \ds{acacia} dataset considered in this thesis used a subset of the
+data; in particular columns 19 through 21 were ignored; the two-class
+classification problem being detecting the presence of {\it Acacia
+mabellae} (column 19) from the site attributes (columns 1 through
+18).  Column 3 (the site number) was removed from the dataset, leaving
+a total of 17 attributes.  (The {\it Acacia mabellae} species was
+chosen because it had a roughly even number of positive and negative
+examples (119 and 85).
+
+Previous work with this dataset \cite{Payne97, Williamson97a} used a
+Support Vector Machine \cite{Vapnik95}.  The average test error over
+100 trials for a partition of 144 training samples and 60 test samples
+was 32.6\%.
+
+\begin{table}
+\begin{center}
+\begin{tabular}{l l}
+\hline
+\bf{No.} & \bf{Description} \\
+\hline\hline
+1&	easting \\
+2&	northing \\
+3&	site number \\
+4&	elevation  \\
+5&	drainage area \\
+6&	slope (percent)\\
+7&	flow path length\\
+8&	landsat band 1 \\
+9&	landsat band 2\\
+10&	landsat band 3\\
+11&	landsat band 4 \\
+12&	landsat band 5\\
+13&	landsat band 6 \\
+14&	landsat band 7 \\
+15&	nutrient supply index\\
+16&	geology\\
+17&	net radiation\\
+\hline
+18&	{\it Acacia mabellae} present\\
+19&	{\it Breynia oblongifolia} present\\
+20&	{\it Eucalyptus maculata} present\\
+21&	{\it Eucalyptus tereticornis} present\\
+\hline
+\end{tabular}
+\end{center}
+\caption{Attributes of the \ds{acacia} dataset}
+\label{tbl:acacia attributes}
+\end{table}
 
 \section{Sonar dataset}
 
+This dataset (from the UCI repository \cite{UCI}) contains data
+obtained by bouncing sonar signals off two objects: a metal cylinder
+and rock, under similar conditions.  The sonar signal is preprocessed
+into 60 values in the range $[0,1]$ which each measure the energy in a
+particular frequency band.  The experiment was repeated with the
+cylinders rotated at different angles.
+
+The two class classification problem is to detect whether the object
+is a rock or metal cylinder.  There are 208 examples in the dataset,
+comprising 97 cylinders and 111 rocks.
+
+Previous experiments using this dataset \cite{Gorman88} using a Neural
+Network over 13 trials of 192 training samples and 16 test samples
+resulted in a test error of 15.3\%.
+
+
 \section{Wisconsin prognostic breast cancer dataset}
 
+The \ds{wpbc} dataset is also from the UCI repository \cite{UCI}, and
+comes from the medical domain.  It contains prognostic information for
+breast cancer patients of a Wisconsin doctor%
+\footnote{Of course, the patient details are not identifiable through
+the dataset.}.
+
+A total of 32 attributes are recorded, which contain various
+sunmmarised information on the status of the patient, their previous
+history, and cell nuclei in breast tissus samples.  The machine
+learning problem is to predict whether the breast cancer will recur.
+The dataset contains a total of 198 samples, of which 151 of the
+samples are (non-recurring) and 47 positive (recurring).  Of these 198
+samples, 4 have a missing attribute; these samples are ignored to give
+a total of 194 samples.
