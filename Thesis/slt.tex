@@ -1,6 +1,7 @@
 \input{commands}
 
-\chapter{Background Theory}
+\chapter{Statistical learning theory}
+\label{chapter:slt}
 
 This chapter explores the theoretical background behind the
 boosting algorithm.  The main aim of the chapter is to develop a
@@ -108,7 +109,7 @@ is the ``input space'', and $\mathcal{I} \subseteq \mathbb{R}^n$ where
 $n$ is the dimensionality of the sample space.
 
 The input set depends upon number and range of input variables in the
-problem; in the ``toy'' datasets considered in this thesis, usually
+problem; in the datasets considered in this thesis, usually
 $\mathcal{I} = [0,1] \times [0,1] \subset \mathbb{R}^2$.
 
 
@@ -145,8 +146,8 @@ considered further in sections \ref{sec:regression} (regression) and
 \subsubsection{Learning machine}
 \label{sec:learning machine}
 
-The output of the learning machine is a function with a form very
-similar to that of the supervisor:
+The learning machine is a function with a form very similar to that of
+the supervisor:
 %
 \begin{equation}
 \mathbf{\hat{y}} = \hat{h}(\mathbf{x}) \qquad \mbox{where} \qquad
