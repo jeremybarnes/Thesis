@@ -17,7 +17,7 @@ definition of what we mean by the term ``boosting''.
 
 A useful viewpoint of the boosting algorithm as an optimisation via
 gradient descent in a cost space is then considered.  A result from
-Mason et al. \cite{Mason99} is reproduced which shows that boosting is
+Mason et al. \cite{Mason99} is derived which shows that boosting is
 indeed performing gradient descent.
 
 We then consider \emph{normed boosting algorithms} where the
@@ -34,22 +34,38 @@ problem of overfitting in boosting.  Both practical and theoretical
 explanations for this phenomenon are given.
 
 
-\section{Definition of boosting}
-
-In order to achieve a formal definition of boosting, we need the
-following definitions.  This discussion follows \cite{Duffy99}.
-
-Probably Approximately Correct
-
-(The basic gist of it is that the training error must approach zero
-for it to be strictly called ``boosting''.  Otherwise, it is an
-``AdaBoost Like Algorithm'' (ADA).
-
 \section{The original boosting algorithm: AdaBoost}
 
+We first describe the AdaBoost algorithm, first published by Freund
+and Scahpire \cite{Freund96}.  In essence, this algorithm
+``bootstraps'' itself onto another learning algorithm (the \emph{weak
+learning algorithm}) and improves the performance by producing a
+linear combination of weak learning hypotheses.
+
+AdaBoost performs \emph{very} well; its combined hypotheses generally
+perform significantly better than \emph{any} non-boosted algorithm.
+This is particularly true for reliable (low-noise) data.  Even
+the simplest of weak algorithms, when ``boosted'', will usually
+outperform the best unboosted algorithms.
+\footnote{As a result, the focus of recent research effort has shifted
+from the development of \emph{learning} algorithms (which are all more 
+or less equivalent when boosted) to the development of better
+\emph{boosting} algorithms.}
+
+We first consider questions of how and why AdaBoost works; in
+particular how it chooses the optimal linear combination of
+classifiers from the very large set of possible linear combinations.
+But before that, we need to introduce our notation.
+
+\subsection{Notation}
+
+(refer to figure below?)
+
 \begin{linefigure}
+\label{fig:boosting algorithm}
 \noindent{\bf Input:} $l$ examples $(\bfx_1, \bfy_1), \ldots, (\bfx_l,
-\bfy_l)$
+\bfy_l)$, a weak learning algorithm $\bbW : (\calI \times \calO)^l
+\mapsto (\calI \mapsto \calO)$.
 \par
 \noindent{\bf Initialisation:} $w_i|_{t=1} = 1/l$ for $i=1 \ldots l$
 \par
@@ -104,37 +120,31 @@ F'(\bfx) = \sign \left\{ \sum_{i=1}^T w_i f_i(\bfx) \right\}
 \caption{The AdaBoost algorithm}
 \end{linefigure}
 
-AdaBoost is a machine learning algorithm
-that combines many ``weak'' hypotheses to generate a hypothesis 
-that usually performs significantly better than any of the weak
-hypotheses.  Even the simplest of weak algorithms, when
-``boosted'', will usually outperform the best unboosted algorithms.
-\footnote{As a result, the focus of recent research effort has shifted from the
-development of \emph{learning} algorithms (which are all more
-or less equivalent when boosted) to the development of better \emph{boosting}
-algorithms.}
 
-These weak hypotheses are combined in a linear combination.
-The weight of each weak hypothesis (the
-\emph{classifier weight}) depends upon the performance of that
-classifier on the training dataset.  Section \ref{sec:classifier
-weights} describes these classifier weights in more detail.
-
-Each sample in the training dataset is given a weight (\emph{sample
-weight}) which is modified depending upon how ``hard'' that
-sample is to classify.  Section \ref{sec:sample weights} describes
-these sample weights in more detail.
-
-A complete and explicit description of the AdaBoost algorithm is
-provided in figure \ref{fig:adaboost}.  Further details are also
-available in Freund and Schapire's paper \cite{Freund96}.
+Figure \ref{fig:boosting algorithm} gives an explicit description of
+AdaBoost.  The key features are:
+%
+\begin{enumerate}
+\item	The AdaBoost algorithm operates in iterations.  During
+	iteration $t+1$, one classifier $h_{t+1}$ is added to the combined
+	hypothesis $F_{t}$, to give $F_{t+1} = F_t + b_t h_{t+1}.$
+\item	The weight $b_t$ of each weak hypothesis (the \emph{classifier
+	weight}) depends upon the weighted empirirical risk
+	(\ref{eqn:weighted empirical risk}) of that classifier on the
+	training dataset.  Section \ref{sec:classifier weights}
+	describes these classifier weights in more detail. 
+\item	Each sample in the training dataset is given a weight
+	(\emph{sample weight}) which is modified depending upon how
+	``hard'' that sample is to classify.  Section \ref{sec:sample
+	weights} describes these sample weights in more detail.
+\end{enumerate}
 
 
 \subsection{Classifier weights}
 \label{sec:classifier weights}
 
 The AdaBoost algorithm combines a number of ``weak'' classifiers
-$f_1(\cdot), \ldots, f_n(\cdot)$ in a linear combination to produce a
+$h_1(\cdot), \ldots, h_n(\cdot)$ in a linear combination to produce a
 ``stronger'' classifier $F(\cdot) = \sum_{i=1}^{n} b_i f_i(\cdot)$.
 The coefficients $b_i$ are subject to the condition that they produce a
 convex combination where $\|b\|_1 = \sum_{i=1}^{t} b_i = 1$.
@@ -150,12 +160,21 @@ b_t = - \log \frac{\epsilon_t}{1 - \epsilon_t}
 \label{eqn:theory:bt}
 \end{equation}
 %
-When $\epsilon_t = 1/2$, the classifier only does as
-well as random guessing, and has $b_t = 0$.  As
-$\epsilon_t$ approaches zero, $b_t$ increases without bound.  The
-effect is that $F$ becomes dominated by those weak hypotheses that
-performed well on the training samples
-\footnote{Training is halted if $\epsilon_t = 0$ or $\epsilon_t \geq 1/2$.}.  The weights are normalised once training is completed.
+This function is plotted in figure \ref{fig:b function}.
+
+\begin{linefigure}
+\begin{center}
+\includegraphics{figures/b_function.epsg}
+\end{center}
+\begin{capt}{Classifier weights against weighted training error}
+When $\epsilon_t = 1/2$, the classifier only does as well as random
+guessing, and $b_t = 0$.  As $\epsilon_t$ approaches zero, $b_t$
+increases without bound.  The effect is that $F$ becomes dominated by
+those weak hypotheses that performed well on the training samples
+(training is halted if $\epsilon_t = 0$ or $\epsilon_t \geq
+1/2$).
+\end{capt}
+\end{linefigure}
 
 
 \subsection{Sample weights}
@@ -178,12 +197,26 @@ This function has the following effect on distribution of weights:
 
 \end{itemize}
 
+\begin{linefigure}
+\begin{center}
+\includegraphics{figures/sample_weights.epsg}
+\end{center}
+\begin{capt}{Classifier weights against weighted training error}
+When $\epsilon_t = 1/2$, the classifier only does as well as random
+guessing, and $b_t = 0$.  As $\epsilon_t$ approaches zero, $b_t$
+increases without bound.  The effect is that $F$ becomes dominated by
+those weak hypotheses that performed well on the training samples
+(training is halted if $\epsilon_t = 0$ or $\epsilon_t \geq
+1/2$).
+\end{capt}
+\end{linefigure}
+
 The overall effect is for those samples near the decision boundary to
 increase in weight, and those far from it to decrease.  This forces
 the algorithm to concentrate on the hard samples, and is one reason
 why it works well on low-noise datasets.  Unfortunately, those samples
 corrupted by noise are usually hard also, and concentrating on those
-is not desirable.
+is not desirable. (make more clear)
 
 
 \section{Boosting as gradient descent}

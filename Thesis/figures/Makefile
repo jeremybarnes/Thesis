@@ -35,7 +35,8 @@ all:		bfunc.epsg regression_problem.epsg \
 		stumpdiagram.epsg stumpcandidates.epsg \
 		stumpvcdim.epsg shattering.epsg \
 		fat_shattering.epsg vcdim_problems.epsg \
-		overfitting.epsg srm.epsg covering.epsg
+		overfitting.epsg srm.epsg covering.epsg \
+		p_convex.epsg
 
 clean:		
 		-rm *.epsg *.mscript *~

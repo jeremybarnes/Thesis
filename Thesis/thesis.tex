@@ -16,14 +16,18 @@
 
 \input{commands}
 
-% Get a decent page width
+% Get a decent page size
+
 \oddsidemargin 0.1 in      %   Left margin on odd-numbered pages.
-\evensidemargin 0.15 in    %   Left margin on even-numbered pages.
+\evensidemargin 0.1 in    %   Left margin on even-numbered pages.
 \marginparwidth 1 in       %   Width of marginal notes.
 \oddsidemargin 0.125 in    %   Note that \oddsidemargin = \evensidemargin
 \evensidemargin 0.125 in
 \marginparwidth 0.75 in
 \textwidth 6.125 in % Width of text line.
+\textheight 9 in
+\voffset -1.5 cm
+
 
 \title{Capacity Control in Boosting using a $p$-Convex Hull}
 \author{Jeremy Peter Barnes}
@@ -35,6 +39,9 @@
 \frontmatter
 
 \maketitle
+
+\include{abstract}
+
 \tableofcontents
 \listoffigures
 \listoftables
@@ -44,8 +51,8 @@
 % Execute a change in font size to make it happen
 \small\normalsize
 
-\include{abstract}
 \include{acknowledgements}
+\include{notation}
 
 \mainmatter
 
@@ -77,8 +84,6 @@
 % Execute a change in font size to make it happen
 \small\normalsize
 
-\include{acronyms}
-\include{notation}
 \include{implementation}
 \include{userguide}
 \include{progguide}

@@ -60,9 +60,8 @@ estimate, such that $\mathbf{\hat{y} - y = 0}$ for all samples $\mathbf{x}$.
 \begin{picture}(270,155)(30,20)
 \put(30,110){\framebox(60, 60){\parbox{55pt}{\center{Sample generator}}}}
 \put(150,110){\framebox(60, 60){\parbox{55pt}{\center{Learning machine
-$\hat{h}(\mathbf{x})$}}}}
-\put(150,30){\framebox(60, 40){\parbox{55pt}{\center{Supervisor
-$h(\mathbf{x})$}}}}
+$\bbW$}}}}
+\put(150,30){\framebox(60, 40){\parbox{55pt}{\center{Supervisor}}}}
 \put(90, 140){\vector(1,0){60}}
 \put(120,140){\line(0,-1){90}}
 \put(120,50){\vector(1,0){30}}
@@ -128,7 +127,10 @@ range as the supervisor:
 Any useful learning machine exhibits a learning behaviour (not shown in
 equation \ref{eqn:learning machine formulation}, whereby the function
 $\hat{h}(\cdot)$ is updated based on the error feedback
-$\mathbf{\hat{y} - y = 0}$.
+$\mathbf{\hat{y} - y = 0}$.  Further discussion of exactly what
+constitutes ``learning behaviour'' is beyond the scope of this thesis;
+the interested reader should consult eg. Anthony and Bartlett
+\cite{Anthony99}.
 
 
 \subsection{Domain and range of learning machines}
@@ -188,19 +190,47 @@ as illustrated in figure \ref{fig:classification problem}.
 \begin{center}
 \includegraphics{figures/classification_problem.epsg}
 \end{center}
-\caption{A classification problem}
-\label{fig:classification problem}
+\begin{capt}{A classification problem}
 The $\times$ symbol represents $y=-1$ and the $\circ$ symbol $y=1$.
 The dotted line is the ``decision boundary'', which is the boundary of
 adjacent regions of different symbols.  Note that in the data shown,
 there are many possible decision boundaries which classify the data
 correctly.
+\end{capt}
+\label{fig:classification problem}
 \end{linefigure}
 
 For the remainder of this thesis, only classification problems will be
 considered.  In most cases, these will also be \emph{binary}
 classification problems (two categories) where $\mathcal{O} = \{-1,
 1\}$.
+
+
+\subsection{Representation of learning machines and learning
+algorithms}
+
+In order to avoid confusion, we will now discuss exactly what we mean
+by a \emph{learning machine} and a \emph{hypothesis} (or
+\emph{classifier}), and how we represent them.
+
+A learning \emph{algorithm} $\bbW$ takes a labelled set of data $X =
+((\bfx_1, y_1), \ldots, (\bfx_m, y_m))$, where $x_i \in \calI$ and
+$y_i \in \calO$, and outputs a hypothesis $h(\cdot) : \calI \mapsto
+\calO$ chosen according to some known principle.
+
+It is often convenient to represent learning algorithms by the set
+$\calH = \{h : \left( \exists X : \bbW(X) = h \right)$.  This set
+contains all hypotheses that the learning algorithm $\bbW$ could
+generate; note however that the \emph{rule} through which a $h$ is
+selected from $\calH$ is not explicit in this formulation. 
+When we apply an operation to $\calH$, for example $\sign(\calH)$, we
+actually apply that operation to all elements of that set.
+
+In summary, when we are talking about a learning machine or a learning
+algorithm, we are talking about some procedure that chooses a
+hypothesis $h$ from a set $\calH$ according to some rule.  The terms
+``hypothesis'' and ``classifier'' are used interchangably.
+
 
 \subsection{Alternative formulation for binary classification problems}
 \label{sec:margin formulation}
@@ -243,9 +273,15 @@ learning machine is of its classification.  Geometrically, for
 decision boundary will roughly correspond to the magnitude of the
 margin at that point.
 
+In order to distinguish functions returning margins from those that
+return categories, we adopt the convention of calling real-valued
+functions $f$ and discrete-valued functions $h$.  Thus, we have $h =
+\sign(f)$.  We adopt a similar convention for the learning algorithms, 
+
 The two most important results of this chapter (sections
 \ref{sec:covering number bounds} and \ref{p-convex}) rely upon the
 margin formulation.
+
 
 
 \subsection{Summary}
@@ -341,44 +377,69 @@ However, for the timebeing we will consider a measure that we
 \subsection{Empirical risk}
 \label{sec:empirical risk}
 Empirical risk is a weaker version of true risk, that can be
-evaluated.  Given a set of $l$ observations
-$\{(\bfx_1, \bfy_1), \ldots, (\bfx_l, \bfy_l)\}$ and setting $\bfyh_i
-= \hat{h}(\bfy_i)$ as the output of our learning machine $h(\cdot)$,
-we can define our empirical risk as 
+evaluated.
+
+\begin{definition}[Empirical risk]
+Given $m$ observations $X = ((\bfx_1, \bfy_1), \ldots, (\bfx_m,
+\bfy_m))$ and a hypothesis $h(\cdot) \in \calH$, we define the
+\emph{empirical risk} of $h$ over $X$ as 
 %
 \begin{equation}
-R_{\emp} = \frac{1}{l} \sum_{i=1}^{l} Q(\bfx_i, \bfy_i, \bfyh_i)
+R_{\emp} = \frac{1}{m} \sum_{i=1}^{m} Q(\bfx_i, \bfy_i, \bfyh_i)
 \end{equation}
-%
+\end{definition}
+
 The following observations concern the empirical risk:
 %
 \begin{itemize}
-\item 	As $l \rightarrow \infty$, and assuming that $\bfx$ is evenly
-	distributed over \calI\, (and that $Q$ is reasonably well
-	behaved), we would expect that $R_{\emp}(\cdot) \rightarrow
-	R(\cdot)$.
-
+\item 	The law of large numbers ensures that as $m \rightarrow
+	\infty$, the empirical risk approaches the true risk under
+	conditions of ``reasonable'' behaviour of $Q$.  This is
+	explored in section \ref{sec:slt}.
 \item	$R_{\emp}$ is the ``best that we can do'', in that it uses all
-	available observations.  However, there is further scope for
-	\emph{a priori} knowledge of the system to be used via the
-	selection of an appropriate model.
-
-\item	Section \ref{sec:slt} explores the rate of convergence of
-	empirical risk $R_{\emp}$ to true risk $R$.
+	available observations.
 \end{itemize}
+
+
+\subsection{Weighted empirical risk}
+
+The empirical risk can be extended slightly to the case where
+the samples in $X$ are not equally important, by giving each sample a
+weight.
+
+\begin{definition}[Weighted empirical risk]
+Given $m$ observations $X = ((\bfx_1, \bfy_1), \ldots, (\bfx_m,
+\bfy_m))$ a normalised vector of weights $W = (w_1, \ldots, w_m) \in
+\bbR^m$ where $\sum_{i} w_i = 1$ and a hypothesis $h(\cdot) \in
+\calH$, we define the \emph{weighted empirical risk} of $h$ over $X$ as 
+%
+\begin{equation}
+R_{\emp} = \sum_{i=1}^{m} w_i Q(\bfx_i, \bfy_i, \bfyh_i)
+\end{equation}
+\end{definition}
+
+It is clear that when all $w_i = 1/m$, this definition is equivalent
+to that of empirical risk.
+
+Weighted training samples will not be considered further in this
+chapter; in all cases is is a simple matter to extend results using
+unweighted samples to accept weighted samples.  They are introduced
+because the boosting algorithm uses them (chapter
+\ref{chapter:boosting}).
 
 
 \subsection{Margin risk}
 
-We define here a further risk value that will be of use further on.
+We define here a further risk value that will be of use later on.
 Recall from section \ref{sec:margin formulation} that the margin is a
 real-valued quantity that indicates how confident a classification
 is.  Margins with positive values indicate that the classification of
 a point was correct.
 
-We introduce a stronger form of risk.  Specifically, we include in our
-risk values not only those samples that were classified wrongly,
-\emph{but also those samples with a small margin}.
+We use these margins to introduce a stronger form of risk.
+Specifically, we include in our risk values not only those samples
+that were classified wrongly, \emph{but also those samples with a
+small margin}. 
 
 \begin{definition}[Margin risk]
 Given a hypothesis $f : \calI \mapsto \mathbb{R}$, a set of
@@ -389,6 +450,9 @@ and a minimum margin $\gamma$, we define the \emph{margin risk} as
 R^{\gamma}_{\emp}(f) = \Pr_{i=1\cdots m}(y_i f(x_i) < \gamma)
 \end{equation}
 \end{definition}
+
+The margin risk is the proportion of samples with a margin less than
+$\gamma$.
 
 
 \subsection{Empirical risk minimisation}
@@ -501,12 +565,13 @@ upon shattering.
 \begin{center}
 \includegraphics{figures/shattering.epsg}
 \end{center}
-\caption{Shattering a set of points}
 \label{fig:shattering}
-The $\times$ symbols are points; the lines are decision boundaries.
+\begin{capt}{Shattering a set of points}
+The $\times$ symbols are data points; the lines are decision boundaries.
 Part (a) shows how two points can be shattered by linear decision
 boundaries.  Part (b) shows that there are no three nonincident points
 cannot be shattered by a linear decision boundary.
+\end{capt}
 \end{linefigure}
 
 
@@ -592,22 +657,31 @@ The existence of these two bounds shows that the VC dimension is the
 
 \subsection{Covering numbers}
 
-The problem with the VC dimension is that it is sensitive to very
-small changes to the scale.  For example, consider two hypothesis
-spaces.  The first has the unit circle ($r(\theta) = 1$) as its decision
-boundary, and $h = 2$.  The second is the set of all decision
-boundaries where $|r(\theta) - 1| < \epsilon$, where $\epsilon$ is a
-small number.  This has $h = \infty$.  However, it is obvious that as
-$\epsilon$ get small enough the two are indistinguishable.  See figure
-\ref{fig:vcdim problems}.
+One problem with the VC dimension is that it is sensitive to behaviour
+on an arbitrarily small scale.  Figure \ref{fig:vcdim problems} shows
+a parasitic example.  For this reason, we use \emph{covering numbers}
+as a measure of complexity.
 
 \begin{linefigure}
 \begin{center}
 \includegraphics{figures/vcdim_problems.epsg}
 \end{center}
-\caption{Motivation for covering numbers: an example where
-$\VCdim(\calH) = \infty$ but the set is infinitessimally close to one where
-$\VCdim(\hat{\calH}) = 2$}
+\begin{capt}{Problems with scale insensitive measures of complexity}
+We consider the decision boundaries of two hypothesis classes.  Part
+(a) shows the decision boundary of class $\calH_{\circ}$,
+which consists of circles centered at $(\bar{x}_1, \bar{x}_2)$ with a
+radius function $r(\theta) = 1$.  These decision boundaries are simply
+circles; $\VCdim(\calH_{\circ}) = 4$.
+
+Part (b) shows a second hypothesis class $\calH_{\ast}$.  This class
+has a radius function $r(\theta) = 1 + \alpha \sin(\omega \theta)$.
+Despite $\calH_{\circ} \rightarrow \calH_{\ast}$ as $\alpha
+\rightarrow \infty$, $\VCdim(\calH_{\ast}) = \infty$ for all $\alpha >
+0$.  In other words, two function classes with decision boundaries
+that are arbitrarily close have wildly differing VC dimensions.  Thus,
+in this case the VC dimension is \emph{not} a good measure of
+complexity.
+\end{capt}
 \label{fig:vcdim problems}
 \end{linefigure}
 
@@ -619,7 +693,7 @@ of specified points.  The key features of covering numbers are:
 \begin{itemize}
 \item	Covering numbers are scale sensitive.  When we look at an
 	appropriate scale, intricacies (such as those in figure
-	\ref{fig:vcdim problem}) become insignificant.
+	\ref{fig:vcdim problems}) become insignificant.
 \item	Covering numbers look at the function locally (around a number
 	of specified points) rather than globally.  Covering
 	numbers concentrate on the important areas of the function.
@@ -639,10 +713,11 @@ functions covering other function classes.
 \begin{center}
 \includegraphics{figures/covering.epsg}
 \end{center}
-\caption{Illustration of covering numbers}
+\begin{capt}{Illustration of covering numbers}
 Show some functions drawn in solid lines, and another function in the
 dashed line covering them.  Show the points at which the cover
 operates, and the epsilon length bar either side.
+\end{capt}
 \end{linefigure}
 
 The following definition formalises the notion that we are only
@@ -719,7 +794,9 @@ uniform covering numbers.  Only the result is stated here.
 Consider a hypothesis space $\calH : f \in \calH \rightarrow f : \calI
 \mapsto \mathbb{R}$, a vector of samples $X \in \calI^H$, and a margin
 $0 \leq \gamma < 1/2$.  Then with probability at least $1 - \delta$, 
-
+\begin{equation}
+Equation goes here
+\end{equation}
 \end{theorem}
 
 This result bounds how far our empirical risk can be from the true
@@ -733,17 +810,16 @@ risk.  The key features are as follows:
 \end{itemize}
 
 
-\subsubsection{Application to $p$-convex hulls ($0 < p < 2$)}
+\subsection{Application to $p$-convex hulls ($0 < p < 2$)}
 \label{sec:p-convex}
 
 The theoretical motivation behind the algorithms developed in this
 thesis uses the covering number of a $p$-convex hull ($\co_p(\calH)$).
 This section defines a ``$p$-convex hull'' and gives a result on the covering
-numbers for $0 < p < 2$.  
+numbers for $0 < p < 2$.  See Williamson et. al. \cite{Williamson99}
+for a full discussion.
 
-At the moment, this whole section is copied pretty much verbatim from
-\cite{Williamson99}.
-
+\begin{definition}[$p$-convex hull]
 The $p$-convex hull (strictly speaking, the $p$-absolutely convex hull) of
 a set $\calH$ of functions (where $p>0$) is defined as
 %
@@ -758,27 +834,73 @@ f_i : f_1, \ldots, f_n \in F,
  \sum_{i=1}^{n} | a_i |^p \leq 1
 \right\}
 \end{equation}
+\end{definition}
 
-Thus the $p$-convex hull is a subset of the set of all possible linear
-combinations of functions of a class $F$, where the members of the
-subset are those where $\sum_{i=1}^n |\alpha_i| \leq 1$.  The
-following remarks concern $p$-convex hulls:
+Thus the $p$-convex hull of $\calH$ is a subset of $\lin(\calH)$, the
+set of all possible linear combinations of functions in $\calH$.
+While the $p$-convex hull of a set of \emph{functions} is hard to
+visualise, the $p$-convex hull of euclidian points is a useful visual
+aid.  See figure \ref{fig:p-convex}.
+
+\begin{linefigure}
+\begin{center}
+\includegraphics{figures/p_convex.epsg}
+\end{center}
+\begin{capt}{The $p$-convex hull of two variables}
+The figure details the shape of a $p$-convex hull of two variables $u$
+and $v$ for various values of $p$.  The smaller $p$ is, the closer to
+the axes the hull is.  Note that we define two sets: the points on the
+boundary are termed ``on'' the hull, and those within the boundary
+``in'' the hull.  The equation of the curves is $\left( u^p + v^p
+\right) ^{(1/p)} = 1$.
+\end{capt}
+\end{linefigure}
+
+We will see in section \ref{sec:theoretical overfitting} that the
+$p$-convex hulls define a \emph{structure}:  If $0 \leq p_1 \leq p_2
+\leq \cdots \leq p_z$, then $\cop 1 \subseteq \cop 2 \subseteq \cdots
+\subseteq \cop z$.  In other words, the higher that $p$ is, the richer
+the set of functions in $\cop{F}$.
+
+We now state a theorem that gives an approximate bound on the covering
+numbers of a $p$-convex hull.  This result is central to this thesis.
+
+\begin{theorem}[Covering numbers of a $p$-convex hull]
+Consider a hypothesis class $\calH$ and a number $0 < p \leq 2$.  Then
+the uniform covering number at scale $\epsilon > 0$ can, under some
+assumptions,  be approximated by
 %
-\begin{itemize}
-\item	If $0 < p_1 \leq p_2 \leq \cdots \leq p_z \leq 1$, then
-	$\cop 1 \subseteq \cop 2 \subseteq \cdots \subseteq \cop z$
-	That is to say, the higher that $p$ is, the richer the set of
-	functions in $\cop{F}$.
-\item	In general, it is very hard to visualise the \emph{convex} hull
-	of a set of functions, let alone the $p$-convex hull.  The
-	convex hull is always richer than the function class.
-\item	As an example (from Williamson et al. \cite{Williamson99}), the convex
-	hull of the Heaviside functions on $[0, 1]$ is the set of
-	functions of ``bounded variation''.\marginpar{Need a diagram}
-\end{itemize}
+\begin{equation}
+\label{eqn:approx p-convex bound}
+\log \cover{\calH}{\epsilon} \approx c(p) d\ (1 /
+\epsilon)^{\frac{2p}{2-p}} \log (1 / \epsilon)
+\end{equation}
+%
+where $c(p)$ is a constant that depends upon $p$.
+\end{theorem}
+
+This theorem can be made a lot more exact, but at the expense of a lot
+more complexity.  This complexity is unnecessary; it is the form of
+this bound that motivates the work in this thesis.  In particular, it
+should be noted that the approximate bound (\ref{eqn:approx p-convex
+bound}) decreases with $p$ for $0 < p \leq 2$.
+
+As a final note, it should always be remembered that the
+$\co_{p}(\calH)$ is usually \emph{lot} ``richer'' than $\calH$.
+Extending our hypothesis space in this manner is one way to markedly
+improve the empirical risk; indeed this is exactly what the Boosting
+algorithm (chapter \ref{chapter:boosting}) does.
+
 
 \subsection{Summary}
 
+In this section we developed bounds on the generalisation performance
+of learning algorithms that utilise the ERM inductive principle.  We
+began by considering finite hypothesis classes, and then extended
+through the VC dimension and covering numbers as useful measures of
+the complexity of infinite hypothesis classes.  We then briefly
+considered a result on the covering numbers of the $p$-convex hull of
+a hypothesis class.
 
 
 \section{Overfitting}
@@ -799,13 +921,14 @@ underlying distribution well but not our data.  Figure
 \begin{center}
 \includegraphics{figures/overfitting.epsg}
 \end{center}
-\caption{Overfitting with polynomials: two extreme examples.}
+\begin{capt}{Overfitting with polynomials: two extreme examples.}
 The $\times$ points are the noisy data points.  The dashed line is the
 underlying distribution.  In part (a) an order 2 polynomial has bee
 fitted.  In part (b) an order 10 polynomial has been fitted.  The fit
 is closer to the underlying distribution for the second order
 polynomial, which shows that more complex models do not necessarily
 perform better.
+\end{capt}
 \label{fig:overfitting}
 \end{linefigure}
 
@@ -819,7 +942,9 @@ explanation based on general properties of model complexity, and a
 more quantitative explanation based on an investigation of the theory
 developed throughout this chapter.
 
+
 \subsection{Theoretical overfitting}
+\label{sec:theoretical overfitting}
 
 Let us speak more formally.  Consider a series of hypothesis
 classes $\calH_1, \ldots, \calH_n, n \leq \infty$ (recall that a
@@ -895,12 +1020,13 @@ The principal of finding the optimal complexity is known as
 \begin{center}
 \includegraphics{figures/srm.epsg}
 \end{center}
-\caption{Structural risk minimisation}
+\begin{capt}{Structural risk minimisation}
 Training errors (empirical risk) and test errors (approximate true
 risk) for a dataset.  $|\calH|$ increases with the number of
 iterations.  The theoretical best possible performance is
 indicated with the dashed line, and the optimal risk identified with
 the $\circ$.  Overfitting is clearly seen to occur.
+\end{capt}
 \label{fig:overfitting}
 \end{linefigure}
 
@@ -911,7 +1037,8 @@ is useful if we have a tight bound on $b(\delta, |\calH|, m)$ and some
 method of approximating $R_{\emp}$.  In this case, we can directly
 minimise (\ref{eqn:general bound}).
 
-In this thesis, we don't have a tight bound on $b$.  We instead
+In the problems considered in this thesis, we don't have a tight bound
+on $b$.  We instead 
 approximate the true risk directly by using a \emph{testing dataset}
 $T$.  The learning machine never sees the labels of the samples in
 $T$; thus this dataset can be used to approximate the true risk:
@@ -939,11 +1066,5 @@ implementing this procedure.
 
 \section{Chapter summary}
 
-
-
-
-
-
-
-
-
+In this chapter we considered the goal of machine learning: to choose
+a hypothesis from a set that minimis

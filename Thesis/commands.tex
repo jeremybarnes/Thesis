@@ -2,6 +2,8 @@
 % Jeremy Barnes, 1999
 % $Id$
 
+% Miscellaneous commands to reduce typing... mainly for maths symbols
+
 \providecommand{\emp}{\mathrm{emp}}
 \providecommand{\calF}{\ensuremath{\mathcal{F}}}
 \providecommand{\fat}{\ensuremath{\mathrm{fat}}}
@@ -25,6 +27,9 @@
 \providecommand{\MATLAB}{{\tt MATLAB}}
 \providecommand{\C}{{\tt C}}
 \providecommand{\argmin}{\mathrm{argmin}}
+\providecommand{\bbR}{\ensuremath{\mathbb{W}}}
+\providecommand{\bbW}{\ensuremath{\mathbb{W}}}
+
 
 % Theorem-like constructs
 \newtheorem{theorem}{Theorem}
@@ -32,8 +37,12 @@
 
 \providecommand{\proof}{\par \par \noindent {\bf Proof:\ }}
 
-\providecommand{\figlinewidth}{1pt}
+\providecommand{\figlinewidth}{0.5 pt}
 
+% Environments for a figure
 \newenvironment{linefigure}%
 		{\begin{figure} \rule{\textwidth}{\figlinewidth}}%
 		{\rule{\textwidth}{\figlinewidth}\end{figure}}
+
+\newenvironment{capt}[1]%
+	{\caption{#1}\begin{minipage}[t]{\textwidth}\sl}{\end{minipage}}
