@@ -88,7 +88,7 @@ function [x, y] = check_dataset(obj, s, d)
 
 if (~isa(d, 'dataset'))
    error([s ': not enough arguments or first is not a dataset']);
-elseif (numcategories(categories(d)) ~= numcategories(categories(obj)))
+elseif (numcategories(d) ~= numcategories(obj))
    error([s ': numcategories in dataset and classifier don''t' ...
 	  ' match']);
 elseif (dimensions(d) ~= dimensions(obj))
