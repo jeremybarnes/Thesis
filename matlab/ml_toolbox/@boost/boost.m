@@ -59,6 +59,9 @@ obj.aborted = 0;
 % The classifier weights
 obj.b = zeros(1, 0);
 
+% Here for testing purposes
+obj.nosave = 0;
+
 % construct class and define superior/inferior relationship
 obj = class(obj, 'boost', parent);
 superiorto('double', 'classifier');
