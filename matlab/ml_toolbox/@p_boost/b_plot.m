@@ -44,7 +44,7 @@ if (~isempty(nosort))
    end
 end
 
-b = obj.b(1:obj.iterations);
+b = classifier_weights(obj);
 b = b ./ sum(b);
 
 if (isempty(nosort))
