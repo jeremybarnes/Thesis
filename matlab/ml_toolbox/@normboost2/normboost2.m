@@ -24,13 +24,20 @@ function obj = normboost2(weaklearner, norm)
 % Jeremy Barnes, 15/8/1999
 % $Id$
 
-if (nargin == 1)
+if ((nargin == 1) & (isa(weaklearner, 'normboost2')))
    % One parameter --> make a copy
    obj = weaklearner;
    return
 end
 
-parent = normboost(weaklearner, norm);
+if (nargin == 0)
+   % Zero parameters: choose defaults
+   parent = normboost;
+else
+   parent = normboost(weaklearner, norm);
+end
+
+obj.dummy = 1; % Dummy field to stop complaints
 
 % construct class and define superior/inferior relationship
 obj = class(obj, 'normboost2', parent);
