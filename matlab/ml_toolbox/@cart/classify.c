@@ -52,6 +52,7 @@ void recursive_classify(mxArray *tree, double *x, int data_len, int *y,
     int isterminal, category, i, j;
     mxArray *f_isterminal, *f_category;
 
+    /*
     mexPrintf("recursive_classify (%d data points, %d dimensions)\n",
 	      data_len, dim);
     mexPrintf("input:\n");
@@ -61,7 +62,7 @@ void recursive_classify(mxArray *tree, double *x, int data_len, int *y,
 	    mexPrintf("%12.4g  ", x[data_len*j + i]);
 	mexPrintf("    y: %d\n", y[i]);
     }
-
+    */
 
     /* Check for the trivial case */
     if (data_len == 0)
@@ -81,7 +82,7 @@ void recursive_classify(mxArray *tree, double *x, int data_len, int *y,
 
 	category = (int)mxGetScalar(f_category);
 
-	mexPrintf("  TERMINAL: category = %d\n", category);
+	/*mexPrintf("  TERMINAL: category = %d\n", category); */
 
 	for (i=0; i<data_len; i++)
 	    y[i] = category; /* use setmem for speed? */
@@ -122,8 +123,8 @@ void recursive_classify(mxArray *tree, double *x, int data_len, int *y,
 	if (right == NULL)
 	    mexErrMsgTxt("classify: Error reading RIGHT field");
 
-	printf("  NONTERMINAL: splitvar = %d, splitval = %g\n",
-	       splitvar, splitval);
+	/*mexPrintf("  NONTERMINAL: splitvar = %d, splitval = %g\n",
+	  splitvar, splitval);*/
 
 	/* Split the data up */
 	split_data(x, data_len, splitvar, splitval, dim,
@@ -150,6 +151,7 @@ void recursive_classify(mxArray *tree, double *x, int data_len, int *y,
 	mxFree(right_index);
     }
 
+    /*
     mexPrintf("output:\n");
     for (i=0; i<data_len; i++) {
 	mexPrintf("    x: ");
@@ -158,7 +160,7 @@ void recursive_classify(mxArray *tree, double *x, int data_len, int *y,
 	mexPrintf("    y: %d\n", y[i]);
     }
     mexPrintf("\n\n");
-
+    */
 
 }
 
