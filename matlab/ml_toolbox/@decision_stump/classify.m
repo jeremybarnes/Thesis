@@ -32,13 +32,32 @@ if (isempty(x))
    return;
 end
 
-xsplit = x(:, obj.splitvar);
-y = (xsplit > obj.splitval);
-
-% We need to transform y : 0 --> leftcategory and 1 --> rightcategory
-
-y = y .* (obj.rightcategory - obj.leftcategory) + obj.leftcategory;
-
+y = classify_guts(obj, obj.splitvar, obj.splitval, obj.leftcategory, ...
+		  obj.rightcategory);
 
 % POSTCONDITIONS
 check_invariants(obj);
+
+
+
+
+
+
+function y = classify_guts(x, var, val, leftcat, rightcat)
+
+% CLASSIFY_GUTS the guts of the classification algorithm, minus any
+% object oriented code, designed to be implemented in high speed C code.
+
+
+xsplit = x(:, var);
+y = (xsplit > val);
+
+% We need to transform y : 0 --> leftcategory and 1 --> rightcategory
+
+y = y .* (obj.rightcat - obj.leftcat) + obj.leftcat;
+
+
+
+
+
+
