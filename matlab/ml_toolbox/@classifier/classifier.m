@@ -31,7 +31,7 @@ if (nargin == 0)
 end
 
 % 1 argument -- just make a copy
-if (nargin == 1)
+if ((nargin == 1) & (isa(categories, 'classifier')))
    obj = categories;
    return
 end

@@ -12,7 +12,7 @@ numpoints = 100;
 
 b = category_list('binary');
 wl = decision_stump(b, 2);
-myboost = p_boost(wl, 1000, 1);
+myboost = p_boost(wl, 1);
 
 % Generate our training data
 d = dataset(b, 2);
@@ -55,7 +55,7 @@ while (iter <= displayiters(length(displayiters)))
       marginplot(myboost, [1 1; 0 0]);
 	   hold on;
 	   dataplot(d);
-	   plot_decision_boundary(myboost);
+	   plot_decision_boundary(myboost, [1 1; 0 0]);
       axis([-0.2 1.2 -0.2 1.2 0 2]);
       title([int2str(iter) ' iterations']);
       whichplot = whichplot + 1;

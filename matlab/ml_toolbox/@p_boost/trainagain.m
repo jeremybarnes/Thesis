@@ -20,12 +20,14 @@ function [obj_r, context] = trainagain(obj)
 % $Id$
 
 % Use the boost method to do most of the work
-[boost_obj, boost_context] = trainagain(boost(obj));
+boost_obj = as_boost(obj);
+
+[boost_obj, context] = trainagain(boost_obj);
 
 p = get_p(obj);
 
 % Update the bt value based on p
-bt = boost_context.bt;
+bt = context.bt;
 bt = bt^(1/p);
 
 % Add our iteration on
