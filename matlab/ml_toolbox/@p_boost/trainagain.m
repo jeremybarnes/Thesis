@@ -40,7 +40,7 @@ end
 new_c = train(obj.weaklearner, obj.x, obj.y, obj.w);
 
 % find the training error
-new_error = training_error(new_c)
+new_error = training_error(new_c);
 
 % see what this algorithm does to our data
 new_y = classify(new_c, obj.x);
@@ -63,10 +63,9 @@ bt = log(beta_t);
 
 
 % This is where we use our p parameter...
-bt = sign(bt) * abs(bt)^(1/obj.p)
+bt = sign(bt) * abs(bt)^(1/obj.p);
 
-new_w = obj.w .* exp(log(beta_t) .* (new_y == obj.y));
-new_weight_vector = new_w'
+new_w = obj.w .* exp(log(beta_t^(1/obj.p)) .* (new_y == obj.y));
 sum_new_w = sum(new_w);
 
 if (sum(new_w) == Inf)
