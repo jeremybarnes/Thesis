@@ -52,6 +52,9 @@ end
 
 
 % Calculate alpha
+% This one here operates on F(x) + a f(x) instead of (1-a)F(x) + a f(x).
+% We then divide everything by (1+a) to get our norm.  This should make
+% us more likely to get a solution... (I hope!)
 
 if (iterations(obj) == 0)
    % First iteration -- set alpha to 1 and marg to the margins of the
@@ -77,10 +80,19 @@ else
 						      alphas(i));
    end
    
+   % Calculate numerically to test that we got them right...
+   calc_alpha = (alphas(1:length(alphas)-1) + alphas(2:length(alphas))) / 2;
+   calc_d = diff(all_c) ./ diff(alphas);
+   calc_alpha2 = (calc_alpha(1:length(calc_alpha)-1) + ...
+		  calc_alpha(2:length(calc_alpha))) / 2;
+   calc_d2 = diff(calc_d) ./ diff(calc_alpha);
+   
    figure(1);  clf;
    subplot(3, 1, 1);  plot(alphas, all_c);   grid on;  hold on;
    subplot(3, 1, 2);  plot(alphas, all_d);   grid on;  hold on;
+   plot(calc_alpha, calc_d, 'k-');
    subplot(3, 1, 3);  plot(alphas, all_d2);  grid on;  hold on;
+   plot(calc_alpha2, calc_d2, 'k-');
 
    % END DEBUGGING
 
@@ -114,7 +126,7 @@ else
    end
 
    old_b = classifier_weights(obj);
-   new_b = [(1 - alpha.^p).^(1/p) * old_b alpha];
+   new_b = [old_b alpha] ./ (1 + alpha.^p).^(1/p)
    pnorm(new_b, p)
 
 end
