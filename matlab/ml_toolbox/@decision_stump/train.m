@@ -65,7 +65,7 @@ check_invariants(obj_r);
 
 
 
-function [var, val, leftcat, rightcat] = train_guts(x, y, w, ...
+function [var, val, left_cat, right_cat] = train_guts(x, y, w, ...
 						  dimensions, cat);
 
 
@@ -83,34 +83,46 @@ for i=1:dimensions
    % the set of points > than this value will be empty, which is both
    % pointless and annoying to program for.
 
-   candidate_points = x(:, i);
-   point_to_remove = find(candidate_points == max(candidate_points));
-   if length(point_to_remove) > 1
-      point_to_remove = point_to_remove(1);
-   end
-   candidate_points(point_to_remove) = [];
+   candidate_points = [x(:, i) y w];
 
+   % Sort them...
+   candidate_points = sortrows(candidate_points, [1]);
+   candidate_x = candidate_points(:, 1);
+   candidate_y = candidate_points(:, 2);
+   candidate_w = candidate_points(:, 3);
 
-   for j=1:length(candidate_points)
-      point = candidate_points(j);
-      
-      % Split up our data
-      [left_x, left_y, right_x, right_y, left_w, right_w] = ...
-         split_data(x, y, w, i, point);
+   w_sum = sum(candidate_w);
 
-      % Calculate the probability of samples being in each
-      % category.
-      left_sum = sum(left_w);
+   % Initialise our data
+   left_total = zeros(1, cat);
+   left_sum = 0.0;
+
+   right_total = category_weight(candidate_y, candidate_w, cat);
+   right_sum = w_sum;
+
+   for j=1:length(candidate_points-1) % leave out last point...
+
+      % Extract the value we are swapping over
+      this_x = candidate_x(j);
+      this_y = candidate_y(j);
+      this_w = candidate_w(j);
+
+      % Swap it
+      left_total(this_y + 1) = left_total(this_y + 1) + this_w;
+      left_sum = left_sum + this_w;
+
+      right_total(this_y + 1) = right_total(this_y + 1) - this_w;
+      right_sum = right_sum - this_w;
+
+      % Normalise to a density
       if (left_sum > eps)
-	 left_dens = category_weight(left_y, left_w, cat) ./ left_sum;
+	 left_dens = left_total ./ left_sum;
       else
 	 left_dens = 0.0;
       end
 
-      right_sum = sum(right_w);
       if (right_sum > eps)
-	 right_dens = category_weight(right_y, right_w, cat) ./ ...
-	     right_sum;
+	 right_dens = right_total ./ right_sum;
       else
 	 right_dens = 0.0;
       end
@@ -120,45 +132,22 @@ for i=1:dimensions
       Qright = misclassification(right_dens);
 
       % Calculate our new impurity
-      this_Q = (Qleft .* sum(left_w) + Qright .* sum(right_w)) ./ ...
-	       sum(w); % 5% of time on this line
+      this_Q = (Qleft .* left_sum + Qright .* right_sum) ./ ...
+	       w_sum; % 5% of time on this line
 
       % If our new impurity is better, then we can be happy and joyous,
       % and record this fact for the calling routine.
       % Also, save the y and w vectors so that we can later calcualte
       % the categories.
       if (this_Q < best_Q + eps)
-	 var = i; val = point; best_Q = this_Q;
-	 best_left_y  = left_y;   best_left_w = left_w;
-	 best_right_y = right_y;  best_right_w = right_w;
+	 var = i; val = this_x; best_Q = this_Q;
+	 [max_dens, max_index] = max(left_dens);
+	 left_cat = max_index - 1;
+	 [max_dens, max_index] = max(right_dens);
+	 right_cat = max_index - 1;
       end
    end
 end
-
-% Now, in each half of the data find the category with the greatest
-% weight, as this category is the one that we choose.
-left_cats  = category_weight(best_left_y, best_left_w, cat);
-right_cats = category_weight(best_right_y, best_right_w, cat);
-
-left_max = max(left_cats);
-right_max = max(right_cats);
-
-left_max_cat = find(left_cats == left_max);
-right_max_cat = find(right_cats == right_max);
-
-% If there are more than one optimal categories, then just take the one
-% with the lowest category number.
-
-if (length(left_max_cat) > 1)
-   left_max_cat = left_max_cat(1);
-end
-
-if (length(right_max_cat) > 1)
-   right_max_cat = right_max_cat(1);
-end
-
-leftcat = left_max_cat - 1;
-rightcat = right_max_cat - 1;
 
 
 
@@ -210,38 +199,4 @@ cats = zeros(1, cat);
 for i=0:cat-1
    cats(i+1) = sum((y == i) .* w); % 30% of time on this line
 end
-
-
-
-
-
-
-
-
-
-function [left_x, left_y, right_x, right_y, left_w, right_w] = ...
-   split_data(x, y, w, splitvar, splitval);
-% SPLIT_DATA separate a dataset by splitting value of one variable
-%
-% This function takes a dataset {X,Y,W} and splits it into two disjoint
-% parts.  The two parts are split on one variable of X (the variable
-% given by SPLITVAR), into "left" and "right" datasets {LEFT_X, LEFT_Y}
-% and {RIGHT_X, RIGHT_Y}.  The left half satisfies X(SPLITVAR) <= SPLITVAL,
-% with the right half satisfying X(SPLITVAR) > SPLITVAL.
-
-% Separate our data into left and right halves.  To do this, create an
-% index vector which shows which data points are to the left and the
-% right of the split point.
-
-left_index  = find(x(:, splitvar) <= splitval); % 14% of time on this line
-right_index = find(x(:, splitvar) >  splitval); % 13% of time on this line
-
-left_x  = x(left_index,  :); % 4% of time on this line
-left_y  = y(left_index,  :); % 4% of time on this line
-left_w  = w(left_index,  :); % 4% of time on this line
-
-right_x = x(right_index, :); % 4% of time on this line
-right_y = y(right_index, :); % 4% of time on this line
-right_w = w(right_index, :); % 4% of time on this line
-
 
