@@ -6,15 +6,20 @@ function obj = boost(weaklearner, maxiterations)
 %
 % SYNTAX:
 %
-% obj = boost(weaklearner)
+% obj = boost(weaklearner, maxiterations)
 %
 % Creates a boosted classifier, based upon the WEAKLEARNER.  The
 % dimensions and categories of the weak learner are copied as the
 % dimensions and categories of the boosted learner.
 %
+% WEAKLEARNER is a any descendent type of the CLASSIFIER class (using
+% another BOOST as the weaklearner is not recommended for sanity!).  It
+% is used as a template to construct useful instances of a weak learner.
+%
 % MAXITERATIONS specifies the maximum number of times that the boosting
 % algorithm can be iterated.  It is used to allocate storage ahead of
-% time to improve efficiency.
+% time to improve efficiency, and to tell the TRAIN method how long to
+% train for.
 %
 % RETURNS:
 %
