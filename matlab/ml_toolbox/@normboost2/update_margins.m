@@ -9,7 +9,7 @@ function new_margins = update_margins(obj, old_margins, wl_y, context)
 % CONTEXT is there to provide context for this iteration, if nosave is
 % on.
 
-% @normboost2/private/update_margins.m
+% @normboost2/update_margins.m
 % Jeremy Barnes, 22/9/1999
 % $Id$
 
@@ -20,7 +20,15 @@ function new_margins = update_margins(obj, old_margins, wl_y, context)
 alpha = context.alpha;
 p = norm(obj);
 
-% Transform 0,1 into -1,1
+% Transform (0,1) into (-1,1)
 wl_y = 2*wl_y - 1;
 
-new_margins = old_margins / (1 + alpha.^p).^(1/p)  +  alpha * wl_y;
+% The margins update differently on the first iteration to the rest, as
+% there is no way we can optimise (we have a flat cost function).
+if (context.first_iter)
+   new_margins = wl_y;
+else
+   new_margins = (old_margins + (alpha * wl_y)) ./ ...
+       (1 + alpha.^p).^(1/p);
+end
+
