@@ -112,7 +112,7 @@ else
       % Draw DEBUG_TRAIN plots of the minimisation of the first
       % DEBUG_TRAIN iterations
 
-      alphas = linspace(0.01, 20);
+      alphas = logspace(-5, 1, 100);
       all_c = zeros(size(alphas));
       all_d = zeros(size(alphas));
       all_d2 = zeros(size(alphas));
@@ -123,8 +123,9 @@ else
       end
 
       subplot(DEBUG_TRAIN, 1, iterations(obj));
-      plot(alphas, all_c);  grid on;  hold on;
-      
+      semilogx(alphas, all_c);  grid on;  hold on;
+
+      obj.margins
       % END DEBUGGING
    end
    
@@ -160,7 +161,7 @@ else
 	 
 	 % END DEBUGGING
       elseif ((DEBUG_TRAIN > 1) & (iterations(obj)-1 <= DEBUG_TRAIN))
-	 plot(alpha, c, 'rx');
+	 semilogx(alpha, c, 'rx');
       end
       
       % Handle d2=0 in a very crude manner, which allows us to continue
@@ -192,6 +193,8 @@ else
       iter = iter + 1;
    end
 
+   % FIXME: Do we need alpha = new_alpha here?
+   
    % Test for lack of convergence
    if (iter >= 100)
       warning('trainagain: failed to converge after 100 iterations');
@@ -211,6 +214,7 @@ else
    old_b = classifier_weights(obj);
    new_b = [old_b alpha] ./ pnorm([old_b alpha], p);
 
+   one_norm = pnorm(new_b, 1)
 end
 
 % Update the sample weights.  These are calculated as the derivatives
