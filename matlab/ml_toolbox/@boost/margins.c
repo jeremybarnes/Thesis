@@ -127,8 +127,8 @@ void do_margins(const mxArray *obj, const mxArray *x, double *m,
 
 	/* Get MATLAB to ask our classifier to classify the data */
 
-	rparams[0] = this_classifier;
-	rparams[1] = x;
+	(const mxArray *)rparams[0] = this_classifier;
+	(const mxArray *)rparams[1] = x;
 
 	mexCallMATLAB(1, lparams, 2, rparams, "classify");
 
@@ -188,7 +188,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 {
     double *m;
     mxArray *f_dimensions, *f_categories, *rparams[1], *lparams[1];
-    int i, dimensions, data_len, categories;
+    int dimensions, data_len, categories;
 
     /* Check that we have 2 RHS arguments */
     if (nrhs != 2) {
