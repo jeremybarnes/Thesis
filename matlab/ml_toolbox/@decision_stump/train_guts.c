@@ -144,6 +144,8 @@ void optimal_split(double *x, int *y, double *w, int dimensions,
 	    if (this_Q > best_Q) {
 		tmp_var = i;
 		tmp_val = (xyw[j].x + xyw[j+1].x) * 0.5; /* half way... */
+		/* mexPrintf("tmp_val = (%g + %g)/2 = %g", xyw[j].x,
+		   xyw[j+1].x, tmp_val); */
 		best_Q = this_Q;
 		tmp_left = left_index;
 		tmp_right = right_index;
