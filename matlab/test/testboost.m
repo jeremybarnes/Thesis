@@ -54,16 +54,16 @@ test_d = datagen(test_d, datatype, 5000, 0, 0);
 
 % Do the testing
 [trained, test_err, train_err] = test(boost1, d, test_d, num_iter);
-[trained2, test_err2, train_err2] = test(boost1, d, test_d, num_iter, 'slow');
+%[trained2, test_err2, train_err2] = test(boost1, d, test_d, num_iter, 'slow');
 
 % Plot the results
 figure(1);  clf;
 
 iter = 1:length(test_err);
-plot(iter, test_err, 'r-');  hold on;
-plot(iter, train_err, 'b-');
-plot(iter, test_err2, 'c--');
-plot(iter, train_err2, 'm--');
+semilogx(iter, test_err, 'r-');  hold on;
+semilogx(iter, train_err, 'b-');
+%plot(iter, test_err2, 'c--');
+%plot(iter, train_err2, 'm--');
 xlabel('iterations');  ylabel('error');
-legend('test error', 'training error', 'slow test error', ['slow training' ...
-		    ' error']);
+legend('test error', 'training error');
+%, 'slow test error', ['slow training' ...  ' error']);
