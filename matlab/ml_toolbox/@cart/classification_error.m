@@ -21,7 +21,6 @@ function e = classification_error(obj, varargin)
 % Jeremy Barnes 22/4/1999
 % $Id$
 
-% PRECONDITIONS
 [x, y, w] = get_xyw(obj, 'classification_error', varargin);
 
 % Classify the data
@@ -35,6 +34,3 @@ weightwrong = sum(ywrong .* w);
 
 % Find the proportion of wrong weight
 e = weightwrong / sum(w);
-
-% POSTCONDITIONS:
-check_invariants(obj);
