@@ -12,6 +12,8 @@ SUBDIRS=@boost @cart @decision_stump
 
 .PHONY : all
 
-all:
+all:	Makefile
 	$(foreach dir, $(SUBDIRS), make -C $(dir) ;)
+	touch .done~
+
 
