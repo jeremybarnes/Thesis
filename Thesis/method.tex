@@ -72,7 +72,7 @@ initially coded were able to be run in a matter of days.
 
 Minimising numerical errors was a major design goal.  Several sections
 of code incorporate safeguards (such as periodic full recalculations
-in loops that are optimised incremental calculations) to minimise the
+in loops that are optimised via incremental calculations) to minimise the
 effect of numerical errors.  In addition, 64 bit IEEE double precision
 floating point numbers are used exclusively.
 
@@ -89,7 +89,7 @@ A total of seven datasets were used in the experiments.  Four
 synthetic datasets, randomly generated from a known distribution with
 noise added artificially.  Two other datasets (\ds{sonar} and
 \ds{wpbc}%
-\footnote{Wisconsin Prognostic Breast Cancer.}
+\footnote{Wisconsin Prognostic Breast Cancer.}%
 ) were obtained from the UCI repository \cite{UCI}, and the
 final dataset (\ds{acacia}) was ecological data used in a PhD thesis
 \cite{Payne97}.  A summary of the features of each dataset appears in table
@@ -103,7 +103,7 @@ measurements ) but contains a low sample-to-attribute ratio; and the
 difficult%
 \footnote{Difficult and very difficult in that previous applications
 of machine learning algorithms to these datasets produce indifferent
-to poor results.}%
+to poor results.}
 real-world data.
 
 \begin{table}
@@ -246,10 +246,9 @@ contained the following information:
 	iteration (recall that the algorithms would abort if the
 	training error exceeded $\frac{1}{2}$, fell below $0$, or if
 	the cost function was strictly increasing); 
-\item	The value of the best (lowest) test error
-	$\underset{X_T}{R_{\emp}}$ for each trial, and the number of
-	training iterations after which this best error value
-	occurred;
+\item	The value of the best (lowest) test error for each trial, and
+	the number of training iterations after which this best error
+	value occurred;
 \end{itemize}
 %
 Each of the $p$-boosting algorithms had further statistics produced

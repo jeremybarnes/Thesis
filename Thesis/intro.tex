@@ -7,10 +7,11 @@
 
 The project undertaken was an investigation of a method of
 overcoming a known problem (\emph{overfitting}) of a particular
-machine learning algorithm (the \emph{Boosting} algorithm).  The
-result is a series of machine learning algorithms called
-\emph{$p$-boosting algorithms}.  These algorithms are developed,
-analysed and tested in later chapters.
+machine learning algorithm (the \emph{AdaBoost}%
+\footnote{Adaptive Boosting.}
+algorithm).  The result is a series of machine learning algorithms
+called \emph{$p$-boosting algorithms}.  These algorithms are
+developed, analysed and tested in later chapters.
 
 \subsection*{Part I: Background}
 
@@ -27,7 +28,7 @@ machine learning.  Assumptions of \emph{binary problems} and
 \emph{classification problems} further restrict the scope of the
 investigation.
 
-With the necessary background in place, the \emph{Boosting} algorithm
+With the necessary background in place, the \emph{AdaBoost} algorithm
 itself is the subject of chapter \ref{chapter:boosting}.  This
 algorithm forms the starting point for the original work that is
 considered in further chapters.  The \emph{problem} of overfitting in
@@ -126,8 +127,9 @@ the classical algorithms (all of which are more or less equal when
 boosted) to developments in voting methods.
 
 These algorithms were initially observed to be almost immune to many
-of the problems of overfitting.  Recent results have indicated that
-this is unfortunately not the case.
+of the problems of overfitting (see section \ref{sec:issues} below).
+Recent results have indicated that this is unfortunately not the
+case.
 
 \subsection{A real-world application}
 \label{sec:churn example}
@@ -144,6 +146,7 @@ can target these likely customers with special offers or improved
 service, thereby retaining their custom.
 
 \section{Issues in machine learning}
+\label{sec:issues}
 
 Machine learning is a mathematically hard (ill-posed) problem, and
 there are many difficult issues involved.  A real-world example of
@@ -169,8 +172,8 @@ assumed that the training data is given and thus uncontrollable).
 Statistical learning theory gives us a theoretical reason for
 overfitting, and also an insight into how it may be avoided.  In
 particular, by limiting the complexity of the \emph{set} of hypotheses
-that the learning machine may generate we can avoid overfitting (this
-technique is known as \emph{capacity control}).
+that the learning machine may generate we can avoid overfitting.  This
+technique is known as \emph{capacity control}.
 
 
 \section{Original work}
@@ -179,7 +182,7 @@ The original work of this project (first considered in
 \cite{Williamson99}) is contained in chapters \ref{chapter:pboosting}
 through \ref{chapter:conclusion}.  The motivation behind this work is
 an observation on a theoretical bound on generalisation ability; in
-particular on a method of reducing overfitting in the boosting
+particular on a method of reducing overfitting in the AdaBoost
 algorithm by using $p$-convex hulls.  This concept is first developed
 into several practical algorithms (chapter \ref{chapter:pboosting});
 these algorithms are then tested against the original AdaBoost

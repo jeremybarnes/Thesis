@@ -25,8 +25,8 @@ quiver([a(50)+0.05 a(50)+0.05 a(50) + 0.2], ...
 
 axis([0 1.1 0 1.1]);
 axis square;
-xlabel('\it{F_t}');
-ylabel('\it{f_{t+1}}');
+ylabel('\it{F_t}');
+xlabel('\it{f_{t+1}}');
 title('(a) \sl{Strict \it{p}-boost}');
 
 
@@ -41,8 +41,8 @@ quiver([0.9 1.1], [1 1], [1 0], [0 1], 'k-');
 
 axis([0 1.1 0 1.1]);
 axis square;
-xlabel('\it{F_t}');
-ylabel('\it{f_{t+1}}');
+ylabel('\it{F_t}');
+xlabel('\it{f_{t+1}}');
 title('(b) \sl{AdaBoost}');
 
 

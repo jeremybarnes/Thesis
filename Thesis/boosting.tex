@@ -16,24 +16,22 @@ a range of  machine learning algorithms, all of which combine several
 significantly outperforms all of them.
 
 In this chapter we describe the classic algorithm \emph{AdaBoost}
-developed by Freund and Schapire \cite{Freund96}, and present results
-on its properties and generalisation performance.  We then show that
-AdaBoost implements the optimisation of a cost functional via gradient
-descent, an property that proves to provide a useful framework for the
-development of modified algorithms in chapter \ref{chapter:pboosting}.
-We than digress slightly to look at \emph{normed} boosting algorithms,
-a minor modification, and conclude by again considering the inherent
-problem of overfitting.
+published by Freund and Schapire in 1996 \cite{Freund96}, and present
+results on its properties and generalisation performance.  We then
+show that AdaBoost implements the optimisation of a cost functional
+via gradient descent, an property that proves to provide a useful
+framework for the development of modified algorithms in chapter
+\ref{chapter:pboosting}. We digress slightly to look at \emph{normed}
+boosting algorithms, a minor modification, and conclude by again
+considering the inherent problem of overfitting.
 
 \section{The AdaBoost algorithm}
 
-We first describe the AdaBoost algorithm, published by Freund and
-Schapire in 1996 \cite{Freund96}.  In essence, this algorithm 
-``bootstraps'' itself onto another learning algorithm (the \emph{weak
-learning algorithm}--the decision stumps algorithm described in
-appendix \ref{appendix:stumps} is one such algorithm), improving its
-performance by using a ``committee'' (linear combination) of weak
-hypotheses.
+In essence, the AdaBoost algorithm ``bootstraps'' itself onto another
+learning algorithm (the \emph{weak learning algorithm}--the decision
+stumps algorithm described in appendix \ref{appendix:stumps} is one
+such algorithm), improving its performance by using a ``committee''
+(linear combination) of weak hypotheses.
 
 AdaBoost performs \emph{very} well; its combined hypotheses generally
 perform significantly better than \emph{any} non-boosted algorithm
@@ -265,37 +263,38 @@ C(F) = \frac{1}{m} \sum_{i=1}^{m} c(y_i F(\bfx_i))
 which sums another function $c$ (introduced below) over the
 \emph{margin} of all training samples in $X$.
 
-At iteration $t$ of gradient descent, we wish to choose a hypothesis $h_t$ and
-a weight $b_t$ such that $C(F + b_t h_t) < C(F)$.  We do not choose
-$h_t$ directly, however--that is done by the weak learning
-algorithm--instead, we manipulate the sample weights $\bfw_t$ in such
-a manner that (as we will see) the weak learning algorithm chooses the
-``right'' $h_t$ for us.  The optimal $h_t$, called $h_t^{\ast}$, is
-the one that leads to the steepest reduction in the cost function:
+At iteration $t+1$ of gradient descent, we wish to choose a hypothesis
+$h_{t+1}$ and a weight $b_{t+1}$ such that $C(F_t + b_{t+1} h_{t+1}) <
+C(F_t)$.  We do not choose $h_{t+1}$ directly, however--that is done by
+the weak learning algorithm--instead, we manipulate the sample weights
+$\bfw_t$ in such a manner that (as we will see) the weak learning
+algorithm chooses the ``right'' $h_{t+1}$ for us.  The optimal $h_{t+1}$,
+called $h_{t+1}^{\ast}$, is the one that leads to the steepest reduction
+in the cost function: 
 %
 \begin{equation}
-h_t^{\ast} = -\nabla C(F)(\bfx) = \left. \frac{\partial C(F + \alpha
+h_{t+1}^{\ast} = -\nabla C(F)(\bfx) = \left. \frac{\partial C(F + \alpha
 1_{\bfx})}{\partial \alpha} \right|_{\alpha = 0}
 \label{eqn:functional derivative}
 \end{equation}
 %
 where $1_{\bfx}$ is the indicator function of $\bfx$; the use of which
 is necessary as (\ref{eqn:functional derivative}) is known only where
-we have a sample.  Since the optimal $h_t^{\ast}$ will not necessarily
-be in $\calH$, we choose the $h_t \in \calH$ with the greatest inner
-product $\ip{-\nabla C(F)}{h_t^{\ast}}$.  More specifically, using the
+we have a sample.  Since the optimal $h_{t+1}^{\ast}$ will not necessarily
+be in $\calH$, we choose the $h_{t+1} \in \calH$ with the greatest inner
+product $\ip{-\nabla C(F)}{h_{t+1}^{\ast}}$.  More specifically, using the
 inner product space and cost functions chosen above, we are maximising 
 %
 \begin{equation}
-- \ip{\nabla C(F)}{f} = - \frac{1}{m^2} \sum_{i=1}^{m} y_i f(\bfx_i)
-  c'(y_i F(\bfx_i))
+- \ip{\nabla C(F_t)}{f_{t+1}} = - \frac{1}{m^2} \sum_{i=1}^{m} y_i
+  f_{t+1}(\bfx_i)  c'(y_i F_t(\bfx_i))
 \label{eqn:function to maximise}
 \end{equation}
 %
 The following theorem states that the \emph{weighted empirical risk}
 $R_{\emp}^{\bfw_t}$ (section \ref{sec:weighted empirical risk}) is
 the ``right'' form of risk to minimise, and gives the weights
-$\bfw_t = (w_{1,t}, \ldots, w_{m,t})$:
+$\bfw_t = (w_{t,1}, \ldots, w_{t,m})$:
 
 \begin{theorem}[Weighted empirical risk minimisation \cite{Mason99}]
 \label{thm:gradient descent weights and direction}
@@ -316,17 +315,17 @@ F(\bfx_j))} \qquad i=1 \ldots m
 \end{theorem}
 \proof See \cite{Mason99}.  We assume that $c(\alpha)$ is
 monotonically decreasing with respect to an increasing $\alpha$ (as
-any sensible cost function will); the result follows easily from this
+any sensible cost function will be); the result follows easily from this
 assumption.
 
-Having chosen our direction (hypothesis) $h_t$, we now choose a step
-size (classifier weight) $b_t$.  AdaBoost uses a line search for the
+Having chosen our direction (hypothesis) $h_{t+1}$, we now choose a step
+size (classifier weight) $b_{t+1}$.  AdaBoost uses a line search for the
 minimum of the cost functional along the line parallel with $h_{t+1}$
 through $F_t$:
 %
 \begin{equation}
-b_t = \argmin_{\alpha} \sum_{i=1}^{m} C(y_i F(\bfx_i) + y_i \alpha
-h_t(\bfx_i))
+b_{t+1} = \argmin_{\alpha} \sum_{i=1}^{m} C(y_i F_t(\bfx_i) + y_i \alpha
+h_{t+1}(\bfx_i))
 \end{equation}
 %
 The gradient descent process is illustrated in figure
@@ -497,13 +496,13 @@ time \cite{Freund97}]
 \label{thm:AdaBoost training error convergence}
 Suppose that the AdaBoost algorithm $\bbB$ operating on weak-learning
 algorithm $\bbW$ generates hypotheses $h_t$ with training errors
-$\epsilon_1 \ldots \epsilon_T$ over a training set $X$.  Furthermore,
+$\epsilon_1, \ldots, \epsilon_T$ over a training set $X$.  Furthermore,
 assume that each $\epsilon_t < 1/2$, and let $\beta_t = 1/2 -
 \epsilon_t$.  Then the empirical risk of the \emph{combined}
-hypothesis $H_t = \sign(F_t)$ is bounded by
+hypothesis $H_T = \sign(F_T)$ is bounded by
 %
 \begin{equation}
-R_{\emp}(H_t) \leq \prod_{t=1}^{T} \sqrt{1 - 4 \beta_t^2} \leq \exp
+R_{\emp}(H_T) \leq \prod_{t=1}^{T} \sqrt{1 - 4 \beta_t^2} \leq \exp
 \left\{ - 2 \sum_{t=1}^T \beta_T^2 \right\}
 \end{equation}
 \end{theorem}
@@ -519,7 +518,7 @@ of boosting.
 \begin{theorem}[Sum of AdaBoost classifier weights is unbounded]
 \label{thm:classifier weights unbounded}
 Suppose that we are given a set of training samples $X$ and a
-weak-learner $\bbW$, and run AdaBoost $\bbB$, halting training at $T$
+weak-learner $\bbW$, and run AdaBoost for $T$ training
 iterations.  Then either
 %
 \begin{itemize}
@@ -545,24 +544,25 @@ showing that this bound will only hold if training terminates.
 
 \subsection{AdaBoost maximises the minimum margin}
 
-This section introduces several theorems which together show that
-AdaBoost chooses the linear combination that maximises the minimum
-margin over its training samples.
+This section shows that the limiting behaviour of AdaBoost is to
+choose the linear combination that maximises the minimum margin over
+its training samples.
 
 \begin{theorem}[AdaBoost maximises the minimum margin]
 \label{thm:maximises minimum margin}
-Given a particular learning algorithm $F$ and a training set $X$,
-define the minimum margin as
+Given a particular hypothesis $F$ and a training set $X$, define the
+minimum margin as 
 \[
 m_{\min} = \min_{(\bfx_i,y_i) \in X} y_i F(x_i)
 \]
-Then the boosting algorithm will converge as $t \rightarrow \infty$ to
+Then the AdaBoost algorithm will converge as $t \rightarrow \infty$ to
 the solution which maximises the minimum margin.
 \end{theorem}
 
-\proof We present an outline.  For AdaBoost we can write $F_t = b_1 h_1 +
+\proof We present an outline (assuming that training doesn't
+terminate).  We can write AdaBoost's hypothesis as $F_t = b_1 h_1 +
 \cdots + b_t h_t$. Then defining the \emph{normalised hypotheses}
-$\bar{f}_i$ as 
+$\bar{f}_i$ as  
 %
 \begin{equation}
 \bar{f}_i = \frac{b_i h_i}{\|b\|_1}
@@ -578,12 +578,12 @@ C(F) = \sum_{i=1}^{m} \exp\{-y_i \bar{F}_t(\bfx_i)\}^{\|b\|_1}
 %
 We know from theorem \ref{thm:adaboost gradient descent} that
 AdaBoost is working to minimise the cost function.  From theorem
-\ref{thm:classifier weights unbounded}, as $\|b\| \rightarrow \infty$
-the largest value of $-y_i \bar{F}_t(x_i)$ will dominate the sum
-(\ref{eqn:normalised cost}), and so $C(F) \rightarrow exp\{\max -y_i
-\bar{F}_t(x_i)\}$.  Thus, by 
-minimising $C(F)$, we are making $\min y_i \bar{F}_t(x_i)$ as large as
-possible; that is we are maximising the minimum margin.  Figure
+\ref{thm:classifier weights unbounded},  $\|b\| \rightarrow \infty$;
+thus as $t \rightarrow \infty$ the largest value of $-y_i
+\bar{F}_t(x_i)$ will dominate the sum (\ref{eqn:normalised cost}), and
+so $C(F) \rightarrow exp\{\max -y_i \bar{F}_t(x_i)\}$.  Thus, to  
+minimise $C(F)$ we must be making $\min y_i \bar{F}_t(x_i)$ as large
+as possible; that is we are maximising the minimum margin.  Figure 
 \ref{fig:adaboost margins} illustrates the evolution of both the cost
 function and the margins of a dataset.
 
@@ -609,6 +609,30 @@ axis normalised separately for each $p$ value in order to stretch the
 margin distribution over the whole range.)
 \end{capt}
 \end{linefigure}
+
+
+\subsection{Invariance of AdaBoost to uniform scaling of classifier
+weights}
+
+We present here an obvious theorem about the invariance of hypothesis
+weights.  It has some implications on the hypothesis classes that the
+$p$-boosting algorithms discussed in chapter \ref{chapter:pboosting}
+use.
+
+\begin{theorem}
+\label{thm:invariance}
+The hypothesis returned by the AdaBoost is independent of a 
+scaling of the $b$ values.  Given an unthresholded hypothesis $F$ and
+a constant $\alpha > 0$,
+%
+\begin{equation}
+H = \sign(F) \equiv H' = \sign(\alpha F) 
+\end{equation}
+\end{theorem}
+
+\proof This follows easily from the fact that the sign function is
+unaffected by a constant scaling.
+
 
 
 \section{Performance bounds for Boosting}
@@ -654,7 +678,8 @@ Three plots of test/training error vs iteration number for Boosting.
 The dataset used was the ``ring'' distribution (see chapter
 \ref{chapter:method}) with 50 samples.  Mild overfitting is visible on
 the 20\% noise plot and becomes more pronounced as the level of noise
-increases.
+increases.  The solid curve is the test error (true risk); the dashed
+curve the training error.
 \end{capt}
 \end{linefigure}
 
@@ -663,9 +688,9 @@ that AdaBoost maximises the minimum margin (theorem
 \ref{thm:maximises minimum margin}).  Intuitively, this property
 causes the  AdaBoost algorithm to concentrate on a few hard
 samples.  Unfortunately, in a noisy dataset, these samples are usually
-all noisy.  Some algorithms are described in the next section that
+all noise.  Some algorithms are mentioned in the next section that
 explicitly allow for some samples to be misclassified, in order to
-reduce the tenancy towards overfitting.
+reduce the tendency towards overfitting.
 
 \section{Previous work on regularising AdaBoost}
 

@@ -122,13 +122,15 @@ to the algorithm terminating training after few iterations); for $1
 \leq p < 2$ it appears to reach a reasonable hypothesis (and a
 particularly good one in the case of the \ds{wpbc} and \ds{acacia}
 datasets).  It shares the sloppy algorithm's general down-sloping
-characteristic on low-noise datasets, and also appears to reach a
-minimum on the higher noise datasets.  It is interesting to note that
-the $p^{\ast}$ value differs substantially between the strict and
-sloppy algorithms.  This is a counter-intuitive result: the optimal
-capacity should be an intrinsic property of the \emph{dataset}, not
-the algorithm, when both algorithms are operating from the same
-hypothesis class $\calX = \co_p(\calH)$.
+characteristic on low-noise datasets, and also shares the existence of
+an optimal $p$ value on the higher noise datasets.  It is interesting
+to note that the $p^{\ast}$ value differs substantially between the
+strict and sloppy algorithms (1.7 vs 0.9 on the \ds{ring30} dataset.
+This is a counter-intuitive result: the optimal capacity should be an
+intrinsic property of the \emph{dataset}, not the algorithm, when both
+algorithms are operating from the same hypothesis class $\calX =
+\co_p(\calH)$.  One possible explanation is that deficiencies in the
+strict algorithm bias the error values for low $p$.
 
 The performance of the na\"{\i}ve algorithm does not deviate
 significantly from that of AdaBoost.  The $p$ parameter appears to
@@ -158,14 +160,13 @@ that the sloppy algorithm was not trained on the \ds{wpbc} or
 \label{sec:training curves}
 
 Figure \ref{fig:training curves} shows a selection of training curves
-from the strict and sloppy algorithms, all training on the \ds{ring30}
+from the strict and sloppy algorithms, all trained on the \ds{ring30}
 dataset.  There are three interesting observations concerning these
 curves.  Firstly, part (a) shows that the training error for the
 strict algorithm, $p=0.5$ is actually \emph{increasing} with the number
 of iterations!  This behaviour often recurs immediately before
-training is aborted.  Thus, there is an indication of instability of
-the strict and decision stumps combination; the mechanism behind it is
-unclear and was not investigated further.
+training is aborted; it is most likely a consequence of the difficult
+cost functional discussed in chapter \ref{chapter:pboosting}.
 
 Secondly, for $p=0.5$ (parts (a) and (d)), the test error and training
 error curves follow each other quite closely.  This behaviour has a
@@ -208,14 +209,14 @@ reference) and the strict and sloppy algorithms.
 \hspace*{-1cm}\includegraphics{figures/weight_distributions.epsg}
 \end{center}
 \begin{capt}{Details of the training process}{fig:weight distribution}
-The above graphs detail a \emph{single} training run (not average
+The graphs detail a \emph{single} training run (not average
 behaviour).  All three algorithms were trained to 10000 iterations,
 using the \ds{ring30} distribution, for $p=1$ (black), $p=0.5$
 (dark gray) and $p=1.5$ (light grey).  Parts (a) to (c) show
 classifier weights; parts (d) through (f) are the corresponding
 training error curves.  Note that (c) contains the \emph{same} data
 plotted on two different scales--the two steep curves belong to the
-right hand scale.  (Note log scale on classifier weight graph).
+right hand scale.  Note also the log scale on classifier weight graph.
 \end{capt}
 \end{linefigure}
 
@@ -250,10 +251,12 @@ most of the classifier weights are so small as to be practically
 zero.  The second obvious feature is the ``kink'' in the $p=1$ and
 $p=0.5$ curves at approximately 800 iterations; this kink corresponds
 to the end of the noisy sections of part (f) and a (comparatively)
-rapid decrease in training error.  The magnified curves on the right
-of part (c) (where we see the iterations with high weights for $p \in
-\{1, 1.5\}$) show that only a few hypotheses $h_t$ have significant
-weight in $H_t$, as designed.
+rapid decrease in training error.  The curves in the lower right
+corner of (c) ($p=1$ and $p=1.5$) are the \emph{same} data plotted on
+the magnified scale (visible on the right hand scale of the graph; the
+range is $10^0$ to $10^{-5}$.  The sharpness of the peaks indicate
+that only a few iterations have a significant amount of weight (in
+other words, $b_t$ is sparse).  This behaviour was expected by design.
 
 In summary, these results indicate that the \emph{concept} of using a
 $p$-convex hull is a good one: we saw in figure \ref{fig:test err
@@ -269,14 +272,14 @@ significant.
 
 \subsection{Remedies for inefficient training}
 
-These observations would suggest that the starting point for the
-gradient descent algorithm is particularly bad; as a result a lot of
-iterations are wasted in getting to a good starting point (the kink in
-part (c)) from where the optimisation can converge quite quickly.
-Another optimisation strategy that is less sensitive to starting point
-may prove to be more efficient (such as annealing); this algorithm
-could prove to be \emph{very} useful if the slow initial training
-could be avoided.
+Observations in the previous section would suggest that the starting
+point for the gradient descent algorithm is particularly bad; as a
+result a lot of iterations are wasted in getting to a good starting
+point (the kink in part (c)) from where the optimisation can converge
+quite quickly. Another optimisation strategy that is less sensitive to
+starting point may prove to be more efficient (such as annealing);
+this algorithm could prove to be \emph{very} useful if the slow
+initial training could be avoided.
 
 Of course, it is not at all clear how to ``start at a different
 point'', as the algorithms as currently implemented start in a
@@ -297,7 +300,7 @@ algorithm).  The main feature of this cost function is that it gets
 steeper as the number of iterations increases, and thus has the
 property of guaranteed zero training error.  However, it may be that
 this algorithm would have its own problems.  Insufficient time was
-available to perform experiments.
+available to further investigate this refinement.
 
 \section{Further observations}
 
@@ -319,13 +322,13 @@ the trials making it through 1000 training iterations without
 terminating.  A stronger weak learning algorithm (such as a deeper
 decision tree), or a method of restarting training after it has
 aborted (one such is described in \cite{Bauer99}) could be used to 
-avoid termination of the algorithm.  In contrast, only the strict
-algorithm terminated on any other datasets.
+avoid termination of the algorithm.  Only the strict algorithm
+terminated on any other datasets.
 
 \subsection{Na\"{\i}ve $p$-boost}
 
 Observation of figures \ref{fig:test err summary} and \ref{fig:effect
-of p} show that the performance of the na\"{\i}ve algorithm closely
+of p} shows that the performance of the na\"{\i}ve algorithm closely
 matches that of the AdaBoost algorithm; the variation between the two
 being insignificant (the two algorithms are equivalent when $p = 1$.
 This is a surprising result--in chapter \ref{chapter:pboosting} it was
@@ -346,4 +349,3 @@ its success lay not in its specific form but in its adaptive
 resampling property, where increasing weight was placed on those cases
 more frequently misclassified.  \cite{Breiman96}
 \end{quotation}
-

@@ -68,17 +68,16 @@ $R_{\emp}^{\gamma}(h)$	& Margin risk
 $\VCdim(\cdot)$		& VC dimension
 			& \ref{sec:vcdim} \\
 
-$\covert{\calX}{\epsilon}{d}$ &
+$\covert{\calX}{\epsilon}{X}$ &
 			\longexp{Covering number at scale $\epsilon$ of $\calX$
-			using norm $d$ (usually $d_{\infty}$; assumed if not
-			specified)}
+			over samples $X$}
 			& \ref{sec:covering numbers} \\
 
 
-$\covert{\calX}{\epsilon}{k}$ &
+$\covert{\calX}{\epsilon}{m}$ &
 			\longexp{
 			Uniform covering number of $\calX$ at scale $\epsilon$
-			over $k$ points}
+			over $m$ points}
 			& " \\
 
 \notspace
@@ -88,14 +87,14 @@ $\co_{p}(\calX)$, $\co(\calX)$
 			& \ref{sec:p-convex} \\
 $\bbB$, $\trainboost$	& AdaBoost, action of AdaBoost
 			& fig \ref{fig:boosting algorithm} \\
-$F(\bfx)$, $H(\bfx)$	& \longexp{Boosting hypothesis, nonthresholded
+$F(\bfx)$, $H(\bfx)$	& \longexp{Boosting hypothesis, non-thresholded
 			\& thresholded, $H(\cdot) = \sign(F(\cdot))$}
 			& " \\
 
 $b_1, \ldots, b_t$	& AdaBoost classifier weights
 			& " \\
 
-$w_{t,1}, \ldots, w_{t,m}$ & AdaBoost sample weights
+$w_{t,1}, \ldots, w_{t,m}$ & AdaBoost sample weights at iteration $t$
 			& " \\
 
 \hline
@@ -114,8 +113,9 @@ A hat ($\hat{\ \ }$) means ``estimate''.  An asterisk ($\ \ ^{\ast}$) means
 
 SLT	& Statistical Learning Theory 	& \ref{acr:slt} \\
 ERM	& Empirical Risk Minimisation 	& \ref{acr:erm} \\
-SRM	& Structural Risk Mininmisation & \ref{acr:srm} \\
+SRM	& Structural Risk Minimisation & \ref{acr:srm} \\
 VC dimension & Vapnik-Chervonenkis dimension & \ref{acr:vcdim} \\
+AdaBoost & Adaptive Boosting algorithm	& chapter \ref{chapter:boosting} \\
 \hline
 
 \end{tabular}

@@ -6,7 +6,7 @@
 \label{chapter:pboosting}
 
 This chapter describes the concepts behind and a theoretical
-justification of \emph{$p$-boosting}, a generalisation of the boosting
+justification of \emph{$p$-boosting}, a generalisation of the AdaBoost
 algorithm.  The treatment is somewhat abstract to begin with; further
 sections become more concrete as practical issues are considered.
 
@@ -103,15 +103,14 @@ generalisation error over a set of $m$ independent training samples
 with probability at least $1 - \delta$ can be approximated by 
 %
 \begin{equation}
-R(H) \lesssim R_{\emp}^{\gamma}(F) + \sqrt{ \frac{8}{m} \left[ \log 2
-+ c(p) \: d \: \left( \frac{2}{\gamma} \right)^{\frac{2p}{2-p}} \log
-\left( \frac{2}{\gamma} \right) - \log \delta \right]}
+R(H) \lesssim R_{\emp}^{\gamma}(F) + \sqrt{ \frac{8}{m} \left[ c(p) \: d \: \left( \frac{2}{\gamma} \right)^{\frac{2p}{2-p}} \log_2
+\left( \frac{2}{\gamma} \right) - \log_2 \delta \right]}
 \end{equation}
-where $c(p)$ is a constant that depends upon $p$. 
 %
+where $c(p)$ is a constant that depends upon $p$.
 \end{theorem}
 
-This result is necessarily an approximation, due to the approximate
+This theorem is necessarily approximate, due to the approximate
 nature of the theorems it is based upon and the loose nature of such
 generalisation bounds.  However, it is clear that the confidence
 interval should decrease as $p \rightarrow 0$ (again assuming a nearly
@@ -125,7 +124,7 @@ Having established that boosting algorithms which operate on
 $p$-convex hulls theoretically have the desirable property of a
 tunable capacity via the $p$ parameter, we turn to questions of how to
 modify AdaBoost to operate on a $p$-convex hull.  We first describe a
-``naive $p$-boosting'' algorithm, which attempts to directly modify
+``na\"{\i}ve $p$-boosting'' algorithm, which attempts to directly modify
 the classifier weights to produce this effect.  After considering
 shortcomings of the na\"{\i}ve algorithm, we derive a gradient descent
 algorithm ``strict $p$-boosting'', using a restricted domain $\calX =
@@ -143,10 +142,10 @@ algorithm is called the ``gravity $p$-boosting'' algorithm.
 
 The na\"{\i}ve algorithm (named with the benefit of hindsight) attempts to
 modify the $b$ values of AdaBoost in a manner that will produce a
-``$p$-convex like'' distribution of parameters on $p$.
+``$p$-convex like'' distribution of classifier weights.
 
 The key feature of the algorithm is the calculation of the classifier
-weights $b$.  Denoting the classifier weight that AdaBoost would have
+weights $b_t$.  Denoting the classifier weight that AdaBoost would have
 used as $b'_t$, we use the formula
 %
 \begin{equation}
@@ -162,7 +161,8 @@ effect of $p$ is plotted figure \ref{fig:naive b values}.
 \begin{center}
 \includegraphics{figures/naive.epsg}
 \end{center}
-\begin{capt}{Effect of $p$ on classifier weights for naive algorithm}{fig:naive b values}
+\begin{capt}{Effect of $p$ on classifier weights for na\"{\i}ve
+algorithm}{fig:naive b values} 
 The three lines show $b_t$ against $\epsilon_t$ for $p \in \{ 0.5,
 0.7, 1.0 \}$.
 \end{capt}
@@ -173,7 +173,7 @@ the value of $b_t$, or based upon $b'_t$ (unchanged from AdaBoost).
 The first option yields the equation
 %
 \begin{equation}
-w_i|_{t+1} = \left\{
+w_{t+1,i} = \left\{
 \begin{array}{cl}
 	w_i|_t / Z_t \exp \left\{ (b'_t)^{1/p} \right\} & \qquad \qquad \mbox{if
 	$f_t(x_i) = y_i$} \\
@@ -194,7 +194,7 @@ the gradient descent framework.  The sample weights are calculated
 the same as AdaBoost; thus given an identical initial state both
 algorithms would proceed in the same ``direction''.  However the step
 sizes are different: AdaBoost performs a line search for the minimum
-in this direction and moves to that point; whereas the naive algorithm
+in this direction and moves to that point; whereas the na\"{\i}ve algorithm
 also searches for that point \emph{and then purposely avoids it!}
 Experiments with this algorithm prove to have indifferent performance.
 
@@ -296,7 +296,7 @@ appendix \ref{appendix:datasets}) containing 10 samples.
 It was observed that sometimes there was no optimal solution 
 at $t=2$ (that is,  \emph{no} $p$-convex combination of the first two
 weak-learners produced a smaller cost than the first weak-learner
-only.  It was furthermore observed that a sufficient condition for
+only).  It was furthermore observed that a sufficient condition for
 there to be no solution was: 
 %
 \begin{enumerate}
@@ -317,7 +317,7 @@ Recalling that the cost functional $C(F)$ is the sum over the $m$
 training samples of the cost function approximation
 (\ref{eqn:classifier weight cost function approximation}), it is
 useful to look at the contribution of each \emph{sample} $S = (\bfx,
-y)$ to the total cost $C$, as a function of $\alpha$:
+y)$ to the total cost $C$, as a function of $\alpha$ and $p$:
 %
 \begin{equation}
 \label{eqn:sample cost function}
@@ -331,9 +331,9 @@ When $\alpha = 0$, (\ref{eqn:sample cost function}) reduces to
 c_S(0, p) = \exp \left\{ -y F_t(\bfx) \right\}
 \end{equation}
 %
-It is useful to consider the meaning behind each part of
+Consider the meaning behind each part of
 (\ref{eqn:sample cost function}).  The term $y F_t(\bfx)$ is simply
-the margin of the sample $S$ at iteration $t$.  We write this $m_{S,
+the margin of the sample $S$ at iteration $t$--we write this $m_{S,
 t}$.  The term $y \alpha f_{t+1}(\bfx)$ is equal to $\alpha$ if the
 weak-learner $h_{t+1}$ classifies $S$ correctly, or $-\alpha$
 otherwise.  The denominator $(1 + \alpha^p)^{\frac{1}{p}}$ is equal to
@@ -350,8 +350,8 @@ second.
 When performing the line search for $t=2$, the margin $m_{(\bfx_i,
 y_i), 1}$ will evaluate to one of two values: $+1$ if  $h_1(\bfx_i) =
 y_i$ and $-1$ otherwise.  Likewise, the margin of the weak-learning
-hypothesis $h_2$ will be $\pm 1$ depending upon whether it classified
-the sample correctly or not.  As a result, there are four
+hypothesis $h_2$ will be $\pm \alpha$ depending upon whether it
+classified the sample correctly or not.  As a result, there are four
 possibilities for the sample cost function, depending upon the history
 of the first two weak learning hypotheses: 
 %
@@ -376,7 +376,7 @@ function}.
 
 \begin{linefigure}
 \begin{center}
-\hspace*{-1cm}\includegraphics{figures/alpha_function.epsg}
+\hspace*{-0.5cm}\includegraphics{figures/alpha_function.epsg}
 \end{center}
 \begin{capt}{Sample cost contributions}{fig:alpha function}
 Parts (a) through (d) show the sample cost at iteration $t=2$ as a
@@ -403,13 +403,13 @@ functional
 %
 \begin{equation}
 C(\alpha,p) = \sum_{i=1}^{10} c_{(\bfx, y)}(\alpha, p) 
-= 7c_{(1 \ra 1)} + 2c_{(1 \ra -1)} + c_{(-1 \ra 1)}
+= 7c_{(+1 \ra +1)} + 2c_{(+1 \ra -1)} + c_{(-1 \ra +1)}
 \end{equation}
 %
 for the same values of $p$.  Note that a well-defined minimum exists
 for $p \geq 1$, but the cost function is monotonic increasing for $p =
-0.5$.  It is clear that the contribution of $2c_{(+1 \ra -1)}$
-prevents a minima from occurring.
+0.5$.  It is obvious that the contribution of $7c_{(+1 \ra +1)}$
+prevents a minimum from occurring.
 
 While this analysis is by no means complete, some general observations
 can be made on likely reasons for the strict algorithm terminating
@@ -444,7 +444,7 @@ simplification involves searching along the same line as AdaBoost, and
 then normalising to the $p$-convex hull \emph{after} a suitable point
 has been found.  In this way, the hypothesis $F_t$ returned after
 round $t$ is still $F_t \in \co_p(\calH)$, and the strictly increasing
-cost functions that affect the strict algorithm are avoided.  Figure
+cost functions that troubled the strict algorithm are avoided.  Figure
 \ref{fig:sloppy line search} illustrates the differences in the line
 search between the sloppy and strict algorithms.
 
@@ -498,6 +498,81 @@ project, due to the difficulties described above and lack of time.  As
 a result, no experiments were performed using this algorithm; and it
 will not be considered further.
 
+\section{Hypotheses and learning machines}
 
+In this section, we return again to the distinction between a
+hypothesis and a learning machine.  We first ask the question, ``What
+is the difference between AdaBoost and the strict or sloppy algorithms
+when $p=1$?''  This is an important question, as the hypothesis space
+for both algorithms is the same: $\calX = \co_1(\calH)$ (recall that
+AdaBoost normalises its hypothesis when training is completed).  This
+line of reasoning is then continued to resolve a contradiction.
 
+The difference between AdaBoost and the $p$-boosting algorithms when
+$p=1$ is the slope of the cost function during training.
+Theorem \ref{thm:classifier weights unbounded} shows that the cost
+function for AdaBoost gets increasingly steep as $t$ increases (due to
+$\|\bfb\|$ being unbounded).  However, the $p$-boosting algorithms
+normalise $\|\bfb\|$ to 1 at every iteration; as a result the cost
+function is always the same shape.  Thus, they are two quite different
+algorithms because the optimise over different cost functions.
 
+We now extend these ideas further and generate an apparent
+contradiction, the resolution of which removes the potential for a
+great deal of confusion.
+
+Theorem \ref{thm:invariance} on page \pageref{thm:invariance}
+describes how AdaBoost is invariant to any nonzero proportional
+scaling of its classifier weights.  This theorem also holds for the
+$p$-boosting algorithms, as they too generate their final hypothesis
+by thresholding a linear combination.
+
+Consider two hypotheses $H_1 = \sign(F_1)$ and $H_2 = \sign(F_2)$
+where $F_1 \in \co_{p_1}(\calH)$, $F_2 \in \co_{p_2}(\calH)$ and
+$p_1 \neq p_2$.  It is clear that $H_1$ is invariant to any scaling
+$\beta F_1$ where $\beta > 0$.  But if we choose
+%
+\begin{equation}
+\label{eqn:contradiction beta}
+\beta = \frac{1}{\|F_1\|_{p_2}}
+\end{equation}
+%
+where $\|F_1\|_{p_2}$ means the $p_2$-norm of the weights of $F_1$, 
+then suddenly
+%
+\begin{equation}
+\left\| \beta F_1 \right\|_{p_2} = \frac{\|F_1\|_{p_2}}{\|F_1\|_{p_2}}
+= 1
+\end{equation}
+%
+and hence $\beta F_1 \in \co_{p_2}(\calH)$!  We have just shown that
+a hypothesis equivalent to $H_1$ (just a scaling of classifier
+weights) is on a \emph{different} $p$-convex hull.
+Apparently, all $p$-convex hulls are equivalent; the choice of $p$ is
+immaterial.
+
+This conclusion is contradicted both by the theory developed in
+previous chapters and by the results presented in chapter
+\ref{chapter:results}.  The way out is to observe that we have only
+considered scaling the \emph{final} hypothesis 
+$F_1$, not modifying the \emph{algorithm}.  The properties of a
+hypothesis depend upon how it was
+generated.  Although the hypothesis class that $H_1$ and $H_2$ are in
+happen to be equivalent, each was generated by a distinct process
+(they were trained on $\co_{p_1}(\calH)$ and $\co_{p_2}(\calH)$
+respectively).  The $p$-convex hulls may all be equivalent--but the
+$p$-boosting \emph{algorithms} are not.
+
+If we try to extend the contradiction to the algorithms, we lose
+it altogether.  Consider an algorithm which scaled $H_1$ by a factor
+$\beta$ in (\ref{eqn:contradiction beta}) on every iteration.  Then
+this algorithm is effectively constraining $F_1$ to a $p_2$-convex
+hull, which makes this algorithm identical to the $p_2$-boosting
+algorithm used to train $F_2$.
+
+The performance bounds presented in the previous chapters also neatly
+avoid the contradiction, as they depend upon the hypothesis class
+\emph{in which ERM was performed}, not the hypothesis class that the
+final hypothesis $H_T$ happens to be in.  Properties of a hypothesis
+depend upon the entire history of its training; nothing can be
+concluded without knowing something about how it was generated.
