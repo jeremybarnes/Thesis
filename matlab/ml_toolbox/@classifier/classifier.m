@@ -19,13 +19,18 @@ function obj = classifier(categories, dimensions)
 % RETURNS:
 %
 % OBJ is the new classifier.
-%
 
 % @classifier/classifier.m
 % Jeremy Barnes, 4/4/1999
 % $Id$
 
+% 1 argument -- just make a copy
+if (nargin == 1)
+   obj = categories;
+   return
+end
 
+% More than one argument -- create a new one
 if (dimensions <= 0)
    error('classifier: DIMENSIONS must be >= 1');
 end
