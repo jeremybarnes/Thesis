@@ -48,10 +48,10 @@ set(ax(2), 'plotboxaspectratiomode', 'manual', ...
 	   'xtick', []);
 
 
-subplot(2, 3, 4);  setup_axis;  xlabel('Iterations');
+subplot(2, 3, 4);  setup_axis;  xlabel('Iterations');  title('(d)');
 ylabel('Training error');
-subplot(2, 3, 5);  setup_axis;  xlabel('Iterations');
-subplot(2, 3, 6);  setup_axis;  xlabel('Iterations');
+subplot(2, 3, 5);  setup_axis;  xlabel('Iterations');  title('(e)');
+subplot(2, 3, 6);  setup_axis;  xlabel('Iterations');  title('(f)');
 
 set(gcf, 'paperposition', [0 0 7 5]);
 
@@ -60,11 +60,16 @@ print(EPSFILENAME, '-f1','-depsc2', '-adobecset');
 
 
 
-function draw_graph(test, trial, pvalues, noisevalue, linestyles, sp_num)
+function draw_graph(test, trial, pvalues, noisevalue, linestyles, sp_num, ...
+		    normalise)
 
 % Draws a plot
 
 global DATA_SAVE_PATH
+
+if (nargin == 6)
+   normalise = 0;
+end
 
 for i=1:length(pvalues)
    pvalue = pvalues(i);
@@ -77,6 +82,10 @@ for i=1:length(pvalues)
 %   whos('-file', filename)
    
    end_margins = end_margins .* (y_values(train_d) .* 2 - 1);
+   
+   if (normalise)
+      end_weights = end_weights ./ sum(end_weights);
+   end
    
    if (sp_num > 0)
       subplot(2, 3, sp_num);

@@ -12,7 +12,9 @@
 # Our .epsg rule also fixes the dodgy Matlab EPS to remove the command that
 # clips to the bounding box.
 %.epsg:		%.eps
-		sed -e 's/^ *-*[0-9][0-9]* *-*[0-9][0-9]* *-*[0-9][0-9]* *-*[0-9][0-9]* rc/%&/' $< > $@
+		sed -e 's/^ *-*[0-9][0-9]* *-*[0-9][0-9]* *-*[0-9][0-9]* *-*[0-9][0-9]* rc/%&/' $< > tmpfile
+		sed -e 's/^ *-*[0-9][0-9]* *-*[0-9][0-9]* *-*[0-9][0-9]* *-*[0-9][0-9]* rf/%&/' tmpfile > $@
+		rm tmpfile
 
 
 ifeq ($(OSTYPE),Linux)
@@ -66,4 +68,4 @@ all:		b_func.epsg classification_problem.epsg \
 		alpha_function.epsg weight_distributions.epsg
 
 clean:		
-		-rm *.epsg *.mscript *~ tmpcommand
+		-rm *.epsg *.mscript *~ tmpcommand tmpfile
