@@ -42,7 +42,7 @@ end
 % OK, now to transform our x values into index values into our weight
 % categories.  The transformation is x1min -> 1, x1max -> 128
 
-x1 = floor((x1 - x1min) .* 127 ./ x1range) + 1;
+x1 = 128 - floor((x1 - x1min) .* 127 ./ x1range);
 x2 = floor((x2 - x2min) .* 127 ./ x2range) + 1;
 
 % For each category, add the weight into the appropriate weightmap
@@ -93,7 +93,7 @@ for i = 1:cat
    finalweight = finalweight + weightmaps{i};
 end
 
-colormap(uniform_color_cube(cat, bits));
+colormap(twoclass_colormap('white'));
 
 image(finalweight);
 
