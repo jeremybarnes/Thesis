@@ -26,7 +26,6 @@ function dataplot(obj, varargin)
 % $Id$
 
 
-% PRECONDITIONS
 if (obj.dimensions > 3)
    error('dataplot: only can plot three or less dimensions');
 end
@@ -117,7 +116,3 @@ end
 if (do_legend)
    legend(char(categories(obj.categories)));
 end
-
-
-% POSTCONDITIONS
-check_invariants(obj);
