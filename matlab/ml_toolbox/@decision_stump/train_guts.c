@@ -143,7 +143,7 @@ void optimal_split(double *x, int *y, double *w, int dimensions,
 	    
 	    if (this_Q > best_Q) {
 		tmp_var = i;
-		tmp_val = xyw[j].x;
+		tmp_val = (xyw[j].x + xyw[j+1].x) * 0.5; /* half way... */
 		best_Q = this_Q;
 		tmp_left = left_index;
 		tmp_right = right_index;
