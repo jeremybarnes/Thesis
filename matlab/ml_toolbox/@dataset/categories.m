@@ -1,29 +1,30 @@
-% labels.m
-% Jeremy Barnes, 3/4/1999
-% $Id$
-%
-% LABELS - returns the labels object of a dataset
+function cat = categories(obj)
+
+% CATEGORIES return the CATEGORY_LIST object of a DATASET
 %
 % SYNTAX:
 %
-% lab = labels(obj)
+% cat = categories(obj)
 %
 % RETURNS:
 %
-% An object of type classlabels which contains the names and number of
-% classes that can appear in the dataset.
+% An object of type CATEGORY_LIST which contains the names and number of
+% categories that can appear in the dataset.
 %
 
-function lab = labels(obj)
+% labels.m
+% Jeremy Barnes, 3/4/1999
+% $Id$
+
 
 % PRECONDITIONS:
 % none
 
-lab = obj.labels;
+
+cat = obj.categories;
+
 
 % POSTCONDITIONS:
 check_invarients(obj);
-
-return;
 
 
