@@ -32,10 +32,10 @@ x_data = x(obj);
 y_data = y(obj);
 w_data = w(obj);
 
-new_c = train(weaklearner(obj), x_data, y_data, w_data);
+new_c = train(weaklearner(obj), x_data, y_data, w_data)
 
 % find the training error
-new_error = training_error(new_c);
+new_error = training_error(new_c)
 
 % see what this algorithm does to our data
 new_y = classify(new_c, x_data);
@@ -43,18 +43,18 @@ new_y = classify(new_c, x_data);
 % find if we need to abort
 if ((new_error == 0) | (new_error > 0.5 - eps))
    obj_r = abort(obj);
-   return;
+   return
 end
 
 
-% This section updates the weights.
+% Update classifier weights
+bt = - 0.5 * log(new_error / (1 - new_error))
 
-bt = - 0.5 * log(new_error / (1 - new_error));
-
-new_w = obj.w .* exp(bt .* ((new_y == y_data)*2-1));
+% Update sample weights
+new_w = w_data .* exp(-bt .* ((new_y == y_data)*2-1));
 new_w = new_w ./ sum(new_w);
 
+% Change the object
 obj = add_iteration(obj, new_c, [obj.b bt], new_w);
-
 
 obj_r = obj;
