@@ -78,7 +78,7 @@ while (noisevalue <= length(noise))
 	    case 'normboost2'
 	       alg = normboost2(wl, p(pvalue));
 	    case 'p_boost'
-	       alg = p_boost(wl, p(value));
+	       alg = p_boost(wl, p(pvalue));
 	    otherwise,
 	       error('Invalid algorithm name');
 	 end
