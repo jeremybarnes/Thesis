@@ -145,11 +145,11 @@ while (1)
 
    legend(char(the_legend));
 
-%   figure(5);  clf;
-%   marginplot(pboosts{3}, [0 0; 1 1]);
-%   hold on;
-%   dataplot(d);
-%   axis([-0.2 1.2 -0.2 1.2 0 2]); 
+   figure(4);  clf;
+   marginplot(pboosts{3}, [0 0; 1 1]);
+   hold on;
+   dataplot(d);
+   axis([-0.2 1.2 -0.2 1.2 0 2]); 
 
    if (iter >= 5)
       pause;
