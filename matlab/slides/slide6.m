@@ -12,7 +12,7 @@ numpoints = 20;
 
 b = category_list('binary');
 wl = decision_stump(b, 2);
-myboost = p_boost(wl, 1000, 1);
+myboost = p_boost(wl, 1);
 
 % Generate our training and test data
 d = dataset(b, 2);
