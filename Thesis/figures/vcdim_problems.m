@@ -36,7 +36,7 @@ axis square;  axis([-1.2 1.2 -1.2 1.2]);
 
 set(1, 'paperposition', [1 1 6 2.5]);
 
-print(EPSFILENAME, '-f1','-deps2');
+print(EPSFILENAME, '-f1','-deps2', '-adobecset');
 
 
 

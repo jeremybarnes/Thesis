@@ -59,8 +59,8 @@ which is illustrated in figure \ref{fig:supervised learning}.  The
 (but unknown) probability distribution $p(\bfx)$%
 \footnote{In practice, these samples are normally \emph{observed}
 rather then \emph{generated}.}%
-.  We denote the domain of the learning machine $\calI$, such that
-each $\mathbf{x}_i \in \mathcal{I}$. 
+.  We denote the domain, or ``input space'', of the learning machine
+$\calI$, such that each $\mathbf{x}_i \in \mathcal{I}$.
 
 \begin{linefigure}
 \begin{center}
@@ -91,9 +91,12 @@ $\bbW$}}}}
 The \emph{supervisor} implements the unknown dependency which the
 learning machine is trying to learn.  Given a sample $\bfx$, it
 returns a result (or label) $y^{\ast}$ according to a \emph{fixed but
-unknown} probability distribution $D$ on $(\bfx, y^{\ast})$.  We
-furthermore allow $y^{\ast}$ to be subject to \emph{label noise}, a
-random process that modifies $y^{\ast}$ in some manner%
+unknown} probability distribution $D$ on $(\bfx, y^{\ast})$.  The
+the range or ``output space'' of the learning machine is denoted
+$\calO$, such that all $y^{\ast} \in \calO$.
+
+We furthermore allow $y^{\ast}$ to be subject to \emph{label noise}, a
+random process that modifies $y^{\ast}$ in some manner% 
 \footnote{We consider exactly \emph{what} manner shortly.}
 to give $y$.  (Often, instead of presenting samples in serial to an
 ``online'' supervisor as shown in figure \ref{fig:supervised learning}
@@ -219,7 +222,7 @@ A learning machine $\bbW$ takes a labelled set of data $X =
 ((\bfx_1, y_1), \ldots, (\bfx_m, y_m))$, where $x_i \in \calI$ and
 $y_i \in \calO$, and outputs a hypothesis $h(\cdot) : \calI \rightarrow
 \calO$ chosen according to some deterministic procedure.  It is often
-convenient to represent learning machines by the universal set
+convenient to represent learning machines by the set
 %
 \begin{equation}
 \calH = \{h : \left( \exists X : \bbW(X) = h \right) \}
@@ -228,9 +231,9 @@ convenient to represent learning machines by the universal set
 This set contains all hypotheses that the learning machine $\bbW$ could
 generate; note however that the deterministic procedure through which
 a $h$ is selected from $\calH$ is not explicit in this formulation%
-\footnote{As a notational convenience, when we apply an operation to $\calH$
-(for example $\sign(\calH)$), we actually apply that operation to all
-elements of that set.}.
+\footnote{As a notational convenience, when we apply an operation to
+$\calH$ (for example $\sign(\calH)$), we actually apply that operation
+to all elements of that set.}.
 
 A hypothesis $h$ is simply a function that takes a sample $\bfx$
 and returns a label $y = h(\bfx)$.  Thus, the relationship between a
@@ -261,14 +264,14 @@ labeled sample as follows.
 
 \begin{definition}[Margin of a sample]
 Given a labeled sample $(\bfx, y)$ and a real-valued hypothesis
-$f(\cdot)$, we define the \emph{margin} of the sample as
+$f$, we define the \emph{margin} of the sample as
 %
 \begin{equation}
-m_{f}(\bfx) = y\ f(\bfx)
+m_{f}(\bfx,y) = y f(\bfx)
 \end{equation}
 %
 which is a real valued function, positive if the hypothesis is correct
-and negative otherwise.
+on the given sample and negative otherwise.
 \end{definition}
 
 In practice, it usually turns out that the magnitude of the margin at
@@ -279,7 +282,14 @@ question.  Thus, we would expect that a hypothesis with large margins
 would have good generalisation performance.  Geometrically, for ``well
 behaved'' functions the distance between a point and the decision
 boundary will roughly correspond to the magnitude of the margin at
-that point (see figure \ref{fig:classification problem}).
+that point (see figure \ref{fig:classification problem})%
+\footnote{We have simplified the discussion for the sake of clarity.
+It is possible to generate margins of arbitrarily large size by
+scaling $f$ by a constant $\beta$.  We are actually, therefore,
+interested in the \emph{normalised margin} $m_F(\bfx, y)/|f|$ where
+$|f|$ is an upper bound over all samples of the magnitude of $f$.  It
+is a minor difference in this thesis as the algorithms that we
+consider all normalise $f$ anyway.}.
 
 We will always call the real-valued hypotheses $f$ and the
 thresholded hypotheses $h = \sign(f)$.  We use similar notation for
@@ -331,8 +341,8 @@ Q(\yh, y) = \left\{
 \end{equation}
 
 This loss function is very easy to understand: zero if right, one if
-wrong.  Adding together several of these loss functions simply counts
-the number of mistakes.
+wrong.  Adding together the loss functions over several samples simply
+counts the number of mistakes.
 
 
 \subsection{True risk}
@@ -367,7 +377,7 @@ measure to use.
 The goal of machine learning is generate learning machines that
 minimise the true risk.  Unfortunately, it is impossible in
 principle to evaluate (\ref{eqn:true risk}) as one does not know
-$h(\bfx)$.   Instead, we know a number $m$ of (possibly noisy)
+either $h(\bfx)$ or $p(\bfx)$.   Instead, we know $m$ (possibly noisy)
 observations $(\bfx_1, y_1),\: \ldots, (\bfx_m, y_m)$.
 
 In section \ref{sec:overfitting} we will describe a method (structural
@@ -382,29 +392,22 @@ The empirical risk is an estimate of true risk, that can be evaluated
 over a collection of training samples.
 
 \begin{definition}[Empirical risk]
-Given $m$ observations%
-\footnote{If there is ambiguity as to which series of training samples
-are being used, we use the form
-%
-\begin{equation*}
-\underset{X}{R_{\emp}(h)}
-\end{equation*}
-%
-which states explicitly that we are calculating over the training set
-$X$.}
-$X = ((\bfx_1, y_1), \ldots, (\bfx_m, y_m))$ and a hypothesis%
-\footnote{We drop the hat fromour hypothesis $\hat{h}$ when it is
+Given $m$ observations $X = ((\bfx_1, y_1), \ldots, (\bfx_m, y_m))$
+and a hypothesis%
+\footnote{We drop the hat from our hypothesis $\hat{h}$ when it is
 clear that we are not discussing a supervisor function.}
 $h \in \calH$, we define the \emph{empirical risk} of $h$ over $X$ as
 %
 \begin{equation}
-R_{\emp}(h) = \frac{1}{m} \sum_{i=1}^{m} Q(h(\bfx_i), y_i)
+R_{\emp}(h) = \underset{X}{R_{\emp}(h)}\frac{1}{m} \sum_{i=1}^{m}
+Q(h(\bfx_i), y_i)
 \end{equation}
 \end{definition}
 
 The law of large numbers ensures that as $m \rightarrow \infty$, the
 empirical risk approaches the true risk (so long as $Q$ is unbiased).
-Convergence for finite $m$ is explored in section \ref{sec:slt}.
+Convergence for finite $m$ is discussed in section \ref{sec:slt}.
+
 
 \subsection{Weighted empirical risk}
 \label{sec:weighted empirical risk}
@@ -421,7 +424,7 @@ y_m))$ a normalised vector of weights $W = (w_1, \ldots, w_m) \in
 \calH$, we define the \emph{weighted empirical risk} of $h$ over $X$ as 
 %
 \begin{equation}
-R_{\emp}^W(h) = \sum_{i=1}^{m} w_i Q(h(\bfx), y_i)
+R_{\emp}^W(h) = \sum_{i=1}^{m} w_i Q(h(\bfx_i), y_i)
 \end{equation}
 \end{definition}
 %
@@ -450,13 +453,12 @@ that were classified wrongly, but also those samples that were
 
 \begin{definition}[Margin risk]
 \label{def:margin risk}
-Given a hypothesis $f : \calI \rightarrow \mathbb{R}$, a series of
-labelled training examples $X = ((\bfx_1, y_1), \ldots, (\bfx_m, y_m))$,
-and a margin $\gamma>0$, we define the \emph{margin risk} of a
-hypothesis $h = \sign(f)$ as
+Given a series of labelled training examples $X = ((\bfx_1, y_1),
+\ldots, (\bfx_m, y_m))$ and a margin $\gamma>0$, we define the
+\emph{margin risk} of a hypothesis $h = \sign(f)$ as
 %
 \begin{equation}
-R^{\gamma}_{\emp}(h) = \frac{1}{m} \left| \left\{ i : y_i \: f(\bfx_i) \leq
+R^{\gamma}_{\emp}(h) = \frac{1}{m} \left| \left\{ i : y_i f(\bfx_i) \leq
 \gamma \right\} \right| 
 \end{equation}
 \end{definition}
@@ -554,7 +556,7 @@ each of the $n = 2^p$ possible classifications of the points are
 produced: 
 %
 \begin{equation}
-\left\{ (h_i(\bfx_1), \ldots, h_i(\bfx_p)): i=1 \ldots n \right\}
+\left\{ (h_i(\bfx_1), \ldots, h_i(\bfx_p)): i=1, \ldots, n \right\}
 = \{\pm 1\}^p
 \end{equation}
 %
@@ -602,10 +604,10 @@ can be shattered; not that all sets of points may be shattered.  An
 extension of the ideas in figure \ref{fig:shattering}, the VC
 dimension of lines in $\mathbb{R}^d$ is $d+1$.
 
-We now use the VC dimension to bound the generalisation performance of
-a hypothesis selected via ERM.
+The VC dimension plays a role in a bound on the generalisation
+performance of a hypothesis selected via ERM. 
 
-\begin{theorem}[VC upper bound]
+\begin{theorem}[VC upper bound \cite{Anthony98}]
 Let $\calH$ be a class of functions mapping from a set $\calI$ to $\calO =
 \{-1, 1\}$ and having VC-dimension $d$.  For any probability
 distribution on $\calI \times \{-1,1\}$, with probability $1-\delta$
@@ -626,7 +628,7 @@ a hypothesis chosen by another principle cannot be asymptotically
 better.  The story appears to be complete\ldots until we introduce a
 new twist: for many function classes $\calH$ the confidence interval
 may be large or even infinite, due to properties of the VC dimension
-which are now explored. 
+which are now explored.  Learning is still, nevertheless, possible.
 
 \subsection{Covering numbers}
 \label{sec:covering numbers}
@@ -634,7 +636,7 @@ which are now explored.
 The problem with the VC dimension is that it is sensitive to behaviour
 on an arbitrarily small scale.  Figure \ref{fig:vcdim problems} shows
 an extreme example.  We use \emph{covering numbers} to avoid some of
-these problems.\enlargethispage{10pt}
+these problems.
 
 \begin{linefigure}
 \begin{center}
@@ -661,16 +663,13 @@ good measure of complexity.
 \end{linefigure}
 
 Covering numbers are a way of measuring the effective ``size'' of a
-class of functions $\calH$ at a given scale $\epsilon$, and only
-in the vicinity of ``interesting'' points.%
-\footnote{Generally, we use the $\bfx$ part of our training samples as
-the ``interesting'' points as we know nothing about our distribution
-at other points.}  We formalise ``interesting points'' as follows:
+class of functions $\calH$ at a given scale $\epsilon$.  The following
+definition is used by the definition of covering numbers:
 
 \begin{definition}[Restriction of a function \cite{Anthony98}]
 \label{def:restriction}
 Consider a set of points $X = \{\bfx_1, \ldots, \bfx_k\} \in \calI^k$,
-and a function $u$ where $u : \mathbb{R}^n \rightarrow \mathbb{R}$.  Then
+and a function $u$ where $u : \calI \rightarrow \mathbb{R}$.  Then
 we define the \emph{restriction of $u$ to $X$} as a vector
 %
 \begin{equation}
@@ -694,18 +693,19 @@ d_{\infty}(\mathbf{p}, \mathbf{q}) = \max_{i} |p_i - q_i|
 \end{equation}
 %
 (the usual $\infty$ norm).  We say that \emph{$\calS$ is an
-$\epsilon$-cover for $\calH$} if and only if 
+$\epsilon$-cover for $\calH$ with respect to $X$} if and only if 
 %
 \begin{equation}
 \forall u \in \calH \exists v \in \calS : d(u_{|X}, v_{|X}) < \epsilon
 \end{equation}
 
-We further define the \emph{``$d$ $\epsilon$-covering number''} of
-$\calH$ as
+We further define the \emph{``$d$ $\epsilon$-covering number of
+$\calH$ with respect to $X$''} as
 % 
 \begin{equation}
-\cover{\calH}{\epsilon} = \min_{\forall \calS \subseteq
-\calH}|\calS| : \mbox{$\calS$ is an $\epsilon$-cover for $\calH$}
+\covert{\calH}{\epsilon}{X} = \sup_{\calS \subseteq
+\calH}|\calS| : \mbox{$\calS$ is an $\epsilon$-cover for $\calH$
+w.r.t. $X$}
 \end{equation}
 \end{definition}
 
@@ -808,8 +808,8 @@ a set $\calH$ of functions (where $p>0$) is defined as
 \left\{
  \sum_{i=1}^{n}
  \alpha _i
-f_i : f_1, \ldots, f_n \in F,
- \alpha _1, \ldots, \alpha _n \in \mathbb{\calH},
+f_i : f_1, \ldots, f_n \in \calH, \quad
+ \alpha _1, \ldots, \alpha _n \in \bbR, \quad
  \sum_{i=1}^{n} | a_i |^p \leq 1
 \right\}
 \end{equation}
@@ -859,8 +859,8 @@ approximated by
 %
 \begin{equation}
 \label{eqn:approx p-convex bound}
-\log \cover{\co_p(\calH)}{\epsilon} \approx c(p) \: d \: (\frac{1}
-{\epsilon})^{\frac{2p}{2-p}} \log (\frac{1}{\epsilon})
+\log_2 \cover{\co_p(\calH)}{\epsilon} \approx c(p) \: d \: (\frac{1}
+{\epsilon})^{\frac{2p}{2-p}} \log_2 (\frac{1}{\epsilon})
 \end{equation}
 %
 where $c(p)$ is a constant that depends upon $p$.
@@ -936,7 +936,7 @@ possible output hypotheses of a learning algorithm) and some
 \emph{appropriate} measure of complexity  $|\cdot|$.  (By
 ``appropriate'', we mean ``suitable for the problem at
 hand''. Depending upon the situation, we might choose $|\calH_i| =
-\VCdim(\calH_i)$ or $|\calH_i| = \cover{\calH_i}{\lambda}$, for
+\VCdim(\calH_i)$ or $|\calH_i| = \cover{\calH_i}{\epsilon}$, for
 example).  We also assume without loss of generality that $\calH_1
 \subseteq \calH_2 \subseteq \cdots \subseteq \calH_n$, and thus using
 any sensible complexity measure, $|\calH_1| \leq |\calH_2| \leq \cdots
@@ -1023,12 +1023,12 @@ bound}).
 
 In the problems considered in this thesis, the bound on $b$ is very
 loose.  We instead approximate the true risk directly by using a
-\emph{testing dataset} $T$.  The learning machine never sees the
-labels of the samples in $T$; thus this dataset can be used to
+\emph{testing dataset} $X_T$.  The learning machine never sees the
+labels of the samples in $X_T$; thus this dataset can be used to
 approximate the true risk:
 %
 \begin{equation}
-R(f) \approx \underset{T}{R_{\emp}(f)}
+R(f) \approx \underset{X_T}{R_{\emp}(f)}
 \end{equation}
 %
 We then simply stop training when it appears that we have reached the

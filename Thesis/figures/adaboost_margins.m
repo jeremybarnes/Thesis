@@ -73,6 +73,7 @@ end
 
 xlabel('Margin \it{\gamma}');
 ylabel('Cumulative density (%)');
+set(gca, 'xtick', [0]);
 axis square;
 title('(b) \sl{Cumulative margin density}');
 

@@ -42,7 +42,6 @@ unboosted algorithms%
 from the development of \emph{learning} algorithms (which are all more 
 or less equivalent when boosted) to the development of better
 \emph{boosting} algorithms.}.
-
 We consider questions of how and why AdaBoost works; in particular how
 it chooses the optimal linear combination of classifiers from the very
 large set of possible linear combinations. 
@@ -151,7 +150,9 @@ b_t = - \frac{1}{2} \log \left( \frac{\epsilon_t}{1 - \epsilon_t} \right)
 %
 which is plotted in figure \ref{fig:b function}.  In section
 \ref{sec:theory:gradient descent} we will show how
-(\ref{eqn:theory:bt}) is derived.
+(\ref{eqn:theory:bt}) is derived.  We will sometimes use the notation
+$\bfb$ to refer to the vector of classifier weights $\bfb = (b_1,
+\ldots, b_t)$.
 
 \begin{linefigure}
 \begin{center}
@@ -172,14 +173,14 @@ those weak hypotheses that performed well on the training samples
 \subsection{Sample weights}
 \label{sec:sample weights}
 
-Each sample in the training set has a corresponding weight $w_j$ which
-is updated to reflect the difficulty of that sample.  On each
-iteration the weights of samples which $h_t$ classified incorrectly
-are increased (multiplied by $\exp \{\frac{1}{2} b_t \}$); those which
-$h_t$ classified correctly are \emph{divided} by the same amount.  The
-whole lot are then normalised.  As a result, the sample weight
-distribution is affected in the following manner (illustrated in
-figure \ref{fig:sample weights}): 
+At iteration $t$, each sample in the training set has a corresponding
+weight $w_t,j$ which is updated to reflect the difficulty of that
+sample.  On each iteration the weights of samples which $h_t$
+classified incorrectly are increased (multiplied by $e^{b_t}$); those
+which $h_t$ classified correctly are \emph{divided} by the same
+amount.  The whole lot are then normalised. As a result, the sample
+weight distribution is affected in the following manner (illustrated
+in figure \ref{fig:sample weights}): 
 
 \begin{itemize}
 \item	Training samples which are misclassified often, or are one of 
@@ -215,8 +216,7 @@ is not desirable.
 \label{sec:theory:gradient descent}
 
 Recent work has shown boosting to be an implementation of a gradient
-descent algorithm in an inner product space
-\cite{Mason99}
+descent algorithm in an inner product space \cite{Mason99}%
 \footnote{This discussion follows \cite{Mason99} rather closely with
 some changes in notation and omission of details such as stopping
 criteria.}.
@@ -225,7 +225,7 @@ an inner product operator \ip{\cdot}{\cdot}.  We define
 %
 \begin{equation}
 \calX = 
-\mathrm{co} (\calH) \doteq
+\mathrm{co} (\calH) =
  \bigcup _{n \in \mathbb{N}}
 \left\{
  \sum_{i=1}^{n}
@@ -348,6 +348,7 @@ gradient descent produces the same $b_t$ and $\bfw_t$ values as
 AdaBoost.
 
 \begin{theorem}[AdaBoost implements gradient descent \cite{Mason99}]
+\label{thm:adaboost gradient descent}
 The AdaBoost algorithm implements gradient descent over a margin cost
 function
 %
@@ -371,7 +372,7 @@ C = \sum_{i=1}^{m} c \left( y_i F_t(\bfx_i) + y_i \alpha
 h_{t+1}(\bfx_i) \right)
 \end{equation}
 %
-Substituting in $c(F(\bfx_i)) = e^{-yF(\bfx_i)}$, we obtain
+Substituting in $c(F(\bfx_i)) = \exp \{-yF(\bfx_i) \}$, we obtain
 %
 \begin{equation}
 C = \sum_{i=1}^{m} \exp \left\{ y_i F_t(\bfx_i) + y_i \alpha
@@ -444,9 +445,9 @@ the samples.
 
 \subsection{Modifying gradient descent}
 
-In this section, we have shown that the AdaBoost algorithm implements
-gradient descent.  There are four degrees of freedom which can be
-exploited to produce modified versions of gradient descent:
+We have shown that the AdaBoost algorithm implements gradient descent.
+There are four degrees of freedom which can be exploited to produce
+modified versions of gradient descent:
 %
 \begin{enumerate}
 \item	Choice of universal set? (AdaBoost: $\co(\calH)$)
@@ -504,29 +505,32 @@ R_{\emp}(H_t) \leq \prod_{t=1}^{T} \sqrt{1 - 4 \beta_t^2} \leq \exp
 \proof The straightforward proof of this theorem is contained in
 \cite{Freund97}.
 
-
-\begin{theorem}[Sum of AdaBoost classifier weights is unbounded]
-\label{thm:increasing classifier weights}
-\todo{Finish this theorem.  It must be published somewhere...}
-\end{theorem}
-
-\proof It suffices to show that, for a constant $\epsilon > 0$ that
-there is always an iteration $t + \delta t$ such that the weight...
-
-
 The following theorem shows that the total weight of the boosting
 algorithm is unbounded as the number of iterations increases.  It is
 used to prove results on the minimum margin and final training error
 of boosting.
 
-\begin{theorem}
-The size of the $b$ weight vector, $\|b\| \rightarrow \infty$
-as $t \rightarrow \infty$ (assuming the boosting algorithm doesn't
-terminate).
-
-\proof ?
+\begin{theorem}[Sum of AdaBoost classifier weights is unbounded]
+\label{thm:classifier weights unbounded}
+Suppose that we are given a set of training samples $X$ and a
+weaklearner $\bbW$, and run AdaBoost $\bbB$, halting training at $T$
+iterations.  Then either
+%
+\begin{itemize}
+\item	AdaBoost terminates on an iteration $t_{\mathrm{term}} < T$;
+	or
+\item	the $1$-norm of the classifier weight vector $\mathbf{b}$ is
+	unbounded as $T \rightarrow \infty$:
+	%
+	\begin{equation}
+	\lim_{T \rightarrow \infty} \| \mathbf{b} \|_1 = \infty
+	\end{equation}
+\end{itemize}
 \end{theorem}
 
+\proof This is proved in \cite{Breiman97}.  The proof proceeds by
+contradiction, assuming a least upper bound on $\|\mathbf{b}\|_1$ and
+showing that this bound will only hold if training terminates.
 
 
 \subsection{AdaBoost maximises the minimum margin}
@@ -536,34 +540,40 @@ AdaBoost chooses the linear combination that maximises the minimum
 margin over its training samples.
 
 \begin{theorem}[AdaBoost maximises the minimum margin]
-\todo{Rework this theorem!}
-Given a particular learning algorithm $F$ and a training
-set $S$, define the minimum margin as
+\label{thm:maximises minimmum margin}
+Given a particular learning algorithm $F$ and a training set $X$,
+define the minimum margin as
 \[
-m_{\min} = min_{\{x,y\} \in S} y_i F(x_i)
+m_{\min} = \min_{(\bfx_i,y_i) \in X} y_i F(x_i)
 \]
 Then the boosting algorithm will converge as $t \rightarrow \infty$ to
-the solution which maximised the minimum margin.
-
-\proof For boosting we can write $F_t = b_1 f_1 + \cdots + b_t f_t$.
-Then defining our \emph{normalised hypotheses} $\bar{f}_i$ as
-\[
-\bar{f} = \frac{b_i f_i}{\|b\|}
-\]
-such that $\hat{F}_t = \bar{f}_1 + \cdots + \bar{f}_t$, we can write
-our cost function (reference?) as 
-\[
-C(b, S) = \sum_{i=1}^{m} \exp\{-y_i \bar{F}_t(x_i)\}^{\|b\|}
-\]
-We already know from the gradient descent theory (reference?) that we
-are trying to minimise the cost function.  Now as $\|b\| \rightarrow
-\infty$ (from the previous theorem) the largest value of $\exp\{-y_i
-\bar{F}_t(x_i)\}$ will dominate, and so $C(b, S) \rightarrow exp\{\max
--y_i \bar{F}_t(x_i)\}$.  Thus, by minimising $C(b, S)$, we are making
-$\min y_i \bar{F}_t(x_i)$ as large as possible; that is we are
-maximising the minimum margin.
+the solution which maximises the minimum margin.
 \end{theorem}
 
+\proof We give an outline.  For AdaBoost we can write $F_t = b_1 h_1 +
+\cdots + b_t h_t$. Then defining the \emph{normalised hypotheses}
+$\bar{f}_i$ as 
+%
+\begin{equation}
+\bar{f} = \frac{b_i h_i}{\|b\|}
+\end{equation}
+%
+such that $\bar{F}_t = \bar{f}_1 + \cdots + \bar{f}_t$, the cost
+functional (\ref{eqn:cost functional along line}) can be rewritten as
+%
+\begin{equation}
+C(F) = \sum_{i=1}^{m} \exp\{-y_i \bar{F}_t(\bfx_i)\}^{\|b\|}
+\end{equation}
+%
+We already know from theorem \ref{thm:adaboost gradient descent} that
+AdaBoost is trying to minimise the cost function.  From theorem
+\ref{thm:classifier weights unbounded}, as $\|b\| \rightarrow \infty$
+the largest value of $\exp\{-y_i \bar{F}_t(x_i)\}$ will dominate, and
+so $C(F) \rightarrow exp\{\max -y_i \bar{F}_t(x_i)\}$.  Thus, by
+minimising $C(F)$, we are making $\min y_i \bar{F}_t(x_i)$ as large as
+possible; that is we are maximising the minimum margin.  Figure
+\ref{fig:adaboost margins} illustrates the evolution of both the cost
+function and the margins of a dataset.
 
 \begin{linefigure}
 \begin{center}
@@ -582,18 +592,19 @@ distribution of the normalised margins (that is, the proportion of
 samples with margin less than or equal to $\gamma$.  As time
 progresses, the minimum margin is pushed further to the right; at 1000
 iterations the training error has evidently reached zero as all
-margins are positive.
+margins are positive.  (Note that for clarity part (b) has its $x$
+axis normalised separately for each $p$ value in order to stretch the
+margin distribution over the whole range.)
 \end{capt}
 \end{linefigure}
-
-
 
 
 \subsection{Invariance of AdaBoost to uniform scaling of classifer
 weights}
 
 We present here an obvious theorem about the invariance of hypothesis
-weights.  It will be used in chapter \ref{chapter:results}.
+weights.  It will be used in chapters \ref{chapter:pboosting} and
+\ref{chapter:results}.
 
 \begin{theorem}
 The hypothesis returned by the AdaBoost is independent of a 
@@ -621,7 +632,7 @@ generated by the AdaBoost algorithm $\bbB$ from a base class $\calH$
 with VC dimension $d$, with probability at least $1 - \delta$ over $m$
 independent training samples has true risk bounded by 
 \begin{equation}
-R(F) \leq R_{\emp}^{\gamma}(F) + \sqrt{\frac{c}{m} \left[ \frac{d
+R(H) \leq R_{\emp}^{\gamma}(H) + \sqrt{\frac{c}{m} \left[ \frac{d
 \ln^2 (m/d)}{\gamma^2} + \ln(1/\delta) \right] }
 \end{equation}
 \end{theorem}
@@ -639,13 +650,14 @@ often induce overfitting.  Figure \ref{fig:overfitting graphs} shows some
 examples of the effect.  There have been several studies into the
 characteristics of AdaBoost that lead to overfitting \cite{Schapire97,
 Grove98, Ratsch98}.  A largely intuitive survey of the characteristics
-of AdaBoost that lead to overiftting is presented here. 
+of AdaBoost that lead to overfitting is presented here. 
 
 \begin{linefigure}
 \begin{center}
 \includegraphics{figures/boost_overfitting.epsg}
 \end{center}
-\begin{capt}{Experimental results for Boosting showing overfitting}
+\begin{capt}{Experimental results for Boosting showing
+overfitting}{fig:overfitting graphs}
 Three plots of test/training error vs iteration number for Boosting.
 The dataset used was the ``ring'' distribution (see chapter
 \ref{chapter:method}) with 50 samples.  Mild overfitting is visible on
@@ -654,9 +666,9 @@ increases.
 \end{capt}
 \end{linefigure}
 
-That overfitting occurs in AdaBoost follows from the property that
-AdaBoost maximises the minimum margin (theorem
-\ref{thm:max-min-margin}).  Intuitively, this property causes the
+That overfitting occurs in AdaBoost is a consequence of the property
+that AdaBoost maximises the minimum margin (theorem
+\ref{thm:max-min-margin}).  Intuitively, this property causes the 
 AdaBoost algorithm to concentrate on a few hard samples.
 Unfortunately, in a noisy dataset, these samples are usually all
 noisy.  Some algorithms are described in the next section that 
@@ -677,13 +689,14 @@ noisy data).
 
 \section{Normed boosting algorithms}
 
-Mason et al. \cite{Mason99a} have studied another modification to
-AdaBoost, where theclassifier weights are \emph{normalised at each
-iteration}.  After $b_t$ is calculated for iteration $t$, the entire
-set of classifier weights $b$ are normalised:
+Several authors \cite{Mason99a, Breiman97} have studied modified
+versions of AdaBoost, where the classifier weights are
+normalised \emph{at each iteration}.  After $b_t$ is calculated for
+iteration $t$, the entire set of classifier weights $b$ are
+normalised:
 %
 \begin{equation}
-b_{i} \Leftarrow \frac{b_i}{\| \mathbf{b} \|_p} \qquad \mbox{for} i=1
+b_{i} \Leftarrow \frac{b_i}{\| \mathbf{b} \|_p} \qquad  i=1
 \ldots t
 \end{equation}
 %
@@ -696,15 +709,15 @@ minimum of the gradient descent cost functional (\ref{eqn:gradient
 descent cost functional}), they do \emph{not} have the property of
 guaranteed convergence to zero training error (theorem
 \ref{thm:AdaBoost training error convergence}); the reason being that 
-$\sum_{i=1}^t b'_{t,i}$ is bounded above (theorem \ref{thm:increasing
+$\sum_{i=1}^t b_{t,i}$ is bounded above (theorem \ref{thm:increasing
 classifier weights} does not hold).  As results in chapter
 \ref{chapter:results} and the discussion in section \ref{sec:boost
 overfitting} indicate, an algorithm does not have to converge to zero
 training error to generalise well.
 
-One of the algorithms developed in chapter \ref{chapter:pboosting} is
-a generalisation of the normed boosting algorithm described in this
-section, where the value of $p$ is unrestricted.
+The ``sloppy'' algorithm developed in chapter \ref{chapter:pboosting}
+is a generalisation of the normed boosting algorithm described in this
+section, where the value of $p$ is any positive real.
 
 
 
