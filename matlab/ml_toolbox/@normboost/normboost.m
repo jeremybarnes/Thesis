@@ -8,18 +8,20 @@ function obj = normboost(weaklearner, norm)
 %
 % obj = normboost(weaklearner, norm, value)
 %
-% FIXME: comment
+% NORMBOOST is a boosting algorithm that searches through a subset
+% of the function space where the functional norm is equal to 1.
+% In performing its line searches, it sticks to this line.
 %
 % RETURNS:
 %
-% OBJ is the new boost object.
+% OBJ is the new normboost object.
 %
 
 % @normboost/normboost.m
 % Jeremy Barnes, 15/8/1999
 % $Id$
 
-if (nargin == 1)
+                    if (nargin == 1)
    % One parameter --> make a copy
    obj = weaklearner;
    return
