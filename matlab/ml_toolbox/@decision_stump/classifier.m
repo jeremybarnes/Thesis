@@ -6,5 +6,6 @@ function obj_r = classifier(obj)
 % Jeremy Barnes, 18/8/1999
 % $Id$
 
+obj = decision_stump(obj);
 obj_r = obj.classifier;
 
