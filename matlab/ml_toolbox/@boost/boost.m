@@ -26,8 +26,6 @@ function obj = boost(weaklearner)
 % $Id$
 
 parent = classifier(categories(weaklearner), dimensions(weaklearner));
-obj = struct(parent);
-
 
 % This is a template, which is trained at each boosting iteration
 obj.weaklearner = weaklearner;
