@@ -1,7 +1,11 @@
+# MAKEFILE for matlabscript
+# $Id$
+
 %.lib :	$(MATLAB)/extern/include/%.def
 	lib /def:$< /machine:ix86 /out:$@
 
-matlabscript.exe: matlabscript.c libmat.lib libmx.lib libeng.lib getopt.obj
+matlabscript.exe: matlabscript.c libmat.lib libmx.lib libeng.lib getopt.obj \
+		license_text.c help_text.c
 	cl /W4 /Ic:\MATLAB\extern\include /ML matlabscript.c \
 		/link libmat.lib libmx.lib libeng.lib getopt.obj
 
