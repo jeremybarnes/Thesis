@@ -28,7 +28,7 @@ if (aborted(obj))
    return;
 end
 
-x_data = x(obj);  y_data = y(obj);  w_data = w(obj);
+x_data = x(obj);  y_data = y(obj);  w_data = w(obj);  p = norm(obj);
 
 % create and train a new classifier
 new_c = train(weaklearner(obj), x_data, y_data, w_data);
@@ -113,7 +113,8 @@ else
       pause;
    end
 
-   new_b = [(1 - alpha.^p).^(1/p) * get_b(obj) alpha];
+   old_b = classifier_weights(obj);
+   new_b = [(1 - alpha.^p).^(1/p) * old_b alpha];
 
 end
 
