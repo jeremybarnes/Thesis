@@ -214,7 +214,7 @@ else
    old_b = classifier_weights(obj);
    new_b = [old_b alpha] ./ pnorm([old_b alpha], p);
 
-   one_norm = pnorm(new_b, 1)
+%   one_norm = pnorm(new_b, 1)
 end
 
 % Update the sample weights.  These are calculated as the derivatives
