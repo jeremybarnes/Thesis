@@ -1,4 +1,4 @@
-function density_plot(cat, x, y, w)
+function density_plot(cat, x, y, w, option)
 
 % DENSITY_PLOT plots class weight density
 %
@@ -20,10 +20,24 @@ function density_plot(cat, x, y, w)
 % Jeremy Barnes, 23/4/1999
 % $Id$
 
-% PRECONDITIONS
-% FIXME: add these
-% x should have 2 columns
-% y should have a maximum of cat categories
+if (nargin == 4)
+   option = 'bitmap';
+end
+
+if (strcmp(option, 'markersize'))
+   do_density_plot_markersize(cat, x, y, w);
+elseif (strcmp(option, 'markercolor'))
+   do_density_plot_markercolor(cat, x, y, w);
+elseif (strcmp(option, 'bitmap'))
+   do_density_plot_bitmap(cat, x, y, w);
+else
+   error(['Invalid option "' option '".']);
+end
+
+
+
+function do_density_plot_bitmap(cat, x, y, w)
+
 if (cat ~= 2)
    error('density_plot: currently only works for two categories');
 end
@@ -64,7 +78,7 @@ end
 %end
 
 for i=1:cat
-   weightmaps{i} = sqrt(weightmaps{i});
+%   weightmaps{i} = sqrt(weightmaps{i});
 end
 
 image_data = twoclass_density_to_color(weightmaps{2}, weightmaps{1});
@@ -72,6 +86,42 @@ image_data = twoclass_density_to_color(weightmaps{2}, weightmaps{1});
 
 colormap(twoclass_colormap('white'));
 
-image(image_data);
+s = surface([0 1], [0 1], [0 0; 0 0], 'facecolor', 'texture', 'cdata', ...
+      image_data, 'cdatamapping', 'direct');
+
+
+
+function do_density_plot_markersize(cat, x, y, w)
+
+% Here, we simply plot one marker per data point, the size depending upon
+% the weight.
+
+for i=1:length(y)
+   
+   w = sqrt(w);
+   
+   sizes = w ./ max(w) * 25;
+   
+   plot(x(i, 1), x(i, 2), 'k.', 'markersize', sizes(i));  hold on;
+end
+
+
+
+
+function do_density_plot_markercolor(cat, x, y, w)
+
+% Here, we simply plot one marker per data point, the size depending upon
+% the weight.
+
+sizes = w ./ max(w);
+
+for i=1:length(y)
+   
+   c = 1 - sqrt(sizes(i));
+%   l = plot(0, 0, 'k.');
+%   get(l)
+   plot(x(i, 1), x(i, 2), 'k.', 'markeredgecolor', [c c c]);  hold on;
+end
+
 
 

@@ -1,10 +1,11 @@
-function runtest(test)
+function runtest(test, option)
 
 % RUNTEST run a test on a boosting algorithm
 %
 % SYNTAX:
 %
 % runtest('test')
+% runtest('test', 'nosave')
 %
 % This function runs the test specified in 'test'.  This test must have
 % first been created using the maketest function.
@@ -12,9 +13,11 @@ function runtest(test)
 % It writes its progress as it goes, which should allow it to continue
 % without too much loss of work if it gets interrupted.
 %
-% It draws and updates a graph as it goes of its progress.
+% The 'nosave' option does not save the weaklearners that are generated.
+% This results in faster execution and less disk space usage, but also
+% the classifier can not be used later.
 %
-% Use displaytest to display the results of a test.
+% Use SUMMARISE and DISPLAY_RESULTS to get at the results.
 
 % runtest.m
 % Jeremy Barnes, 23/9/1999
@@ -49,11 +52,11 @@ noisevalue = 1;
 eval('load(progfile)', '');
 
 
-while (trial <= trials)
+while (noisevalue <= length(noise))
    
    while (pvalue <= length(p))
       
-      while (noisevalue <= length(noise))
+      while (trial <= trials)
 	 
 	 save(progfile, 'trial', 'pvalue', 'noisevalue');
 	 
@@ -79,9 +82,14 @@ while (trial <= trials)
 	 end
 	 
 	 % Test the sucker
-	 [train_alg, teste, traine] = ...
-	     test(alg, train_d, test_d, numiterations);
-
+	 if (strcmp(option, 'nosave'))
+	    [train_alg, teste, traine] = ...
+		test(alg, train_d, test_d, numiterations, 'nosave');
+	 else
+	    [train_alg, teste, traine] = ...
+		test(alg, train_d, test_d, numiterations);
+	 end
+	 
 	 % Save the results
 	 save_filename = [DATA_SAVE_PATH '/' test '-trial' int2str(trial) ...
 			  '-pvalue' int2str(pvalue) '-noisevalue' ...
@@ -89,15 +97,14 @@ while (trial <= trials)
 	 
 	 save(save_filename, 'train_d', 'test_d', 'train_alg', 'teste', ...
 	      'traine');
-	 
-	 noisevalue = noisevalue + 1;
+	 trial = trial + 1;
       end
       
-      noisevalue = 1;
+      trial = 1;
       pvalue = pvalue + 1;
       
    end
    
    pvalue = 1;
-   trial = trial + 1;
+   noisevalue = noisevalue + 1;
 end

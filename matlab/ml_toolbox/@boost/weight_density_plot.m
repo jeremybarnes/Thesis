@@ -1,4 +1,4 @@
-function weight_density_plot(obj)
+function weight_density_plot(obj, option)
 
 % WEIGHT_DENSITY_PLOT plot the density of weights
 %
@@ -13,15 +13,19 @@ function weight_density_plot(obj)
 % Basically, it allows the progress of the boosting algorithm to be
 % visualised and followed.
 %
+% weight_density_plot(obj, 'markers') does it with marker size instead of
+% bitmaps.  This comes out better for printing.
+%
 % FIXME:  comment
 
 % @boost/weight_density_plot.m
 % Jeremy Barnes, 25/4/1999
 % $Id$
 
-% PRECONDITIONS:
-% none
 
+if (nargin == 1)
+   option = 'bitmap'
+end
 
-density_plot(numcategories(obj.categories), obj.x, obj.y, obj.w);
+density_plot(numcategories(obj), x(obj), y(obj), w(obj), option);
 

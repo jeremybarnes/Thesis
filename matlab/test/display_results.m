@@ -14,7 +14,7 @@ function display_results(test, varargin)
 % OPTIONS will allow various things to be specified, such as which graphs
 % to draw... currently, it does SFA.
 
-% summarise.m
+% display_results.m
 % Jeremy Barnes, 23/9/1999
 % $Id$
 
