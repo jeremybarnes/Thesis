@@ -1,0 +1,7 @@
+#!/bin/sh
+
+sed -e 's/f:\/cvsroot/t:\/cvsroot/' $1 > tmpfile
+rm $1
+d2u tmpfile -o tmpfile2
+mv tmpfile2 $1
+rm tmpfile
