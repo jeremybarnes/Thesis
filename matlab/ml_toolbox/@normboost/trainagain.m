@@ -76,11 +76,18 @@ else
       [all_c(i), all_d(i), all_d2(i), crap] = eval_cf(obj, new_c, ...
 						      alphas(i));
    end
+
+   % Calculate numerically to test that we got them right...
+   calc_alpha = (alphas(1:length(alphas)-1) + alphas(2:length(alphas))) / 2;
+   calc_d = diff(all_c) ./ diff(alphas);
+   calc_d2 = diff(all_d) ./ diff(alphas);
    
    figure(1);  clf;
    subplot(3, 1, 1);  plot(alphas, all_c);   grid on;  hold on;
    subplot(3, 1, 2);  plot(alphas, all_d);   grid on;  hold on;
+   plot(calc_alpha, calc_d, 'k-');
    subplot(3, 1, 3);  plot(alphas, all_d2);  grid on;  hold on;
+   plot(calc_alpha, calc_d2, 'k-');
 
    % END DEBUGGING
 
