@@ -32,11 +32,9 @@ if (~isa(weaklearner, 'classifier'))
 end
 
 
-% initialisation of variables in obj
-obj.initialised = 1;
-obj.dimensions = dimensions(weaklearner);
-obj.categories = categories(weaklearner);
-obj.trained_samples = 0;
+parent = classifier(categories(weaklearner), dimensions(weaklearner));
+obj = struct(parent);
+
 
 % This is a template, which is trained at each boosting iteration
 obj.weaklearner = weaklearner;
@@ -67,11 +65,11 @@ obj.y = [];
 obj.aborted = 0;
 
 % The b value is a measure of how good each classifier is
-b = zeros(1, maxiterations);
+obj.b = zeros(1, maxiterations);
 
 % construct class and define superior/inferior relationship
-obj = class(obj, 'boost');
-superiorto('double');
+obj = class(obj, 'boost', parent);
+superiorto('double', 'classifier');
 
 
 % POSTCONDITIONS
