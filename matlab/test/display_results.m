@@ -51,8 +51,8 @@ for noisevalue=1:length(test_info.noise)
       subplot(plot_rows, plot_cols, current_subplot);
       current_subplot = current_subplot + 1;
       
-      train_d = train_mean(noisevalue, pvalue, :);
-      test_d = test_mean(noisevalue, pvalue, :);
+      train_d = permute(train_mean(noisevalue, pvalue, :), [3 1 2]);
+      test_d =  permute(test_mean (noisevalue, pvalue, :), [3 1 2]);
       graphtitle = ['noise=' num2str(current_noise) ...
 		    ' p = ' num2str(current_p)];
       draw_training_profile(test_d, train_d, graphtitle);
@@ -63,6 +63,15 @@ end
 function draw_training_profile(test_d, train_d, graphtitle)
 
 % Draws a graph
+
+% Get rid of samples that are -1 (training stopped)
+
+minus1 = find(test_d < 0);
+if (~isempty(minus1))
+   stopat = minus1(1) - 1;
+   test_d = test_d(1:stopat);
+   train_d = train_d(1:stopat);
+end
 
 iter = 1:length(test_d);
 semilogx(iter, test_d, 'r-');  hold on;
