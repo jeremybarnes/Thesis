@@ -26,7 +26,7 @@ function dataplot(obj, varargin)
 % $Id$
 
 
-if (obj.dimensions > 3)
+if (dimensions(obj) > 3)
    error('dataplot: only can plot three or less dimensions');
 end
 
@@ -36,7 +36,7 @@ end
 
 % Maybe we could do it faster simply by sorting and then splitting it up?
 
-num_categories = numcategories(obj.categories);
+num_categories = numcategories(obj);
 plot_symbols = 'ox.+*sdv^<>ph';
 plot_colors = 'brgkcmyw';
 category_data = cell(num_categories, 3); % row=category, col = [x y opt]
