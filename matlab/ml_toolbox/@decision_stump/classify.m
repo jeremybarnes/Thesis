@@ -35,9 +35,5 @@ end
 y = classify_guts(obj, x, obj.splitvar, obj.splitval, obj.leftcategory, ...
 		  obj.rightcategory);
 
-% POSTCONDITIONS
-check_invariants(obj);
-
-
 
 

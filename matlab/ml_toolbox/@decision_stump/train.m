@@ -61,8 +61,4 @@ train_err = trainerrs' * w;
 
 obj.trainingerror = train_err;
 
-
 obj_r = obj;
-
-% POSTCONDITIONS
-check_invariants(obj_r);

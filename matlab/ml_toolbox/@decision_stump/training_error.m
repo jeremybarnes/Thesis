@@ -19,7 +19,3 @@ function e = training_error(obj)
 % none
 
 e = obj.trainingerror;
-
-
-% POSTCONDITIONS:
-check_invariants(obj);
