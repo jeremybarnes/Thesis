@@ -26,16 +26,9 @@ function y = classify(obj, x)
 % less than optimal for smaller datasets.
 
 
-% PRECONDITIONS
-% none
-
-
 % The work is done in the recursive function below
+obj = cart(obj);
 y = recursive_classify(obj.tree, x);
-
-
-% POSTCONDITIONS
-check_invariants(obj);
 
 
 
@@ -77,8 +70,7 @@ left_y  = recursive_classify(tree.left,  left_x);
 right_y = recursive_classify(tree.right, right_x);
 
 % And put it all back together.
-[x, y] = merge_data(left_x, left_y, left_index, right_x, right_y, ...
-		    right_index);
+y = merge_data(left_y, left_index, right_y, right_index);
 
 
 
@@ -117,22 +109,14 @@ right_x = x(right_index, :);
 
 
 
-function [x, y] = merge_data(left_x,  left_y,  left_index, ...
-			     right_x, right_y, right_index)
+function y = merge_data(left_y, left_index, right_y, right_index)
 % MERGE_DATA merge together a dataset split using SPLIT_DATA
 
-sxl = size(left_x);
-sxr = size(right_x);
-
-x_length = sxl(1) + sxr(1);
+y_length = length(left_y) + length(right_y);
 
 % Pre-allocate for efficiency
-x = zeros(x_length, sxl(2));
-y = zeros(x_length, 1);
+y = zeros(y_length, 1);
 
 % Put it all back together
-x(left_index, :) = left_x;
 y(left_index, 1) = left_y;
-
-x(right_index, :) = right_x;
 y(right_index, 1) = right_y;
