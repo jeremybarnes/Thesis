@@ -51,4 +51,4 @@ thesis.dvi:	$(TEXFILES) $(BIBLIOGRAPHY) $(STYFILES)
 clean:
 		make -C figures clean
 		-rm *~ *.aux *.toc *.log *.dvi *.ps *.lot *.lof *.bbl *.blg \
-			*.input.tex
+			*.input.tex *.todo
