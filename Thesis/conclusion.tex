@@ -28,18 +28,27 @@ line search phase (searching along the same line as AdaBoost).
 
 The strict algorithm performed poorly as compared to AdaBoost and the
 sloppy algorithm, both in terms of generalisation performance and
-training time.  It is hypothesised that the observed behaviour is a
+training time.  This was a disappointing result as the strict
+algorithm was the most direct implementation of the restriction to a
+$p$-convex hull.  It is hypothesised that the observed behaviour is a 
 result of the gradient descent optimisation not finding the global
 minimum.  The sloppy algorithm performed well on noisy datasets, with
 the shape of the capacity-vs-generalisation error curve matching the
 theoretical prediction, and the generalisation error at the optimal
-$p$ value significantly up to 25\% improved on AdaBoost.  However,
-both the strict and the sloppy algorithms required approximately an
-order of magnitude more training iterations than AdaBoost to reach the
-optimal solution.  An accelerated version is proposed that may improve
-on this situation.
+$p$ value significantly (up to 25\%) improved on AdaBoost--which
+already performs \emph{very} well.  However, both the strict and the
+sloppy algorithms required approximately an order of magnitude more
+training iterations than AdaBoost to reach the optimal solution.  An
+accelerated version is proposed that may improve this situation.
+
+No quantitative comparisons between the $p$-boosting algorithm and
+other AdaBoost derivatives with similar goals (soft margins
+\cite{Ratsch98}, DOOM I/II \cite{Mason99, Mason99a}) were made.
+However, the approaches used in these derivatives are not incompatible
+with the $p$-convex hull approach, leaving open the possibility of a
+combined approach.
 
 In conclusion, the capacity controlled ``$p$-boosting'' algorithms
-considered in this project have been shown to be an improvement on
-AdaBoost in some situations.  More extensive testing is required
-before further conclusions can be drawn.
+considered in this project have been shown to be a modest improvement
+on the already excellent AdaBoost in some situations.  More extensive
+testing is required before stronger conclusions can be drawn.

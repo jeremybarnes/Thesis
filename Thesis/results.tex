@@ -12,34 +12,51 @@ them with the results expected from the theory in chapters
 
 \section{Generalisation performance}
 
-Figure \ref{fig:test err summary} compares the average generalisation
-performance (test error value) of the strict, sloppy and na\"{\i}ve
-algorithms with that of AdaBoost.
+Figure \ref{fig:test err summary} is a high-level summary of the
+generalisation performance of the $p$-boosting variants as compared to
+AdaBoost.  The graph compares the result from the hypothesis chosen
+via SRM (section \ref{sec:theoretical overfitting}) with AdaBoost.
 
+It can be seen that although the average generalisation performance of the
+$p$-boosting algorithms is in most cases slightly better than that of
+AdaBoost, only in a few cases is difference significant.  The only
+dataset upon which the strict algorithm generalises significantly better
+than AdaBoost is \ds{acacia}.  The sloppy algorithm generalises
+significantly better on \ds{ring10}, \ds{ring20}, \ds{ring30} and
+\ds{acacia}; while the na\"{\i}ve algorithm never significantly
+outperforms AdaBoost.
 
-
+Thus, the sloppy algorithm appears to outperform AdaBoost on the noisy
+datasets considered (recall that the \ds{acacia} dataset was chosen as
+a difficult dataset).  This result was expected--the algorithm was
+specifically designed to implement capacity control.  It also appears
+that the na\"{\i}ve algorithm has little effect on generalisation
+performance (a somewhat surprising result--the discussion in chapter
+\ref{chapter:pboosting} concluded that the algorithm should be
+\emph{worse} than AdaBoost.  We shall return to this result shortly).
 
 \begin{linefigure}
 \begin{center}
 \includegraphics{figures/test_err_summary.epsg}
 \end{center}
-\begin{capt}{Comparison of AdaBoost and $p$-boosting test
-generalisation performance}{fig:test err summary}
-Each part plots the \emph{average test error value} of AdaBoost
-against the \emph{average test error value} of the specified algorithm
-\emph{at the point of minimum training error}.  The shape of the
-marker indicates the dataset: $\bullet$ \ds{ring0}, $\times$
-\ds{ring10}, $\circ$ \ds{ring20}, $\ast$ \ds{ring30}, $\Box$
-\ds{sonar}, $\bigtriangleup$ \ds{wpbc}, $\Diamond$ \ds{acacia}.  The
-bars indicate one standard deviation each side of each datapoint.
+\begin{capt}{Comparison of AdaBoost and $p$-boosting test generalisation
+performance}{fig:test err summary}
+The diagonal line indicates points where the test error of AdaBoost
+and the $p$-boosting algorithm are equal.  Points above line indicate
+that the $p$-boosting algorithm generalises better than AdaBoost.  The
+light bars indicate the spread of the trials, and are one standard
+deviation in length either side of the mean.
 
-Points above the line indicate that the algorithm generalises performs
-better than AdaBoost on that particular dataset.
+\noindent\bf{Key:} $\bullet$ \ds{ring0}, $\times$ \ds{ring10}, $\circ$
+\ds{ring20}, $\ast$ \ds{ring30}, $\Box$ \ds{sonar}, $\bigtriangleup$
+\ds{wpbc}, $\Diamond$ \ds{acacia}.
 \end{capt}
 \end{linefigure}
 
 
 \section{Effect of $p$ value on generalisation performance}
+
+Figure \ref{fig:effect of p} shows the effect of 
 
 \begin{linefigure}
 \begin{center}
@@ -55,18 +72,68 @@ which is used in figure \ref{fig:test err summary}.
 
 \section{Training curves}
 
+* For low $p$ values, they are almost the same
+* Strict algorithm terminates early for $p < 1$
+* Sloppy algorithm thrashes about a nearly constant line before
+  converging
+
+
 \begin{linefigure}
 \begin{center}
 \includegraphics{figures/training_curves_strict.epsg}
 \includegraphics{figures/training_curves_sloppy.epsg}
-\includegraphics{figures/training_curves_boost.epsg}
 \end{center}
 \begin{capt}{Selected training curves}{fig:training curves} 
 Here is some text that describes this beautiful figure.
 \end{capt}
 \end{linefigure}
 
-\section{Weight and margin distributions}
+\section{The training process}
+
+Figure \ref{fig:weight distribution} is a more detailed look at the
+training process.
+
+* AdaBoost: early weights are slightly larger; once zero error is
+  reached they level off;
+* This is not a contradiction: remember that classifier weights are
+  based upon the weighted error of the weak hypothesis.
+
+* Strict: $p=0.5$ terminates early; $p=1$ doesn't generalise much at
+  all, looking at training weights we see that they are fit well by a
+  straight line, which implies that $b_t = \frac{1}{t^\lambda}$ where
+  $\lambda$ is negative of slope obtained from the graph.  Drop is
+  quite significant: only the first few hypotheses are significant.
+* $p=1.5$ shows similar behaviour to boosting, except for sudden
+  decrease at about 2000 iterations (and it takes ten times longer to
+  converge).
+
+* Sloppy: We get the opposite behaviour: initial weights are
+  insignificant ($10^{-300}$), gradually increase, get a ``break
+  point'' where all of a sudden it stops oscillating around a constant
+  error and trains quite rapidly (watch out for log scale, though).
+* Would suggest that starting point is bad (gradually inching towards
+  a better solution), possibly due to bad direction being chosen,
+  maybe something similar to annealing would help (multiple starting
+  points).
+* Before it reaches zero error, only the last few hypotheses are
+  significant; after it reaches zero it then drops off linearly as we
+  saw before.
+* We expect for low $p$ to take longer to train, as we have a less
+  rich hypothesis space; not for $p \geq 1$, however.
+
+\begin{linefigure}
+\begin{center}
+\includegraphics{figures/weight_distributions.epsg}
+\end{center}
+\begin{capt}{Weight distribution of algorithms}{fig:weight distribution}
+Each was trained to 10000 iterations; note log scale on classifier
+weight graph.  Classifier weights are plotted above \emph{training}
+errors.  The black line is $p=1$, the dark grey is $p=0.5$, the light
+gray is $p=1.5$.  Note that the top panel of (c) contains the same
+data plotted on two different scales.  The curves closest to the right
+are on the right hand scale.
+\end{capt}
+\end{linefigure}
 
 
 \section{Training time}
@@ -107,29 +174,33 @@ Insufficient time was available to perform experiments using this cost
 function, however.
 
 
-\section{Margin distributions}
-
-
-\begin{linefigure}
-\begin{center}
-\includegraphics{figures/margin_distribution.epsg}
-\end{center}
-\begin{capt}{Margin distribution of algorithms}{fig:margin distribution}
-\end{capt}
-\end{linefigure}
 
 
 \section{Other observations}
 
-\subsection{AdaBoost}
+* All algorithms had trouble with the \ds{acacia} dataset.  Appendix
+  \ref{appendix:allgraphs} shows that all of the algorithms (except
+  for a couple of stricts) dropped out before 100 iterations.
+
+* \ds{wpbc} dataset was also hard... all algorithms had some
+  dropouts... not as bad as acacia
+
+* Apart from that, only strict dropped out, for $p < 1$.
 
 \subsection{Naive $p$-boost}
 
-..blah...
+Observation of figures \ref{fig:test err summary} and \ref{fig:effect
+of p} show that the performance of the na\"{\i}ve algorithm closely
+matches that of the AdaBoost algorithm; the variation between the two
+being insignificant (the two algorithms are equivalent when $p = 1$.
+This is a surprising result--in chapter \ref{chapter:pboosting} it was
+shown that the na\"{\i}ve algorithm systematically chooses a
+\emph{less than optimal solution} by modifying distance chosen by the
+line search.
 
-Thus, we observe that the actual distribution of \emph{classifier}
+Thus, we observe that modifications to the \emph{classifier}
 weights has little influence on the generalisation ability of the
-AdaBoost algorithm, and therefore it is the \emph{sample} weights that
-cause the success of the algorithm.  This phenomena has also been
-observed by Breiman \cite{Breiman96}.
+AdaBoost algorithm, and therefore it must be the \emph{sample} weights
+that cause the success of the algorithm.  This phenomena has also been
+observed by Breiman \cite{Breiman96}, who came to the same conclusion.
 

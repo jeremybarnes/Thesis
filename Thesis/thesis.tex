@@ -2,9 +2,9 @@
 % Jeremy Barnes, 1999
 % $Id$
 
-\documentclass[a4paper,11pt,oneside]{book}
+\documentclass[a4paper,11pt,oneside,draft]{book}
 
-\usepackage[dvips]{graphics}
+\usepackage[dvips,draft]{graphics}
 \usepackage{amsmath}
 \usepackage{amsfonts}
 \usepackage{amssymb}
@@ -27,7 +27,7 @@
 \evensidemargin 0.125 in
 \marginparwidth 0.75 in
 \textwidth 6.125 in % Width of text line.
-\textheight 9.6 in
+\textheight 9.8 in
 \voffset -1.5 cm
 \hoffset 0.5cm
 \setlength\abovecaptionskip{0pt}
@@ -82,7 +82,6 @@
 \include{intro}
 
 \include{slt}
-\include{stumps}
 \include{boosting}
 
 \include{pboosting}
@@ -91,7 +90,6 @@
 
 \include{conclusion}
 
-
 \appendix
 
 % Put it back to normal for the non-body parts of the thesis.
@@ -99,11 +97,12 @@
 % Execute a change in font size to make it happen
 \small\normalsize
 
+\include{stumps}
 \include{newton-raphson}
 \include{datasets}
 \include{cdrom}
-\include{userguide}
-\include{progguide}
+\include{software}
+\include{allgraphs}
 \include{proposal}
 
 \backmatter

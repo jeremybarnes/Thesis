@@ -47,7 +47,7 @@ figure \ref{fig:generalisation bound form})}
 \end{linefigure}
 
 We attack the problem by concentrating on the confidence interval.
-It was shown in chapter \ref{chapter:booosting} that this confidence
+It was shown in chapter \ref{chapter:boosting} that this confidence
 interval increases with the complexity of the hypothesis class
 $\calX$.  One obvious way, therefore, to avoid overfitting is to limit
 the complexity of the class of hypotheses that our learning algorithm
@@ -58,8 +58,8 @@ does, we choose $\calX = \co_p(\calH)$ for some $p > 0$.%
 Then, for $p < 1$, we have $|\co_p (\calH)| < |\co (\calH)|$.  In
 effect, we have added a parameter $p$ to our algorithm which can be
 adjusted to tune the capacity of $\calX$.  Using the language of
-section \ref{sec:srm}, the $p$ parameter allows us to define a
-structure on $\calX$.
+section \ref{sec:theoretical overfitting}, the $p$ parameter allows us
+to define a structure on $\calX$.
 
 By decreasing $p$, we decrease our confidence interval.  However, the
 empirical risk is likely to \emph{increase} as $p \rightarrow 0$.
@@ -93,7 +93,7 @@ performance of classifiers over $p$-convex hulls.
 Consider a a hypothesis $F \in \co_p(\calH)$ where the covering
 numbers of $\calH$ grow as $\cover{\calH}{\epsilon} \approx \left
 ( \frac{1}{\epsilon} \right) ^d$.% 
-\footnote{See theorem \ref{thm:p convex bound}.}
+\footnote{See theorem \ref{thm:p-convex bound}.}
 Then the generalisation error over a set of $m$ independent training
 samples with probability at least $1 - \delta$ can be approximated by 
 %
@@ -353,7 +353,7 @@ y_i)$.  These functions are plotted against alpha in figure
 \begin{center}
 \includegraphics{figures/alpha_function.epsg}
 \end{center}
-\begin{capt}{Sample cost contributions}
+\begin{capt}{Sample cost contributions}{fig:alpha function}
 Parts (a) through (d) show the sample cost at iteration $t=2$ as a
 function of the history of the sample through weaklearners $h_1$ and
 $h_2$.

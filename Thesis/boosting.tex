@@ -540,7 +540,7 @@ AdaBoost chooses the linear combination that maximises the minimum
 margin over its training samples.
 
 \begin{theorem}[AdaBoost maximises the minimum margin]
-\label{thm:maximises minimmum margin}
+\label{thm:maximises minimum margin}
 Given a particular learning algorithm $F$ and a training set $X$,
 define the minimum margin as
 \[
@@ -668,10 +668,10 @@ increases.
 
 That overfitting occurs in AdaBoost is a consequence of the property
 that AdaBoost maximises the minimum margin (theorem
-\ref{thm:max-min-margin}).  Intuitively, this property causes the 
-AdaBoost algorithm to concentrate on a few hard samples.
-Unfortunately, in a noisy dataset, these samples are usually all
-noisy.  Some algorithms are described in the next section that 
+\ref{thm:maximises minimum margin}).  Intuitively, this property
+causes the  AdaBoost algorithm to concentrate on a few hard
+samples.  Unfortunately, in a noisy dataset, these samples are usually
+all noisy.  Some algorithms are described in the next section that  
 
 \section{Previous work on regularising AdaBoost}
 
@@ -681,10 +681,10 @@ avoid overfitting.  Algorithms such as \emph{soft margins}
 \cite{Ratsch98} explicitly allow a certain number of training samples
 to have a small or negative margin; while algorithms such as DOOM and
 DOOM II \cite{Mason99a, Mason99b} do this implicitly by flattening out
-the cost function (figure \ref{fig:cost functional}) for low and
-negative margins.  These approaches have been quite successful, both
-outperforming AdaBoost under certain conditions (in particular on
-noisy data).
+the cost function (figure \ref{fig:cost functional approximation}) for
+low and negative margins.  These approaches have been quite
+successful, both outperforming AdaBoost under some conditions (in
+particular on noisy data).
 
 
 \section{Normed boosting algorithms}
@@ -709,8 +709,8 @@ minimum of the gradient descent cost functional (\ref{eqn:gradient
 descent cost functional}), they do \emph{not} have the property of
 guaranteed convergence to zero training error (theorem
 \ref{thm:AdaBoost training error convergence}); the reason being that 
-$\sum_{i=1}^t b_{t,i}$ is bounded above (theorem \ref{thm:increasing
-classifier weights} does not hold).  As results in chapter
+$\sum_{i=1}^t b_{t,i}$ is bounded above (theorem \ref{thm:classifier
+weights unbounded} does not hold).  As results in chapter
 \ref{chapter:results} and the discussion in section \ref{sec:boost
 overfitting} indicate, an algorithm does not have to converge to zero
 training error to generalise well.

@@ -7,10 +7,12 @@
 \chapter{Experiments}
 \label{chapter:method}
 
-The experiments were performed by running extensive simulations on a
-microcomputer.  This chapter describes the experimental setup (including a
-brief description of the software developed) and the testing
-methodology to a level of detail sufficient to repeat the
+Extensive simulations of the $p$-boosting algorithms and AdaBoost were
+run on a microcomputer in order to compare their performance, both
+with the baseline AdaBoost algorithm, and with the theory developed in
+previous chapters.  This chapter describes the experimental setup
+(including a brief description of the software developed) and the
+testing methodology to a level of detail sufficient to repeat the
 experiments.
 
 \section{Experimental setup}
@@ -19,7 +21,11 @@ In this section a summary of the equipment and computer software used
 to perform the experiments is given.  The full source code, datasets
 and test results are available on the CD-ROM attached inside the back
 cover of this thesis.  Appendix \ref{appendix:cdrom} describes the
-contents of this CD-ROM in more detail.
+contents of this CD-ROM in more detail; appendix
+\ref{appendix:datasets} the datasets; and appendix
+\ref{appendix:software} the computer software.
+
+\subsection{Hardware}
 
 The simulations were run on three microcomputers.  The first was a
 400MHz Celeron system with 256MB of memory, running RedHat Linux
@@ -29,55 +35,52 @@ version 5.2 and the same version of \MATLAB.  The third was a 233MHz
 Cyrix M3 machine with 64MB of memory running Windows 95 version
 4.00.1111 and \MATLAB\ version 5.0.0.4073 (Student version).
 
-\section{Software}
+\subsection{Software}
 
 Although an incidental part of the project, the software package that
 was developed in order to perform the simulations is a significant
 piece of work in its own right.  It was written from scratch to
-provide an accessible and efficient entry into the project area--which
-was not available previously.  In particular, it includes many
-functions that allow visualisation of the algorithms.  Use of this
-package will significantly lower the difficulty of beginning similar
-research or extending the ideas developed in this project.
+allow an accessible and efficient entry into the project area--which
+was not available at the commencement of the project.  In particular,
+it includes many functions that allow visualisation of the algorithms.
+Use of this package will significantly lower the difficulty of
+beginning similar research or extending the ideas developed in this
+project.
 
-The software was written as a \MATLAB toolbox.  Two weak learning
+The software was written as a \MATLAB\ toolbox.  Two weak learning
 algorithms (decision stumps and CART), several versions of the
 Boosting algorithm (including all mentioned in this thesis), an
 implementation of a Neural Network algorithm, an automated test
 harness, and assorted analysis and visualisation functions are
-included.
-
-What follows is a brief description of the software package as a
-whole.  For details of individual components, please see appendixes
-\ref{appendix:user-guide} and \ref{appendix:programmers-guide}.
+included.  What follows is a brief description of the design and
+implementation of the software package as a whole.  Individual
+components are covered in appendix \ref{appendix:software}.
 
 \subsection{Optimisation and numerical issues}
 
 The code was profiled extensively using \MATLAB's inbuilt profiler,
-and the most efficient algorithms possible selected for the
-frequently executed sections.  Tight sections of code, and certain
-data and code structures (for example, {\tt for} loops) that \MATLAB
-is inefficient at executing were recoded in \C to further save time.
-(Details of how to interface this code were obtained from
-\cite{MathWorks96} and \cite{MathWorks96a}.)
-As the code was optimised, it was tested to ensure equivalence with
-the previous version of the code.
+and efficient algorithms selected for the frequently executed
+sections.  Tight sections of code, and certain data and code
+structures (for example, {\tt for} loops), which are inefficient under
+\MATLAB, were recoded in \C\ to improve speed.  (Details of how
+to interface this code were obtained from \cite{MathWorks96} and
+\cite{MathWorks96a}.) As each function was optimised, its output was
+compared with that of the un-optimised version to ensure equivalence
+of the two versions of code.  The net effect of these optimisations
+was that simulations which would have required several years to run as
+initially coded were able to be run in a matter of days.
 
-The net effect of these optimisations was that simulations which would
-have required several years to run as initially coded were able to be
-run in a matter of days.
+Minimising numerical errors was a major design goal.  Several sections
+of code incorporate safeguards (such as periodic full recalculations
+in loops that are optimised incremental calculations) to minimise the
+effect of numerical errors.  In addition, 64 bit IEEE double precision
+floating point numbers are used exclusively.
 
-The computer code was designed with the goal of minimising numerical
-errors in mind.  Several sections of code incorporate safeguards (such
-as periodic full recalculations in loops that are optimised by
-calculating incrementally) to minimise the effect of numerical
-errors.  In addition, 64 bit IEEE double precision floating point
-numbers are used exclusively.
-
-In total, the source code was 250KB in size, comprising 215KB of
-\MATLAB code and 35KB of \C code.  There are 9000 lines in 176 \MATLAB
-{\tt .m} files and 1500 lines in 6 \C source files.\todo{Update code
-statistics.} 
+In total, the source code was 270KB in size, comprising 235KB of
+\MATLAB\ code and 35KB of \C code.  There are 10000 lines in 191
+\MATLAB\ {\tt .m} files and 1500 lines in 6 \C\ source files.  All
+source code was maintained under the {\tt CVS} version control
+system.
 
 \section{Datasets}
 
@@ -88,16 +91,14 @@ noise added artificially.  Two other datasets (\ds{sonar} and
 \ds{wpbc}%
 \footnote{Wisconsin Prognostic Breast Cancer.}
 ) were obtained from the UCI repository \cite{UCI}, and the
-final dataset (\ds{acacia}) was used in a PhD thesis.\todo{Get the
-reference to Karen's thesis, or some other reference to the dataset}.
-
-A summary of the features of each dataset appears in table
-\ref{tbl:datasets} (Appendix \ref{appendix:datasets} describes them
+final dataset (\ds{acacia}) was ecological data used in a PhD thesis
+\cite{Payne97}.  A summary of the features of each dataset appears in table
+\ref{tbl:datasets} (Appendix \ref{appendix:datasets} describes the
 datasets in more detail.)  This group was selected to cover a broad
-range of situations.  The four \ds{ring} datasets allow the effect of
+range of situations:  the four \ds{ring} datasets allow the effect of
 noise to be isolated and contain a very high sample-to-attribute
-ratio.  The sonar dataset is a low-noise (generated from precise
-measurements ) but contains a low sample-to-attribute ratio.  The
+ratio;  the \ds{sonar} dataset is low-noise (generated from precise
+measurements ) but contains a low sample-to-attribute ratio; and the
 \ds{wpbc} and \ds{acacia} datasets are examples of difficult and very
 difficult%
 \footnote{Difficult and very difficult in that previous applications
@@ -106,7 +107,6 @@ to poor results.}%
 real-world data.
 
 \begin{table}
-\label{tbl:datasets}
 \begin{center}
 \begin{tabular}{l c c r r r r}\hline
 {\bf Dataset} & $\calI$ & $\calO$ & {\bf Artificial noise} & {\bf
@@ -117,57 +117,60 @@ Size} & {\bf Training samples} & {\bf Test samples} \\
 \ds{ring20} & $[0,1]^2$ & $\{\pm 1\}$ & 20\% & $\infty$ & 50 & 5000 \\
 \ds{ring30} & $[0,1]^2$ & $\{\pm 1\}$ & 30\% & $\infty$ & 50 & 5000 \\
 \hline
-\ds{sonar} & $[0,1]^60$ & $\{\pm 1\}$ & 0\% & 208 & 70 & 138 \\
-\ds{wpbc} & $\subset \bbR^32$ & $\{\pm 1\}$ & 0\% & 194 & 97 & 97 \\
-\ds{acacia} & $\subset \bbR^16$ & $\{\pm 1\}$ & 0\% & 204 & 102 & 102 \\
+\ds{sonar} & $[0,1]^{60}$ & $\{\pm 1\}$ & 0\% & 208 & 70 & 138 \\
+\ds{wpbc} & $\subset \bbR^{32}$ & $\{\pm 1\}$ & 0\% & 194 & 97 & 97 \\
+\ds{acacia} & $\subset \bbR^{16}$ & $\{\pm 1\}$ & 0\% & 204 & 102 & 102 \\
 \hline
 \end{tabular}
 
-Note that samples with missing attribute values were excluded from
-each dataset.
+{\small Note that samples with missing attribute values were excluded
+from each dataset.}
 \end{center}
 \caption{Summary of dataset attributes}
+\label{tbl:datasets}
 \end{table}
 
 \section{Testing}
 
-In this section we detail the aims of our experiments, the testing
-procedure that was followed, and how the results were summarised and
-analysed.
+In this section we detail the aims of our experiments, the procedure
+that was followed, and how the results were summarised and analysed.
 
 \subsection{Aims}
-The aims of the experiments were three-fold.  Firstly, we want to know
-about the generalisation performance of the $p$-boosting algorithms,
-and how it compares with the generalisation performance of AdaBoost.
-We expect that our algorithms will outperform AdaBoost on noisy
-datasets.  We are also interested in the training efficiency of the
-$p$ boosting algorithms compared to AdaBoost.
+The aims of the experiments were four-fold:
+%
+\begin{enumerate}
+\item	To test the generalisation performance of the $p$-boosting
+	algorithms, and how this performance compares with the
+	that of AdaBoost.  It was expected that the $p$-boosting
+	algorithms would outperform AdaBoost on noisy datasets.
 
-The second aim is to verify that the qualitative behaviour (and
-quantitative behaviour wherever possible) of the $p$-boosting
-algorithms matches the theory developed in chapters \ref{chapter:slt},
-\ref{chapter:boosting} and \ref{chapter:pboosting}.  In particular,
-the theory predicts the following features:
-\begin{itemize}
-\item	The $p$ parameter controls the capacity of the function
-	class.  Thus, a generalisation error vs $p$ plot should have a
-	minimum at some optimal value $p^{\ast}$ (see figure
-	\ref{fig:optimal p value}).
+\item	To verify that the qualitative behaviour (and quantitative
+	behaviour wherever possible) of the $p$-boosting algorithms
+	matched the theory developed in chapters \ref{chapter:slt},
+	\ref{chapter:boosting} and \ref{chapter:pboosting}:
+	%	
+	\begin{itemize}
+	\item	The $p$ parameter controls the capacity of the
+		function class.  Thus, a generalisation error vs $p$
+		plot should have a minimum at some optimal value
+		$p^{\ast}$ (figure \ref{fig:optimal p value}).
+	\item	The confidence interval in theorem \ref{thm:p convex
+		generalisation} decreases as $p \rightarrow 0$.  As a
+		result, the true risk (test error) and empirical risk 
+		(training error) curves should match closely as $p
+		\rightarrow 0$.
+	\end{itemize}
+	
+\item	To verify that the algorithms were operating as designed.
+	It was expected that a distribution of classifier weights
+	would show that most of the weight is given to fewer and fewer
+	classifiers for low $p$ values.
 
-\item	The confidence interval in theorem \ref{thm:p convex
-	generalisation} decreases as $p \rightarrow 0$.  As a result,
-	we expect that the true risk (test error) and empirical risk
-	(training error) curves should match closely as $p \rightarrow
-	0$.
-\end{itemize}
-
-The third aim of these tests is to verify that the algorithms are
-working as designed.  We expect that the margins on the training
-samples produced by algorithms with a low $p$ value should be much
-more  uniformly distributed than those of AdaBoost.  We also expect
-that a distribution of classifier weights will show that most of the
-weight is given to fewer and fewer classifiers for low $p$ values.
-
+\item	To test the efficiency of the algorithms as compared to
+	AdaBoost.  An algorithm that generates a slightly better
+	hypothesis but takes much longer to train may not be
+	considered an improvement in some applications.
+\end{enumerate}
 
 \subsection{Method}
 
@@ -179,13 +182,12 @@ trials, each time with a newly generated (\ds{ring*}) or randomly
 permuted and partitioned (\ds{sonar}, \ds{wpbc}, \ds{acacia})
 test and training dataset%
 \footnote{Note that noise was added to the training \ds{ring*}
-datasets but \emph{not} the test \ds{ring*} datasets}%
+datasets but \emph{not} the test \ds{ring*} datasets.}%
 , and this whole procedure repeated for each $p$ value.
 
 \newcommand{\allp}{$\frac{1}{2} \leq p \leq 2; 10p \in \bbN$}
 \newcommand{\lowp}{$\frac{1}{2} \leq p \leq 1; 10p \in \bbN$}
 \begin{table}
-\label{tbl:experiments}
 \begin{center}
 \begin{tabular}{r l l r r c}\hline
 {\bf Number} & {\bf Algorithm} & {\bf Dataset} & {\bf Trials} &
@@ -200,23 +202,26 @@ datasets but \emph{not} the test \ds{ring*} datasets}%
 12   & Na\"{\i}ve & \ds{sonar} &  30 &  1000 & \allp \\
 \hline
 13-16 & Strict & \ds{ring*}    &  30 &  1000 & \allp \\
-17    & Strict & \ds{sonar}    &  30 &  1000 & \allp \\
+17    & Strict & \ds{sonar}    &  50 & 10000 & \allp \\
 18    & Strict & \ds{wpbc}     &  20 &  5000 & \allp \\
 19    & Strict & \ds{acacia}   &  20 & 10000 & \allp \\
 \hline
 21-24 & Sloppy & \ds{ring*}    &  30 &  1000 & \allp \\
 25-28 & Sloppy & \ds{ring*}    &  30 & 10000 & \lowp \\
-29    & Sloppy & \ds{sonar}    &  30 &  1000 & \allp \\
+29    & Sloppy & \ds{sonar}    &  50 & 10000 & \allp \\
 30    & Sloppy & \ds{wpbc}     &  20 &  5000 & \allp \\
 31    & Sloppy & \ds{acacia}   &  20 & 10000 & \allp \\
 \hline  
 \end{tabular}
+
+\small{The weak learning algorithm is always \emph{decision stumps}.}
 \end{center}
 \caption{Summary of experiments conducted}
+\label{tbl:experiments}
 \end{table}
 
-\noindent The following data was recorded for each trial:
-
+The following data was recorded for each trial:
+%
 \begin{itemize}
 \item	All test parameters;
 \item	Test and training datasets;
@@ -229,20 +234,43 @@ datasets but \emph{not} the test \ds{ring*} datasets}%
 
 \subsection{Analysis}
 
-More than two gigabytes of data were generated in the course of
+More than two gigabytes of data was generated in the course of
 testing.  This data was summarised across all trials for each (test,
 p-value) combination, and a summary file created.  The summary file
 contained the following information:
-
+%
 \begin{itemize}
-\item	Mean and standard deviation of test and training error curves
-	at each iteration;
-\item	Number of trials that had not aborted before each iteration;
-\item	The value of the lowest test error for each trial, and the
-	number of the iteration at which this lowest error occurred;
-\item	A margin distribution, averaged over all margin distributions
-	at each best test error point.
+\item	The mean and standard deviation of test and training error
+	curves at each iteration;
+\item	The number of trials that had not aborted before each
+	iteration (recall that the algorithms would abort if the
+	training error exceeded $\frac{1}{2}$, fell below $0$, or if
+	the cost function was strictly increasing); 
+\item	The value of the best (lowest) test error
+	$\underset{X_T}{R_{\emp}}$ for each trial, and the number of
+	training iterations after which this best error value
+	occurred;
 \end{itemize}
+%
+Each of the $p$-boosting algorithms had further statistics produced
+for each $p$ value.  These statistics were:
+%
+\begin{itemize}
+\item	The mean and standard deviation of the best test error at each
+	$p$ value, over all trials;
+\item	The mean and standard deviation of the number of training
+	iterations the best error was produced at, over all trials.
+\end{itemize}
+
+For each of the $p$-boosting algorithms, a crude form of structural
+risk minimisation (see section \ref{sec:theoretical overfitting}) was
+then performed, by selecting the $p$ value with the \emph{lowest mean
+best test error} to be $p^{\ast}$ (see figure \ref{fig:effect of p} on
+page \pageref{fig:effect of p}).  This is the $p$ value that is used 
+whenever comparisons of the performance of algorithms are made (it
+makes little sense to compare anything but the \emph{best}
+performance!)  The entire analysis described above was repeated for
+each dataset.
 
 
 

@@ -4,21 +4,43 @@
 
 \chapter{Abstract}
 
-Boosting is a method used to improve the generalisation ability of a
-``weak'' learning algorithm.  It is implemented by generating many
-instances of the algorithm, each trained with differently weighted
-data.  These weights are chosen so that the ``hard'' examples (those
-that are often misclassified) are emphasised.  This forces the
-learning algorithm to work well with the difficult data, and results
-in an improved overall performance.
+A machine learning algorithm attempts to infer a general relationship
+from a limited number of observations of a process.  Boosting
+algorithms are a class of machine learning algorithms that improve the
+performance of a so-called ``weak'' machine learning algorithm by
+combining many ``weak'' hypotheses in a \emph{combined hypothesis}.
+This combined hypothesis is constructed in a manner that forces
+difficult-to-learn examples to be emphasised in the learning process.
+The first such boosting algorithm was called ``AdaBoost''.
 
-Adjusting the capacity of a learning algorithm controls the size of
-the set of possible generalisations.  It is important to control
-capacity to avoid overfitting (fitting the \emph{noise} rather than
-the underlying distribution).  Although boosting is particularly good
-at avoiding overfitting in the \emph{low-noise} case, capacity control
-may avoid overfitting in high noise samples (which many real-world
-datasets are).
+The performance of boosting algorithms is good to exceptional,
+especially on low-noise data.  However it has recently been observed
+that boosting algorithms overfit (fit the measurement noise of the
+observations rather than the underlying data) on datasets containing
+noisy observations, which degrades the performance.  One way of
+avoiding overfitting is to limit the complexity of the combined
+hypothesis (conceptually, impose a smoothness constraint) so that it
+is not possible for the boosting algorithm to generate an overfitted
+hypothesis.  This process is known as \emph{capacity control}.
 
-This thesis invloves modifying the normal norm function where $p=1$ to
-an adjustable norm function where $p$ is specified by the user.
+We consider a modification to the boosting algorithm to allow the
+capacity to be explicitly controlled via a $p$ parameter.  The details
+of the implementation involve constraining the boosting algorithm to
+generate only hypotheses that lie within a $p$-convex combination of
+the weak hypotheses.  Several alternative algorithms based upon this
+idea are developed; these are collectively called ``$p$-boosting
+algorithms''.
+
+A number of simulations were performed, which indicate that the best
+of these algorithms outperforms AdaBoost by a modest amount (at best
+18\% test error vs 25\%) on low-dimensional, noisy datasets (at the
+cost of significantly increased training time).  The generalisation
+ability over other datasets was not significantly different from
+AdaBoost; more extensive testing is required to draw firm conclusions
+on the merit of these $p$-boosting algorithms.
+
+The $p$-convex hull approach is complementary to other AdaBoost
+variants also designed to improve performance on noisy datasets (soft
+margins \cite{Ratsch98}, DOOM I/II \cite{Mason99}), allowing the
+possibility a combined approach superior to either.
+
