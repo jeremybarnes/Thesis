@@ -18,9 +18,10 @@
 \providecommand{\calI}{\ensuremath{\mathcal{I}}}
 \providecommand{\calH}{\ensuremath{\mathcal{H}}}
 \providecommand{\calX}{\ensuremath{\mathcal{X}}}
+\providecommand{\calR}{\ensuremath{\mathcal{S}}}
+\providecommand{\calS}{\ensuremath{\mathcal{S}}}
 \providecommand{\ip}[2]{\ensuremath{\langle {#1} , {#2} \rangle}}
 \providecommand{\lin}{\mathrm{lin}}
-\providecommand{\calS}{\ensuremath{\mathcal{S}}}
 \providecommand{\VCdim}{\mathrm{VCdim}}
 \providecommand{\Fat}[1]{\mathrm{Fat}_{#1}}
 \providecommand{\cover}[2]{\mathcal{N}({#1}, {#2})}
@@ -50,4 +51,9 @@
 		{\rule{\textwidth}{\figlinewidth}\end{figure}}
 
 \newenvironment{capt}[2]%
-	{\caption{#1}\label{#2}\begin{minipage}[t]{\textwidth}\sl}{\end{minipage}}
+	{\caption{#1}\label{#2}%
+%\renewcommand{\baselinestretch}{1.0}\small\normalsize%
+\begin{minipage}[t]{\textwidth}\sl}%
+{%
+%\renewcommand{\baselinestretch}{1.15}\small\normalsize%
+\end{minipage}}
