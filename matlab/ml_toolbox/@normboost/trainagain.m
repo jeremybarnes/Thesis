@@ -68,6 +68,25 @@ else
    % Calculate b_t using a line search.  This uses the Newton-Raphson method
    % to find the minimum.
 
+   % DEBUGGING CODE -- draw a graph so that we can follow the progress
+
+   alphas = linspace(0.01, 0.99);
+   all_c = zeros(size(alphas));
+   all_d = zeros(size(alphas));
+   all_d2 = zeros(size(alphas));
+
+   for i=1:length(alphas)
+      [all_c(i), all_d(i), all_d2(i), crap] = eval_cf(obj, new_c, ...
+						      alphas(i));
+   end
+   
+   figure(1);  clf;
+   subplot(3, 1, 1);  plot(alphas, all_c);   grid on;  hold on;
+   subplot(3, 1, 2);  plot(alphas, all_d);   grid on;  hold on;
+   subplot(3, 1, 3);  plot(alphas, all_d2);  grid on;  hold on;
+
+   % END DEBUGGING
+
    % Initialisation
    new_alpha = 0.5;
    d = 1;
@@ -77,9 +96,21 @@ else
    while (abs(d) >= 0.001)
       alpha = new_alpha;
       
-      [c, d, d2, marg] = eval_cf(obj, new_c, alpha);
+      [c, d, d2, marg] = eval_cf(obj, new_c, alpha)
+
+      % DEBUGGING
       
-      new_alpha = alpha - (d / d2);
+      subplot(3, 1, 1);  plot(alpha, c, 'rx');
+      subplot(3, 1, 2);  plot(alpha, d, 'rx');
+      subplot(3, 1, 3);  plot(alpha, d2, 'rx');
+      
+      % END DEBUGGING
+
+      % FIXME: need to gracefully handle d2 = 0
+      
+      new_alpha = alpha - (d / d2)
+
+      pause;
    end
 
    new_b = [(1 - alpha.^p).^(1/p) * get_b(obj) alpha];
