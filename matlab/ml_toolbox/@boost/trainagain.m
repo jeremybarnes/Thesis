@@ -22,12 +22,6 @@ function obj_r = trainagain(obj)
 % PRECONDITIONS
 % none
 
-if (obj.iterations > obj.maxiterations)
-   obj_r = obj;
-   warning('trainagain: attempt to train past MAXITERATIONS');
-   return;
-end
-
 if (obj.aborted)
    obj_r = obj;
    warning('trainagain: attempt to train when training is aborted');
