@@ -50,13 +50,15 @@ obj.dimensions = dimensions;
 obj.categories = categories;
 
 % Our default split, which splits on the first variable at 0.500
-splitvar = 1;
-splitval = 0.5;
-leftcategory = 0;
-rightcategory = 1;
+obj.splitvar = 1;
+obj.splitval = 0.5;
+obj.leftcategory = 0;
+obj.rightcategory = 1;
+
+obj.trainingerror = 0.0;
 
 % construct class and use superior/inferior relationship
-obj = class(obj, 'cart', parent);
+obj = class(obj, 'decision_stump', parent);
 superiorto('double', 'classifier');
 
 
