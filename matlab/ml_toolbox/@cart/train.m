@@ -33,7 +33,7 @@ x_range = [x_max; x_min];
 % Training is best done as a recursive procedure.  As this method is
 % inefficient to call recursively, recursively call the one below.
 obj.tree = recursive_train(obj, x, y, w, x_range, 1, obj.maxdepth, ...
-			   obj.cost_fn, numcategories(obj.categories));
+			   obj.cost_fn, numcategories(obj));
 
 % The second part of training is pruning.  Again, this is done
 % recursively.
