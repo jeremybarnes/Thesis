@@ -52,14 +52,17 @@ from the development of \emph{learning} algorithms (which are all more
 or less equivalent when boosted) to the development of better
 \emph{boosting} algorithms.}
 
-We first consider questions of how and why AdaBoost works; in
+We consider questions of how and why AdaBoost works; in
 particular how it chooses the optimal linear combination of
 classifiers from the very large set of possible linear combinations.
-But before that, we need to introduce our notation.
+But first we introduce our notation.
 
 \subsection{Notation}
 
 (refer to figure below?)
+
+* Denote training with double arrow
+* Define and denote equivalence of AdaBoost algorithms
 
 \begin{linefigure}
 \label{fig:boosting algorithm}
@@ -164,7 +167,7 @@ This function is plotted in figure \ref{fig:b function}.
 
 \begin{linefigure}
 \begin{center}
-\includegraphics{figures/b_function.epsg}
+\includegraphics{figures/classifier_weights.epsg}
 \end{center}
 \begin{capt}{Classifier weights against weighted training error}
 When $\epsilon_t = 1/2$, the classifier only does as well as random
@@ -201,13 +204,12 @@ This function has the following effect on distribution of weights:
 \begin{center}
 \includegraphics{figures/sample_weights.epsg}
 \end{center}
-\begin{capt}{Classifier weights against weighted training error}
-When $\epsilon_t = 1/2$, the classifier only does as well as random
-guessing, and $b_t = 0$.  As $\epsilon_t$ approaches zero, $b_t$
-increases without bound.  The effect is that $F$ becomes dominated by
-those weak hypotheses that performed well on the training samples
-(training is halted if $\epsilon_t = 0$ or $\epsilon_t \geq
-1/2$).
+\begin{capt}{Evolution of sample weights}
+The figure shows the evolution of the sample weights from (a) 10
+iterations to (b) 100 iterations of boosting over a set of training
+data in $\bbR^2$.  The sample weight at a point is proportional to the
+intensity of the dot.  The weights of those samples far from the
+decision boundary (indicated) approach zero as $t \rightarrow \infty$.
 \end{capt}
 \end{linefigure}
 
@@ -216,7 +218,9 @@ increase in weight, and those far from it to decrease.  This forces
 the algorithm to concentrate on the hard samples, and is one reason
 why it works well on low-noise datasets.  Unfortunately, those samples
 corrupted by noise are usually hard also, and concentrating on those
-is not desirable. (make more clear)
+is not desirable. (clarify)
+
+\subsection{Summary}
 
 
 \section{Boosting as gradient descent}
@@ -278,38 +282,155 @@ necessary as we can only evaluate \ref{eqn:functional derivative} at
 points where we have a sample.  Since the
 optimal $f_t$ will not necessarily be in $\calF$, we choose the
 $f \in \calF$ with the greatest inner product $\ip{-\nabla
-C(F)}{f}$.
+C(F)}{f}$.  Under the inner product space and cost functions we have
+chosen, this equation has the form
+%
+\begin{equation}
+- \ip{\nabla C(F)}{f} = - \frac{1}{m^2} \sum_{i=1}^{m} y_i f(\bfx_i)
+  C'(y_i F(\bfx_i))
+\label{eqn:function to maximise}
+\end{equation}
+%
+The following theorem states that the \emph{weighted empirical risk}
+$R_{\emp}^{w}$ (section \ref{sec:weighted empirical risk}) is the
+``right'' form of risk to minimise, and gives the weights $w$.
+
+\begin{theorem}[Weighted empirical risk minimisation]
+Maximising (\ref{eqn:function to maximise}) is equivalent to
+minimising the weighted empirical risk
+%
+\begin{equation}
+R_{\emp}^{w_{|t}} = \sum_{i:y_i \neq f(\bfx_i)}^{m} w_{i|t}
+\end{equation}
+%
+where $w_{|t}$ are the sample weights of boosting.
+\proof See \cite{Mason99}.  We assume that our cost function is
+monotonically decreasing; the result follows easily from that
+assumption.
+\end{theorem}
 
 Having chosen our direction, we now choose a step size $b_t$.
 AdaBoost uses a line search for the minimum of the cost functional
-along this line
+along the line
 %
 \begin{equation}
 b_t = \arg \min_{b_t} \sum_{i=1}^{l} C(y_i F(\bfx_i) + y_i b_t f_t(\bfx_i)
 \end{equation}
 %
+
 which (for the cost function (\ref{eqn:theory:cost
 function})) has a closed-form solution  (\ref{eqn:theory:bt}).  Thus, the
 boosting algorithm implements gradient descent.  The process is
 illustrated in figure \ref{fig:gradient descent}.
 
-\begin{figure}
+\begin{linefigure}
 \begin{center}
 \includegraphics{figures/descent.epsg}
-\caption{Schematic representation of gradient descent.  Points within the blue
-circle are in \calF, the height of the surface the value of
-(\ref{eqn:theory:cost function}) at that point.  (a) is a 3D view, (b)
-is top view. Red lines show line searches; markers minimums.  Descent
-from $\circ$ to $\Box$ to $\Diamond$, where it terminates due to
-local minimum.}
-\label{fig:gradient descent}
 \end{center}
-\end{figure}
+\begin{capt}{Schematic representation of gradient descent.}
+Points within the blue circle are in \calF, the height of the surface
+the value of (\ref{eqn:theory:cost function}) at that point.  (a) is a
+3D view, (b) is top view. Red lines show line searches; markers
+minimums.  Descent from $\circ$ to $\Box$ to $\Diamond$, where it
+terminates due to local minimum.
+\end{capt}
+\label{fig:gradient descent}
+\end{linefigure}
+
+This statement is formalised in the following theorem.
+
+\begin{theorem}[AdaBoost implements gradient descent]
+The AdaBoost algorithm implements gradient descent over a cost functional
+%
+\begin{equation}
+Q(F, \bfx, y) = \exp \{-y F(\bfx) \}
+\end{equation}
+%
+\proof We outline a skeleton, ignoring initial conditions and the
+stopping conditions.  We will show that, given a state at iteration
+$t$, then boosting and gradient descent produce identical states at
+iteration $t+1$.
+
+Once we have chosen $f_{t+1}$, we need to choose $w_{t+1}$.  This is
+chosen to minimise the cost functional along the line given by the
+direction $f_{t+1}$.  We can write the value of this cost functional
+as
+%
+\begin{equation}
+C = \sum_{i=1}^{m} c \left( y_i F_t(\bfx_i) + y_i w_{t+1}
+f_{t+1}(\bfx_i) \right)
+\end{equation}
+Substituting in $c(f(x)) = e^{-yf(x)}$, we obtain
+%
+\begin{equation}
+C = \sum_{i=1}^{m} \exp \left\{ y_i F_t(\bfx_i) + y_i w_{t+1}
+f_{t+1}(\bfx_i) \right\}
+\end{equation}
+%
+Now we need to differentiate this expression with respect to
+$w_{t+1}$.   This task is simplified considerably by noting that only
+the second half of the exponential term is variable with $w_{t+1}$.
+The result is that
+%
+\begin{eqnarray}{ll}
+\label{eqn:differentiate}
+\frac{\partial C}{\partial w_{t+1}} &
+= & \sum_{i=1}^{m} \frac{\partial}{\partial w_{t+1}}
+\exp \left\{ y_i F_t(\bfx_i) + y_i w_{t+1}
+f_{t+1}(\bfx_i) \right\} \nonumber \\
+& = & \sum_{i=1}^{m} y_i \exp \left\{ y_i F_t(\bfx_i) + y_i w_{t+1}
+f_{t+1}(\bfx_i) \right\} 
+\end{eqnarray}
+%
+From this result, we make several simplifications.  Noting that
+%
+\begin{equation}
+y_i f_{t+1}(\bfx_i) = \left{ 
+	\begin{array}{ll}
+	1 &	\qquad \mbox{if $y_i = f_{t+1}(\bfx_i)$} \\
+	-1 &	\qquad \mbox{if $y_i \neq f_{t+1}(\bfx_i)$}
+	\end{array}
+\right.
+\end{equation}
+%
+and that $w_{i | t} = k \exp \{ -y_i F_t(x_i) \}$ where $k$ is some
+constant, we can recast (\ref{eqn:differentiate}) into the form
+%
+\begin{equation}
+\underbar{\frac{\sum_{i : y_i = f_{t+1}(\bfx_i)} w_{i|t}}
+{\sum_{i : y_i = f_{t+1}(\bfx_i)} w_{i|t}}}{\epsilon_t} 
+= \exp \( 2 \alpha \}
+\end{equation}
+%
+from which it is a simple transformation to obtain
+(\ref{eqn:theory:bt}).  Thus, the state at iteration $t+1$ is
+equivalent to boosting; thus boosting implements gradient descent.
+\end{theorem}
+
+\subsection{Summary}
 
 
-\section{Performance evaluation}
 
+\section{Properties of the boosting algorithm}
 
+* Guaranteed convergence to zero training error
+
+  * It modifies the weights at each iteration so the previous had
+    $\epsilon_t = 1/2$
+
+  * So we must keep on getting better
+
+  * So we must converge
+
+* Scale invariance
+
+  * The sign makes it not matter
+
+  * If we multiply $F_t$ by $k$ to get $F*_t$, then we get $b*_{t+1} = 1/k
+    b_{t+1}$
+
+* Converges to the solution that has the minimum margin
+	
 \subsection{Convergence of boosting}
 
 \begin{theorem}
@@ -435,6 +556,8 @@ showing that is AdaBoost is given a scaled hypothesis $kF$ instead of
 $F$, it will choose a $b$ value that is also scaled by the same
 amount.
 
+this is not true... look at Gunnar's notes again
+
 \begin{theorem}
 Assume a strong hypothesis $F_t(\cdot) = b_1 f_1(\cdot) + \cdots + b_m
 f_m(\cdot)$.  Denote the training action of the AdaBoost algorithm as
@@ -459,175 +582,21 @@ $kb_{t+1}$ instead of $b_{t+1}$.
 
 
 
-\section{Normed boosting algorithms}
-
-
-
-\section{Old work}
-
-
-\section{The boosting algorithm}
-
-The boosting algorithm will markedly improve the performance of most
-learning machines.  It does this by 
-
-* increases the hypothesis space by using a vote among many weak
-  learners
-
-* Even very poor weak learners are useful when boosted (for example,
-  decision stumps)
-
-* Seems quite resistant to over-fitting
-
-* Arcing is a variant; usually outperforms ``bagging''.
-
-* A very hot topic recently
-
-
-Key features of the boosting algorithm:
-
-* Cannot stand alone -- relies on another algorithm (the ``weak
-  learning algorithm''.
-
-* Hypothesis space is increased by adding more learning algorithms
-  (rather than making the existing learning algorithms more complex).
-
-* Many versions of the weak learning algorithm are trained, \emph{but
-  each on different data}.
-
-* Uses a weighted voting scheme amongst the weak learners to make a
-  decision, with the weight depending upon how well each weak learner
-  classified the training data.
-
-* Data points that are often misclassified or misclassified by a weak
-  learner that performs well are given a higher weight.  In this way,
-  the boosting algorithm forces the weak learning algorithm to
-  concentrate on the ``hard'' datapoints.
-
-
-\subsection{Description of the boosting algorithm}
-
-
-
-The key features of the boosting algorithm are as follows
-
-The boosting algorithm works as follows:
-
-\begin{enumerate}
-
-\item	Several ``weak'' learning algorithms are trained, and each of
-	these has its performance evaluated.  Those that perform well
-	have a higher ``weight'' when the final decision is ``voted''
-	on.
-
-\item	Within the training data set, each example is given a weight
-	which decides how ``hard'' to classify that example is.  This
-	weight is determined by how often the weak learner gets it
-	wrong and how well that particular weak learner performed on
-	the overall dataset.  For example, an example point that was
-	classified incorrectly by a 
-
-\end{enumerate}
-
-The algorithm may be written as in Ratsch et al. \cite{Ratsch98}
-
-The input to the algorithm is $l$ examples $\mathbf{Z} = \langle
-(\mathbf{x}_1, y_1), \ldots, (\mathbf{x}_l, y_l) \rangle$ where
-$\mathbf{x}$ is the independent variable and $y$ is the category
-class.
-
-The weight vector for step $t=1$ is initialised to $w_1(\mathbf{z}_i)
-= 1/l$ for all $i=1 \ldots l$
-
-Do for $t=1 \ldots T$:
-
-
-\begin{enumerate}
-
-\item	Train weak learner on the weighted sample set $\{\mathbf{Z},
-	\mathbf{w}\}$ and obtain ``weak'' hypothesis $h_t : \mathbf{x}
-	\mapsto \{\pm 1\}$
-
-\item	Calculate the training error $\epsilon_t$ of $h_t$:
-	
-	\begin{equation}
-	\epsilon_t = \sum_{i=1}^l w_t (\mathbf{z}_i)
-	I \left( h_t(\mathbf{x}_i) \neq y_i\right)
-	\end{equation}
-
-	If $\epsilon_t = 0$ (a single weak learner can correctly learn
-	the relationship) or $\epsilon_t \geq \phi - \Delta$ (where
-	$\Delta$ is a small positive constant, and thus the weak
-	learner is performing worse than random guessing) then abort
-	the training process.
-
-\item	Calculate how well this weak learner performed:
-
-	\begin{equation}
-	b_t = \log \frac{\epsilon_t (1 - \phi)}{\phi(1 - \epsilon_t)}
-	\end{equation}
-
-\item	Update our weights $\mathbf{w}_t$:
-
-	\begin{equation}
-	w_{t+1}(\mathbf{z}_i) = w_t(\mathbf{z}_i) \exp 
-	\left\{ -b_t I \left( h_t(\mathbf{x}_i) = y_i \right) \right\}
-	/ Z_t
-	\end{equation}
-
-	where $Z_t$ is a normalisation constant, such that
-	$\sum{i=1}{l} w_{t+1}(\mathbf{z}_i) = 1$.
-
-\end{enumerate}
-
-
-
-\subsection{Facts about boosting}
-
-
 These are from \cite{Ratsch98}:
 
-\begin{enumerate}
+\begin{theorem}[Weight update of AdaBoost (Schapire \cite{Schapire97})]
+The weights $w_{i|t}$ in the $t$-th iteration are chosen such that the
+previous hypothesis has exactly a weighted training error $\epsilon$
+of $1/2$.
+\end{theorem}
 
-\item 	The weights $w_t(\mathbf{z}_i)$ in the $t$-th iteration
-	are chosen such that the previous hypothesis has exactly a
-	weighted training error $\epsilon$ of $1/2$ (from
-	\cite{Schapire97}).
-
-\item 	The weight $c_t$ of a hypothesis is chosen such that it
-	minimises the function
-
-	\begin{equation}
-	G(b_t, \mathbf{b}^{t-1}) = \sum_{i=1}^l \exp 
-	\left\{ d(\mathbf{z}_i, \mathbf{b}^t) - \phi | \mathbf{b}^t |
-	\right\}
-	\end{equation}
-
-	where $\phi$ is a constant.  This function depends upon the
-	rate of incorrect classification of all patterns.
-
-	This functional can be minimised analytically by setting
-	$\frac{\partial G(\mathbf{b}^t)}{\partial \mathbf{b}^t}=0$ and
-	is described in references that I don't have (page 4 of
-	\cite{Schapire97}).
-
-	The final equation that we end up with is our familiar
-
-	\begin{equation}
-	b_t = \log \frac{\epsilon_t (1-\phi)}
-	{\phi (1 - \epsilon_t)}
-	\end{equation}
-
-	where in my paper, $\phi=1/2$.
-
-\end{enumerate}
- 
+\subsection{Summary}
 
 
-
-
-\subsection{Application to boosting}
+\section{Performance bounds for Boosting}
 By proceeding I mean somewhere in Peter's book chapter
+
+I need to rewrite this section; it is copied verbatim
 
 The preceding ideas can be applied to the boosting algorithm.  Let us
 take in particular the boosted classifier of the form
@@ -645,16 +614,12 @@ of classifiers is independent of the number of base hypotheses.
 
 \subsection{Bounds on fat-shattering dimension in boosting}
 
+* Can't state this directly.  Substitute in the bound on covering
+  numbers from eg. Peter's slides, and state that instead.
+
 There is a constant $c$ so that for all classes $H$ of functions
 mapping from $X$ to $\{-1, 1\}$, the class of convex combinations of
-functions from $H$,
-\begin{equation}
-\calF = \left\{
-	x \mapsto \sum_{i=1}^N w_i f_i(x) : f_i \in H, w_i > 0, \sum_i
-	w_i = 1
-\right\}
-\end{equation}
-satisfies
+functions from $H$ satisfies
 \begin{equation}
 \fat_{\calF} \leq c \frac{h}{\gamma^2} \ln (1/\gamma)
 \end{equation}
@@ -662,6 +627,10 @@ satisfies
 where $h$ is the VC-dimension of the class $H$ of base hypotheses.
 
 \subsection{Bounds on error in boosting}
+
+* Again, make use of the covering numbers result from last time,
+  substitute in to get this.  If substituting directly gives a better
+  bound, then use that.
 
 There is a constant $c$ such that, for the class \calF\ of convex
 combinations of classifiers from a class $H$ with VC-dimension $h$,
@@ -674,5 +643,16 @@ b/l + \sqrt{\frac{c}{l} \left[ \frac{h \ln^2 (l/h)}{\gamma^2} +
 \end{equation}
 where $b$ is the number of labelled training examples with margin less
 that $\gamma$.
+
+\subsection{Summary}
+
+\section{Overfitting}
+
+
+\section{Normed boosting algorithms}
+
+
+\section{Chapter summary}
+
 
 

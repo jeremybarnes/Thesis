@@ -29,14 +29,15 @@ working_dir 	= $(shell pwd)
 		--run-file "$<"
 
 # Default target
-all:		bfunc.epsg regression_problem.epsg \
+all:		b_func.epsg regression_problem.epsg \
 		classification_problem.epsg dichotomy.epsg \
 		margin_illustration.epsg descent.epsg \
 		stumpdiagram.epsg stumpcandidates.epsg \
 		stumpvcdim.epsg shattering.epsg \
 		fat_shattering.epsg vcdim_problems.epsg \
 		overfitting.epsg srm.epsg covering.epsg \
-		p_convex.epsg
+		p_convex.epsg sample_weights.epsg \
+		classifier_weights.epsg
 
 clean:		
 		-rm *.epsg *.mscript *~

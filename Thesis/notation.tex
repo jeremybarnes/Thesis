@@ -10,29 +10,88 @@
 
 \bf{Acronym} & \bf{Meaning} & \bf{First introduced} \\ \hline \hline
 
-SLT	& Statistical Learning Theory 	& section \ref{acr:slt} \\
-ERM	& Empirical Risk Minimisation 	& section \ref{acr:erm} \\
-SRM	& Structural Risk Mininmisation & section \ref{acr:srm} \\
-VC dimension & Vapnik-Chervonenkis dimension & section \ref{acr:vcdim} \\
-CART	& Classification And Regression Trees & section \ref{acr:cart} \\
+SLT	& Statistical Learning Theory 	& \ref{acr:slt} \\
+ERM	& Empirical Risk Minimisation 	& \ref{acr:erm} \\
+SRM	& Structural Risk Mininmisation & \ref{acr:srm} \\
+VC dimension & Vapnik-Chervonenkis dimension & \ref{acr:vcdim} \\
 \hline
 
 \end{tabular}
 
 \section*{Notation}
-
+\newcommand{\longexp}[1]{\parbox[t]{3in}{#1}}
 \begin{tabular}{l l c}
-
-\bf{Notation}		& \bf{Meaning}		& \bf{Reference} \\
+\bf{Symbols}		& \bf{Meaning}		& \bf{Section} \\
 \hline \hline
-\bfx		& Sample	& figure \ref{fig:supervised learning} \\
-\bfy		& ``Correct'' result & figure \ref{fig:supervised learning} \\
-\bfyh		& Estimated result & figure \ref{fig:supervised learning} \\
-$h(\cdot)$	& Supervisor function & (\ref{eqn:supervisor}) \\
-$\hat{h}(\cdot)$& Learning machine & (\ref{eqn:learning machine formulation})\\
-\calI		& Input space & \ref{sec:sample generator} \\
-$n$		& Dimensionality of input space & \ref{sec:sample generator} \\
-\calO		& Output space & \ref{sec:supervisor} \\
-$m$		& Dimensionality of output space & \ref{sec:sample generator}\\
+$\bfx \in \calI$	& Sample
+			& fig \ref{fig:supervised learning} \\
+
+$y \in \calO$		& Label
+			& " \\
+
+$X = ((\bfx_1, y_1), \ldots))$
+			& Labeled samples, length $m$ (training dataset)
+			& \ref{sec:formulation} \\
+
+$\calI, \calO$		& Domain and range (usually $\{\pm 1\}$) of problem
+			& \ref{sec:domain and range} \\
+\vspace{5mm}
+$h(\cdot) \in \calH : \calI \mapsto \calO$
+			& A hypothesis (classifier)
+			& \ref{sec:formulation} \\
+
+$\calH$			& A set of possible hypotheses $h$
+			& \ref{representation learning machines} \\
+
+$f(\cdot) \in \calF : \calI \mapsto \bbR$
+			& \longexp{A non-thresholded hypothesis; usually 
+			  $h(\cdot) = \sign(f(\cdot))$}
+			& \ref{sec:margin formulation} \\
+
+$\calF$			& A set of possible hypotheses $f$ 
+			  ($\calH = \sign(\calF)$)
+			& " \\
+
+$\bbW : \calI^m \mapsto (\calI \mapsto \calO)$
+ 			& Learning machine ($\bbW(X) = h$)
+			& " \\
+\vspace{5mm}
+$q = Q(\bfx, y, \hat{y})$
+			& Loss function
+			& \ref{sec:loss function} \\
+
+$R(h)$			& True risk
+			& \ref{sec:true risk} \\
+
+$R_{\emp}(h)$		& Empirical risk
+			& \ref{sec:empirical risk} \\
+
+$R_{\emp}^w(h)$		& Weighted empirical risk (training error)
+			& \ref{sec:weighted empirical risk} \\
+
+$R_{\emp}^{\gamma}(h)$	& Margin risk
+			& \ref{sec:margin risk} \\
+
+\vspace{5mm}
+$\VCdim(\cdot)$		& VC dimension
+			& \ref{sec:vcdim} \\
+
+$\covert{\calX}{\epsilon}{d(\cdot, \cdot)}$ &
+			\longexp{Covering number at scale $\epsilon$ of $\calX$
+			using norm $d$ (usually $d_{\infty}$; assumed if not
+			specified)}
+			& \ref{sec:covering numbers} \\
+
+$\covert{\calX}{\epsilon}{k}$ &
+			\longexp{
+			Uniform covering number of $\calX$ at scale $\epsilon$
+			over length $k$}
+			& " \\
+
+$\co_{p}(\calX)$	& $p$-convex hull of set $\calX$
+			& \ref{sec:p-convex} \\
 \hline
 \end{tabular}
+\par\par\noindent
+A hat ($\hat{\ \ }$) means ``estimate''.  An asterisk ($\ \ ^{\ast}$) means
+``optimal'' in some sense.

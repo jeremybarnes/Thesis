@@ -48,8 +48,6 @@ throughout the remainder of the thesis.
 
 \subsection*{Part 2: Theoretical investigation}
 
-The work contained in part 2 onwards is original work.
-
 The key inventive step of the work described in this thesis is the use of a
 \emph{$p$-convex hull} to reduce the problem of overfitting.  Chapter
 \ref{chapter:pboosting} investigates the theoretical justification
@@ -67,13 +65,16 @@ investigations.
 
 \subsection*{Part 4: Discussions}
 
-The chapters in this part evaluate the project.
+The chapters in this part evaluate the project.  (I'll fill this in
+when I've done it...)
+
 
 \section{The scheme of things}
 
 This section provides an overview of the context in which this project
 exists, starting very broadly and rapidly focusing on the immediate
 background.
+
 
 \subsection{Artificial intelligence}
 
@@ -103,6 +104,7 @@ numbers of rules can theoretically learn any learnable problem; it is
 hindsight, was to invent machines that could generate their own
 rules; machines that could \emph{learn}.
 
+
 \subsection{Machine learning}
 
 These machines came in two flavours.  \emph{Supervised learners} are
@@ -119,6 +121,7 @@ body of this thesis are supervised algorithms.
 learn a pattern in the data (for example, identifying interesting
 clumps of stars from telescope images).
 
+
 \subsection{Statistical learning theory}
 
 Statistical learning theory provides the theoretical foundation upon
@@ -127,9 +130,44 @@ allows bounds on the performance of learning algorithms to be
 generated.  Much of this theory can be attributed to V.M.Vapnik
 \ref{Vapnik95}.
 
+Results from statistical learning theory enable us to design learning
+machines which we can be sure will learn a function that is close to
+the optimal.
+
 \subsection{Voting methods}
 
 Boosting and $p$-boosting are both examples of \emph{voting methods},
 a relatively new class of algorithms which operate in a bootstrap-like
-manner by combining many ``weak'' algorithms to generate a higher
-performing algorithm.
+manner by combining many ``weak'' algorithms to generate a composite
+algorithm.  The success of these algorithms has been remarkable; to
+such an extent that the focus of machine learning research has in
+recent years shifted away from the classical algorithms (all of which
+are more or less equal when boosted) and on to developments in voting
+methods.
+
+These algorithms were initially thought to be immune to many of the
+problems of overfitting.  Recent research has indicated that this is
+not the case, however.
+
+\section{Overfitting}
+
+Overfitting, simply put, is learning the specifics of a process too
+well to be able to apply the knowledge to a more general problem.
+A familiar example for many people would be driving a familiar route
+on ``auto-pilot'' and almost coming to grief on a new obstacle.
+
+Statistical learning theory gives us a theoretical reason for
+overfitting, and also an insight into how it may be avoided.  
+
+
+\section{Original work}
+
+The original work of this thesis is motivated by observations of a
+theoretical bound on overfitting; and in particular on a method of
+reducing overfitting in the boosting algorithm.  This theory is first
+developed into several practical algorithms; these algorithms are then
+tested against the original AdaBoost algorithm and for compliance with
+the theory behind them.
+
+
+
