@@ -13,9 +13,6 @@
  * function [var, val, left_cat, right_cat] = 
  *            train_guts(obj, x, y, w, dimensions, cat);
  *
- * This file includes code from the GNU C library, and for this reason
- * is under the GNU General Public License.
- *
  */
 
 #include <math.h>
@@ -57,7 +54,7 @@ void optimal_split(double *x, int *y, double *w, int dimensions,
 
     double this_w;
     int this_y;
-    double w_sum, left_sum, *left_total, right_sum, *right_total;
+    double w_sum, *left_total, *right_total;
     double *xp, *wp;
     int *yp;
 
@@ -65,7 +62,7 @@ void optimal_split(double *x, int *y, double *w, int dimensions,
     int left_index, right_index;
 
     int tmp_var, tmp_left, tmp_right;
-    double tmp_val, left_max, right_max, Qleft, Qright, this_Q;
+    double tmp_val, left_max, right_max, this_Q;
 
     double minus_infinity;
 
@@ -79,7 +76,7 @@ void optimal_split(double *x, int *y, double *w, int dimensions,
     *left_cat = 0;
     *right_cat = 1;
 
-    best_Q = mxGetInf();
+    best_Q = -mxGetInf();
     minus_infinity = -mxGetInf();
 
     for (i=0; i<dimensions; i++) {
@@ -110,12 +107,10 @@ void optimal_split(double *x, int *y, double *w, int dimensions,
 	/* Initialise variables */
 	for (j=0; j<cat; j++)
 	    left_total[j] = 0.0;
-	left_sum = 0.0;
 	left_index = -1;
 	left_max = minus_infinity;
 
 	category_weight(xyw, cat, data_length, right_total);
-	right_sum = w_sum;
 	right_index = xyw[0].y; /* force update at start */
 	right_max = minus_infinity;
 
@@ -129,10 +124,9 @@ void optimal_split(double *x, int *y, double *w, int dimensions,
 		left_max = left_total[this_y];
 		left_index = this_y;
 	    }
-	    left_sum += this_w;
 
 	    right_total[this_y] -= this_w;
-	    /*	    mexPrintf("right_index = %d, this_y = %d\n", right_index, this_y); */
+
 	    if (right_index == this_y) {
 		/* We have to find our maximum value again */
 		right_max = minus_infinity;
@@ -143,15 +137,11 @@ void optimal_split(double *x, int *y, double *w, int dimensions,
 		    }
 		}
 	    }
-	    right_sum -= this_w;
 
 	    /* Calculate individial and combined impurities */
-	    Qleft  = 1.0 - left_max / left_sum;
-	    Qright = 1.0 - right_max / right_sum;
-
-	    this_Q = (Qleft * left_sum + Qright * right_sum) / w_sum;
+	    this_Q = (left_max + right_max);
 	    
-	    if (this_Q < best_Q) {
+	    if (this_Q > best_Q) {
 		tmp_var = i;
 		tmp_val = xyw[j].x;
 		best_Q = this_Q;
