@@ -1,0 +1,186 @@
+classifier.txt
+Jeremy Barnes, 4/4/1999
+$Id$
+Time-stamp: <1999-04-04 18:18:04 dosuser>
+
+	  Description of the abstract data type "classifier"
+	  --------------------------------------------------
+
+1.  Introduction
+----------------
+
+This file describes the abstract data type "classifier".  It includes
+a brief survey of the theory behind the classifier; the interface to
+the abstract data type; and implementation notes.
+
+
+2.  Background Theory
+---------------------
+
+2.1 Input-output relationship
+-----------------------------
+
+A "classifier" is a machine which uses some kind of a rule to separate
+observations into a number of distinct categories, or classes.
+
+More formally, given a sequence of inputs x[0] to x[m] (where each is
+an n-dimensional vector) the classifier will return results y[0] to
+y[n] where each y[i] is an element of the finite set Y = {Y1, Y2, ...,
+Yt} which is a set of all possible categories.
+
+Thus our input-output relationship for our classifier C can be written
+as
+
+ C: x -> y, x is an element of Rn, y is an element of Y
+
+The actual rule used to make this classification will be determined by
+the particular kind of classifier that we use, and does not need to be
+discussed in the context of our "abstract" representation.
+
+
+2.2 Training
+------------
+
+If we were to know the characteristics of our classifier ahead of
+time, we could simply code up the correct classifier ahead of time and
+have an optimal classifier.
+
+Unfortunately, this is not always possible for a number of reasons.
+An unreasonable amount of work may have to be done to discover the
+correct classifier, if one exists (for example, noisy data will often
+not be able to be classified optimally).  Also, we do not want to have
+to write new code for every type of problem that we want to learn.
+
+Thus, the classifiers that we are considering here are also capable of
+learning from previous examples.  By "learning", I mean "supervised
+learning" here, which means that observations, as well as their
+correct classifications, are provided by a "supervisor" for the
+classifier to learn from.  This process is known as "training".
+
+Formalising this, we have a number of training samples T[i] = {x[i],
+y[i]} where x and y are drawn from the same sets described before.
+These i samples are put into the classifier, which "learns" from them.
+
+Formalising the notion of "learning", we say that learning is
+constructing our input-output rule C such that the relationship it
+determines is "optimal".  The notion of an "optimal" learner changes
+from algorithm to algorithm, and is defined within the context of that
+algorithm.
+
+3.  Performance measures
+------------------------
+
+As the notion of an "optimal decision rule" changes between
+classifiers, this cannot be used to compare the performance of a
+number of such classifiers.  Furthermore, we are not only interested
+in the performance of such a classifier on the training data (upon
+which it often performs a perfect classification), we are also
+interested in how it can generalise its findings to other data (which
+is assumed independent of, but drawn from the same distribution as,
+the training data).
+
+Performance measures generally measure the error over the domain of
+the independent variable.  The error is described using a "loss
+function", which is defined over the domain of independent variable.
+
+The best measure of error, which is called the "risk", is calculated
+by integrating the loss function over the whole domain of the
+independent variable.  Unfortunately, in practice this is not possible
+to calculate for the following reasons:
+
+* The correct classification is not usually known at all points in the
+  domain of the independent variable;
+* There is usually no closed form expression for the integral of the
+  loss function.
+
+This leads to the notion of "empirical risk", in which the loss
+function is integrated over a set of "test" observations.
+
+The most common loss function used for classification problems is very
+simple: it has a value of 1 for each point where the incorrect
+classification is made, and 0 where the classification is correct.
+Thus, the value of the empirical risk for a particular test data set
+tested on a particular classifier using this simple loss function is
+simply the number of points in the test data set that are
+misclassified.
+
+Obviously, the choice of test data set can make a large difference to
+the calculated misclassification risk.  Schemes such as using several
+different partitions of the data are often used in an attempt to
+decrease the variability of misclassification risks calculated in this
+way.
+
+
+3.  Interface
+-------------
+
+3.1 Constructor
+---------------
+
+obj = classifier()
+
+Generates a classifier.  Any attempt to call its methods will result
+in an "abstract method" error.
+
+obj = classifier('type', args...)
+
+Generates a classifier of the specified type.  The TYPE parameter
+should be a string containing the name of a descendent type of
+classifier.  The ARGS are all passed to the constructor of that
+descendent type.
+
+3.2 Classification
+------------------
+
+y = classify(x)
+
+Classifies the samples in x, returning the results in y.  This is an
+abstract method in this class; normally a descendent will override it.
+
+3.3 Training
+------------
+
+obj_r = train(obj, x, y)
+
+Trains the classifier obj using the samples in x and y, returning the
+new classifier in obj_r.
+
+Depending upon the descendent type, training several timew will either
+add to the training already done; or train a separate classifier for
+each dataset used.
+
+This is an abstract method.  Normally, a descendent will override it.
+
+
+3.4 Performance measurement
+---------------------------
+
+Pe = empirical_risk(obj, x, y)
+
+Runs the classifier on the dataset given in x and y, and returns the
+empirical risk.  This will be a number 0 <= Pe <= 1 which is the
+proportion of training samples which the classifier got wrong.
+
+
+3.5 Other methods
+-----------------
+
+save_classifier(obj, 'filename')
+load_classifier(obj, 'filename')
+
+These two are used so that the results of time-consuming training does
+not have to be performed over and over.  Not only the data, but also
+the type of classifier are saved - this allows an arbitratry
+classifier to be saved.
+
+plot_classification(obj, x, y)
+
+This method plots the results of a classifier, which are passed to it
+via the x and y vectors.
+
+plot_decision_boundary(obj)
+
+This method attempts to find and plot the decision boundary of the
+given classifier.  It only works with 2D data.
+
+
