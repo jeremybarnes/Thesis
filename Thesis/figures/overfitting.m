@@ -7,7 +7,7 @@ figure(1);  clf;  setup_figure;
 % Parameters
 yint = 2;
 slope = 0.5;
-noise = 2;
+noise = 0.5;
 
 % x values
 x = 0:10

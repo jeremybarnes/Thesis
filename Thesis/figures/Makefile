@@ -13,8 +13,10 @@ working_dir 	= $(shell pwd)
 .PHONY: 	all
 .PHONY:		clean
 
+# Our .epsg rule also fixes the dodgy Matlab EPS to remove the command that
+# clips to the bounding box.
 %.epsg:		%.eps
-		mv $< $@
+		sed -e 's/^ *-*[0-9][0-9]* *-*[0-9][0-9]* *-*[0-9][0-9]* *-*[0-9][0-9]* rc/%&/' $< > $@
 
 # We need to make an "mscript" since the DOS command line is too short to
 # put all of our commands onto

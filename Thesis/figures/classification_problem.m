@@ -43,6 +43,8 @@ title('(b) \sl{output}');
 set(gca, 'xtick', [], 'ytick', []);
 xlabel('\itx_1');  ylabel('\itx_2');
 axis square;
+text(0.85, 0.95, '\it{R}_{-1}', 'fontname', 'times', 'fontsize', 11);
+text(0.50, 0.50, '\it{R}_{+1}', 'fontname', 'times', 'fontsize', 11);
 
 set(1, 'paperposition', [0 0 6 2.5]);
 
