@@ -53,7 +53,7 @@ test_d = datagen(test_d, datatype, 5000, 0, 0);
 [xtest, ytest] = data(test_d);
 
 % Do the testing
-[trained, test_err, train_err] = test(boost1, d, test_d, num_iter);
+[trained, test_err, train_err] = test(boost1, d, test_d, num_iter, 'nosave');
 %[trained2, test_err2, train_err2] = test(boost1, d, test_d, num_iter, 'slow');
 
 % Plot the results
