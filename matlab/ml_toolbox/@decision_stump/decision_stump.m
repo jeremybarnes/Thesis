@@ -44,6 +44,7 @@ end
 
 % ancestor relationship
 parent = classifier(categories, dimensions);
+obj = struct(parent);
 
 % initialisation of variables in obj
 obj.dimensions = dimensions;
@@ -58,5 +59,5 @@ obj.rightcategory = 1;
 obj.trainingerror = 0.0;
 
 % construct class and use superior/inferior relationship
-obj = class(obj, 'decision_stump');
+obj = class(obj, 'decision_stump', parent);
 superiorto('double', 'classifier');
