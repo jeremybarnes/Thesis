@@ -17,7 +17,7 @@ void do_margins(const mxArray *obj, const mxArray *x, double *m,
 		 int data_len, int cat)
 {
 
-    double *votes, *b, *their_b, b_sum, b_sum_recip, this_b;
+    double *votes, *b, *their_b, this_b;
     double max_value, second_max_value, this_vote, *this_y;
     mxArray *f_b, *f_iterations, *classifiers, *this_struct;	
     mxArray *this_classifier, *lparams[1], *rparams[2];
@@ -88,14 +88,13 @@ void do_margins(const mxArray *obj, const mxArray *x, double *m,
 	return;
     }
 
-    b_sum = 0.0;
-    for (i=0; i<iterations; i++)
-	b_sum += their_b[i];
+    /* 6/8/99 -- Removing the normalisation part so that I can get
+       "margins" that are useful for testing stuff out.  Just taking
+       the absolute value instead.
+    */
 
-    b_sum_recip = 1.0 / b_sum;
-
     for (i=0; i<iterations; i++)
-	b[i] = their_b[i] * b_sum_recip;
+	b[i] = fabs(their_b[i]);
     
     /* classifiers is a cell array of structures */
     classifiers = mxGetField(obj, 0, "classifiers");
