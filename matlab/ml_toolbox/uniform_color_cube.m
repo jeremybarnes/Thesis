@@ -60,101 +60,115 @@ intensities = linspace(start_intensity, end_intensity, 2^bits)';
 
 l = length(intensities);
 
-color_map = zeros(l^cat, 3);
+color_map = zeros(l^categories, 3);
 
-if (model == 'additive')
-   switch(cat)
-
-      case 1
-	 color_map = [intensities zeros(l, 2)];
-
-      case 2
-	 for i=0:l-1
-	    color_map(i*l+1:i*l+l, :) = ...
-		[intensities(i)*ones(l, 1) zeros(l, 1) intensities];
-	 end
-
-      case 3
-	 for i=0:l-1
-	    for j=0:l-1
-	       color_map(i*l^2+j*l+1:i*l^2+j*l+l, :) = ...
-		   [intensities(i)*ones(l, 1) intensities ...
-		    intensities(j)*ones(l, 1)];
-	    end
-	 end
-   end
-
-else % model == 'subtractive'
-   onesl1 = ones(l, 1);
-
-   switch(cat)
-      
-      case 1
-	 color_map = [onesl1 onesl1-intensities onesl1-intensities];
-
-      case 2
-	 for i=0:l-1
-	    color_map(i*l+1:i*l+l, :) = ...
-		[(1 - intensities(i))*onesl1
-
-
-		   
-	       
-
-   for i=1:l
-      for j=1:l
-	 
-      
-
-
-
-
-% Work it out for one colour...
-column1 = intensities;
-
-
-
-if (categories == 2)
+switch(categories)
    
-end
-
-
-% FIXME: this bit is a really messy, disgusting algorithm.  I'm sure that
-% we can do MUCH better than this!
-
-if (categories >= 2)
-   % Put them together for two colours...
-   column2 = zeros(l.^2, 2);
-   
-   for i = 1:l
-      column2(l*(i-1)+1:l*i, :) = [ones(l, 1).*intensities(i) ...
-		    column1];
-   end
-end
-
-% And a similar thing for three colours...
-
-if (categories == 3)
-   column3 = zeros(l.^3, 3);
-
-   l2 = l^2;
-   
-   for i = 1:l
-      column3(l2*(i-1)+1:l2*i, :) = [ones(l2, 1).*intensities(i) ...
-		    column2];
-   end
-end
-
-
-switch (categories)
    case 1
-      color_map = add - [column1 fill*ones(l, 2)];
+      color_map = [intensities zeros(l, 2)];
+      
    case 2
-      color_map = add - [column2(:, 1) fill*ones(l^2, 1) column2(:, 2)];
+      for i=0:l-1
+%	 color_map(i*l+1:i*l+l, :) = ...
+%	     [intensities(i+1)*ones(l, 1) zeros(l, 1) intensities];
+
+	 color_map(i*l+1:i*l+l, :) = ...
+	     construct_rb2(intensities(i+1)*ones(l, 1), intensities);
+
+
+      end
+      
    case 3
-      color_map = add - [column3(:, 1) column3(:, 3) column3(:, 2)];
+      for i=0:l-1
+	 for j=0:l-1
+	    color_map(i*l^2+j*l+1:i*l^2+j*l+l, :) = ...
+		[intensities(i+1)*ones(l, 1) intensities ...
+		 intensities(j+1)*ones(l, 1)];
+	 end
+      end
 end
 
 
+if (model == 'subtractive')
+%   color_map = cmy2rgb(color_map);
+end
+      
 
+
+
+
+
+
+function rgb = cmy2rgb(cmy)
+
+% FIXME: comment
+%
+% Not a particularly good system -- this is a very complicated topic!
+%
+% Based upon code from the "Borland Delphi Knowledge Base", which is at
+% <http://www.borland.com/devsupport/delphi/qanda/1767.html>
+%
+% For a better exploration of the issues involved, have a look at the
+% Colour Spaces FAQ, which is at
+% <http://www.inforamp.net/~poynton/PDFs/ColorFAQ.pdf>.
+
+C = cmy(:, 1);
+M = cmy(:, 2);
+Y = cmy(:, 3);
+
+R = 1 - C;
+G = 1 - M;
+B = 1 - Y;
+
+rgb = [R G B];
+
+
+
+function color = construct_rb(r, b)
+
+% Given the two levels of red and blue that we want to see, construct a
+% colour that has the following properties:
+%
+% * if r = b = 0, then the colour is white
+% * if r = 1 and b = 0, then the colour is a dark red
+% * if r = 0 and b = 1, then the colour is a dark blue
+% * if r = b = 1, then the colour is a purple
+%
+% So basically, our colour starts off at white and gets darker (towards
+% red or blue) as the levels increase.
+
+% Our green component depends upon the average of the red and blue
+% components.
+
+g = (1 - r + 1 - b) / 2;
+
+r = 1 - (r * 0.75); % leave some red in there at maximum "brightness"
+                    % (darkness)
+
+b = 1 - (b * 0.75); % same for blue
+
+color = [r g b];
+
+
+
+
+function color = construct_rb2(r, b)
+
+% This time, work out an ideal colour for the red, an ideal for the blue,
+% and then combine them.
+
+ideal_r = [ones(size(r))  1-r  1-r];
+ideal_b = [1-b  1-b  ones(size(b))];
+
+% combine them
+
+color = (ideal_r + ideal_b) / 2;
+
+
+R = (r .* ideal_r(:, 1)   + (1-r).*b.*ideal_b(:, 1));
+G = (r.*ideal_r(:, 2) + b.*ideal_b(:, 2)) / 2;
+B = ((1-b).*r.*ideal_r(:, 3) + b.*ideal_b(:, 3));
+
+
+color = [R G B];
 
