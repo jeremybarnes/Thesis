@@ -1,7 +1,5 @@
-% dimensions.m
-% Jeremy Barnes, 3/4/1999
-% $Id$
-%
+function dim = dimensions(obj)
+
 % DIMENSIONS - returns the number of dimensions of the independent
 %              variable of a dataset
 %
@@ -12,18 +10,9 @@
 % RETURNS:
 %
 % The number of dimensions of the independent variable in the dataset.
-%
 
-function dim = dimensions(obj)
-
-% PRECONDITIONS:
-% none
+% dimensions.m
+% Jeremy Barnes, 3/4/1999
+% $Id$
 
 dim = obj.dimensions;
-
-% POSTCONDITIONS:
-check_invariants(obj);
-
-return;
-
-

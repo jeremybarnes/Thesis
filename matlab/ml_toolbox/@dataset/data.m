@@ -18,11 +18,5 @@ function [x, y] = data(obj)
 % Jeremy Barnes, 6/5/1999
 % $Id$
 
-% PRECONDITIONS:
-% none
-
 x = obj.x_values;
 y = obj.y_values;
-
-% POSTCONDITIONS:
-check_invariants(obj);

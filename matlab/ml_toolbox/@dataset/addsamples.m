@@ -19,8 +19,6 @@ function obj_r = addsamples(obj, x, y)
 % Jeremy Barnes, 3/4/1999
 % $Id$
 
-
-% PRECONDITIONS:
 if (size(x) ~= [length(y) obj.dimensions])
    error('addsamples: size of x vector is incorrect');
 end
@@ -35,6 +33,3 @@ obj.y_values = [obj.y_values; y];
 
 obj.numsamples = obj.numsamples + length(y);
 obj_r = obj;
-
-% POSTCONDITIONS:
-check_invariants(obj_r);
