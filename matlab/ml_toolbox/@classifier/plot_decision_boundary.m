@@ -29,7 +29,7 @@ for i=1:num_xpoints+1
    bigm(:, i) = m;
 end
 
-if (max(bigm) != min(bigm))
+if (max(max(bigm)) != min(min(bigm)))
    [c, h] = contour(ypoints, xpoints, bigm+1, [1 1]);
 end
 
