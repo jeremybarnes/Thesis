@@ -48,6 +48,7 @@ trial = 1;
 pvalue = 1;
 noisevalue = 1;
 
+
 % Load in our progress
 eval('load(progfile)', '');
 
@@ -64,12 +65,18 @@ while (noisevalue <= length(noise))
 	       ' noise=' num2str(noise(noisevalue))]);
 	 
 	 % Create our datasets
-	 d = dataset;
-	 train_d = datagen(d, dist, samples, 0, noise(noisevalue));
-	 test_d = datagen(d, dist, 5000, 0, 0);
+	 if (strcmp(dist, ''))
+	    % We are using a dataset
+	    d = dataset(dataset_name);
+	    [train_d, test_d] = partition(d, split, 'random');
+	 else
+	    d = dataset;
+	    train_d = datagen(d, dist, samples, 0, noise(noisevalue));
+	    test_d = datagen(d, dist, 5000, 0, 0);
+	 end
 	 
 	 % Create our weaklearner and boosting algorithm
-	 wl = decision_stump(2, 2);
+	 wl = decision_stump(numcategories(d), dimensions(d));
 	 switch algorithm
 	    case 'boost'
 	       alg = boost(wl);

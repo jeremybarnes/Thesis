@@ -199,7 +199,7 @@ end
 % Graphs of p vs best iteration
 for i=1:length(test_info.noise)
    subplot(length(test_info.noise), 2, i*2);
-   plot(pvalues, iter_results(i, :), 'rx');  hold on;
+   semilogy(pvalues, iter_results(i, :), 'rx');  hold on;
    plot(test_info.p, iter_means(i, :), 'b-');
    plot(test_info.p, iter_means(i, :) + iter_stdevs(i, :), 'b:');
    plot(test_info.p, max(iter_means(i, :) - iter_stdevs(i, :), 0), 'b:');

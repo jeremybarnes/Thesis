@@ -1,10 +1,10 @@
-function maketest(name, algorithm, p, dist, samples, noise, numiterations, trials)
+function maketest
 
-% MAKETEST create a mat file which describes a test
+% MAKETEST create a mat file which describes a test (interactive)
 %
 % SYNTAX:
 %
-% maketest('name', 'algorithm', p, 'dist', samples, noise, iterations, trials)
+% maketest
 %
 % This function creates a .mat file in the directory pointed to by the
 % global variable DATA_SAVE_PATH.  This file completely describes a test
@@ -46,12 +46,52 @@ if (isempty(DATA_SAVE_PATH))
    error('maketest: must set DATA_SAVE_PATH global variable');
 end
 
+name = input('Name of test: ', 's');
+
 % Try to create a directory for the test
 dirname = [DATA_SAVE_PATH '/' name];
-exec(['!mkdir ' dirname], 'disp(''mkdir failed'';)');
+eval(['!mkdir ' dirname], 'disp(''mkdir failed'';)');
 
 filename = [DATA_SAVE_PATH '/' name '/' name '.mat'];
 
+disp(['Creating test file in ' filename]);
+
+algorithm = input('algorithm to use: ', 's');
+p = input('p value(s) to use: ');
+choice = input('[1] distribution or [2] dataset: ');
+
+if (choice == 1)
+   datatype = 'distribution';
+   dist = input('Which distribution: ', 's');
+   samples = input('Number of samples: ');
+   noise = input('Amount(s) of noise to add: ');
+   dataset_name = '';
+   split = 0;
+else
+   datatype = 'dataset';
+   dataset_name = input('Which dataset: ', 's');
+   split = input('Training partition (<1 = proportion, >1 = samples): ');
+   noise = 0;
+   samples = 0;
+   dist = '';
+end
+
+numiterations = input('Number of iterations to train to: ');
+trials = input('Number of independent trials: ');
+
+this_test.name = name;
+this_test.algorithm = algorithm;
+this_test.p = p;
+this_test.dist = dist;
+this_test.samples = samples;
+this_test.noise = noise;
+this_test.dataset_name = dataset;
+this_test.datatype = datatype;
+this_test.split = split;
+this_test.numiterations = numiterations;
+this_test.trials = trials;
+
 save(filename, 'name', 'algorithm', 'p', 'dist', 'samples', 'noise', ...
-     'numiterations', 'trials');
+     'dataset_name', 'split', 'numiterations', 'trials', 'datatype', ...
+     'this_test');
 
