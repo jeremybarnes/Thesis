@@ -1,4 +1,5 @@
 function obj_r = datagen(obj, type, n, sigma_x, Pe)
+
 % DATAGEN generate data for a dataset
 %
 % SYNTAX:
@@ -38,8 +39,8 @@ function obj_r = datagen(obj, type, n, sigma_x, Pe)
 
 % PRECONDITIONS
 assert(obj, 'obj.initialised == 1');
-assert(obj, 'numlabels(obj.labels) == 2'); % only can generate binary data
-assert(obj, 'obj.dimensions == 2'); % only can generate 2D data
+assert(obj, 'numcategories(obj.categories) == 2'); % only generates binary data
+assert(obj, 'obj.dimensions == 2'); % only generates 2D data
 
 % Generate our real position vector.  This may be different from the
 % observed position vector if we specify position noise.
