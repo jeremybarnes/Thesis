@@ -26,6 +26,7 @@ all:		thesis.ps
 		make -C figures all
 		latex $<
 		-bibtex $(basename $<)
+#		sed 's/([{]part[}].*)[{]([0-9]+)\}/\1\{\}/' thesis.toc
 		latex $<
 		latex $<
 		mv $(subst .tex,.dvi,$<) $@

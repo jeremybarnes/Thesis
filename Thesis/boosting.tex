@@ -111,7 +111,7 @@ $i=1 \ldots m$
 
 \item	Calculate our classifier weight $b_t$:
 	\begin{equation}
-	b_t = - 1/2 \log \frac{\epsilon_t}{1 - \epsilon_t}
+	b_t = - \frac{1}{2} \log \frac{\epsilon_t}{1 - \epsilon_t}
 	\end{equation}
 
 \item	Update the sample weights $w_i$:
@@ -119,9 +119,9 @@ $i=1 \ldots m$
 	\begin{equation}
 	w_i|_{t+1} = \left\{
 	\begin{array}{cl}
-		w_i|_t / Z_t \exp \left\{ b_t \right\}&	\qquad \qquad \mbox{if
+		\frac{w_i|_t}{Z_t} \exp \left\{ b_t \right\}&	\qquad \qquad \mbox{if 
 		$f_t(x_i) = y_i$} \\
-		w_i|_t / Z_t \exp \left\{ -b_t \right\} & \qquad \qquad
+		\frac{w_i|_t}{Z_t} \exp \left\{ -b_t \right\} & \qquad \qquad
 		\mbox{otherwise} \\
 	\end{array} \right.
 	\label{eqn:sample weight update}
@@ -134,7 +134,7 @@ $i=1 \ldots m$
 \par
 \noindent {\bf Output:} 
 \begin{equation}
-H(\bfx) = \sign (F(\bfx)) = \sign \left\{ \sum_{i=1}^T w_i f_i(\bfx) \right\}
+H(\bfx) = \sign (F(\bfx)) = \sign \left\{ \sum_{i=1}^T b_i f_i(\bfx) \right\}
 \end{equation}
 \caption{The AdaBoost algorithm $\bbB$}
 \end{linefigure}
@@ -680,8 +680,8 @@ AdaBoost algorithm, from a base class $\calH$ with VC dimension $d$,
 with probability at least $1 - \delta$ over $m$ independent training
 samples
 \begin{equation}
-R(f) \leq R_{\emp}^{\gamma}(f) + \sqrt{\frac{c}{m} \left[ \frac{d
-\ln^2 (m/d)}{\gamma^2} + \ln(1/\gamma) \right] }
+R(F) \leq R_{\emp}^{\gamma}(F) + \sqrt{\frac{c}{m} \left[ \frac{d
+\ln^2 (m/d)}{\gamma^2} + \ln(1/\delta) \right] }
 \end{equation}
 \end{theorem}
 
