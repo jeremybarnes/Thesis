@@ -6,6 +6,14 @@ function disp(obj)
 % Jeremy Barnes, 25/4/1999
 % $Id$
 
+global in_decision_stump_disp
+
+if (~isempty(in_decision_stump_disp))
+   error('Recursion on @decision_stump/disp');
+end
+
+in_decision_stump_disp = 1;
+
 s = size(obj);
 if ((s(1) ~= 1) | (s(2) ~= 1))
    sizestr = ['(' int2str(s(1))];
@@ -25,3 +33,4 @@ else
    disp(['      rightcategory = ' int2str(obj.rightcategory)]);
 end
 
+in_decision_stump_disp = [];
