@@ -34,6 +34,8 @@ function testboost(datatype, numpoints)
 % PRECONDITIONS:
 % none
 
+
+
 % Set up our classifiers
 b = category_list('binary');
 maxiterations = 100;
@@ -49,7 +51,7 @@ d = datagen(d, datatype, numpoints, 0, 0);
 [x, y] = data(d);
 
 test_d = dataset(b, 2);
-test_d = datagen(d, datatype, numpoints, 0, 0);
+test_d = datagen(test_d, datatype, numpoints, 0, 0);
 [xtest, ytest] = data(test_d);
 
 % Complete our initial training step
@@ -144,7 +146,7 @@ while (1)
 %   end
 
    iter = iter + 1;
-   if (iter == 26)
+   if (iter == 100)
       return;
    end
 end
