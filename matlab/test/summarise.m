@@ -107,10 +107,16 @@ for noisevalue=1:num_noise_values
 	 
 	 % Now find where the best test error occurred and its value, and
          % store these away also
-	 bte = min(teste);
-	 index = find(teste == bte);
-	 if (length(index) > 1)
-	    index = index(1);
+	 if (it > 0)
+	    bte = min(teste);
+	    index = find(teste == bte);
+	    if (length(index) > 1)
+	       index = index(1);
+	    end
+	 
+	 else % Training was aborted on first iteration
+	    bte = NaN;
+	    index = -1;
 	 end
 	 
 	 best_test_error(noisevalue, pvalue, trial) = bte;
