@@ -53,7 +53,6 @@ mxArray_t *reg_to_matlab_string(char *s, struct re_registers *registers,
     /* Copy it in and add null terminator */
     strncpy(reg_str, s + (registers->start[num]), reg_size);
     reg_str[reg_size+1] = '\0';
-    mexPrintf("Register number %d has string \"%s\"\n", num, reg_str);
     out = mxCreateString(reg_str);
     if (out == NULL)
 	mexErrMsgTxt("regex: unable to allocate memory for reg array");
@@ -129,8 +128,6 @@ void mexFunction(int nlhs, mxArray_t *plhs[],
     if (res != 0)
 	mexErrMsgTxt("regex: pattern was not a string");
 
-    mexPrintf("pattern_str (length %d) is \"%s\"\n", pattern_len, pattern_str);
-
     /* Get the string to match */
     string_len = mxGetNumberOfElements(string);
     string_str = mxCalloc(string_len+1, sizeof(char));
@@ -139,8 +136,6 @@ void mexFunction(int nlhs, mxArray_t *plhs[],
 
     res = mxGetString(string, string_str, string_len+1);
     if (res != 0) mexErrMsgTxt("regex: second argument was not a string");
-
-    mexPrintf("string_str (length %d) is \"%s\"\n", string_len, string_str);
 
     /* Set up our regexp buffer */
     pattern_buf.translate = NULL;
@@ -151,26 +146,16 @@ void mexFunction(int nlhs, mxArray_t *plhs[],
     re_set_syntax(MATLAB_REGEX_SYNTAX);
     registers.num_regs = 0;
 
-    mexPrintf("Compiling regular expression...");
-
     /* Compile the regular expression */
     error_msg = re_compile_pattern(pattern_str, pattern_len, &pattern_buf);
 
     if (error_msg != NULL) mexErrMsgTxt(error_msg);
-
-    mexPrintf("done.\n");
-
-    mexPrintf("Searching regular expression...");
 
     /* Do a search on the regular expression */
     res = re_search(&pattern_buf, string_str, string_len, 0, string_len,
 		    &registers);
 
     if (res == -2) mexErrMsgTxt("regex: internal error in matcher!");
-
-    mexPrintf("done.\n");
-
-    mexPrintf("There were %d backreferences\n", pattern_buf.re_nsub);
 
     current_arg = 0;
 
@@ -184,10 +169,8 @@ void mexFunction(int nlhs, mxArray_t *plhs[],
 	
 	if (res == -1) { /* Not found */
 	    *mxGetPr(matched) = 0.0;
-	    mexPrintf("Match was not found\n");
 	} else { /* Found */
 	    *mxGetPr(matched) = 1.0;
-	    mexPrintf("Match was found\n");
 	}
 	plhs[current_arg++] = matched;
     }
@@ -261,21 +244,17 @@ void mexFunction(int nlhs, mxArray_t *plhs[],
 
 
     /* Clean up */
-    mexPrintf("Cleaning up registers...");
     if (registers.num_regs > 0) {
 	mxFree(registers.start);	
 	mxFree(registers.end);
     }
 
-    mexPrintf("done.\nCleaning up pattern_buf...");
     if (pattern_buf.buffer != NULL)
 	mxFree(pattern_buf.buffer);
     pattern_buf.buffer = NULL;
 
-    mexPrintf("done.\nCleaning up strings...");
     mxFree(string_str);
     mxFree(pattern_str);
-    mexPrintf("done.\n");
 }    
     
     

@@ -5,9 +5,10 @@
 # Set this to the path that the GNU regex library is installed in
 # Alternatively, specify it on the command line:
 # make regex_path=~/source/gnu/regex-0.12
+regex_path = /home/jeremy/src/regex-0.12
 
-regex_path = ../regex-0.12
-
+# Set this path where you want it installed
+install_path = /home/jeremy/matlab
 
 # The extension of MEX files on this architecture
 MEX_EXTN = .mexlx
@@ -44,7 +45,20 @@ regex.o:	regex.c
 regex$(MEX_EXTN):	regex.o gnu_regex.o
 		mex $(mex_debug) regex.o gnu_regex.o
 
-gnu_regex.o:
+$(regex_path)/regex.o:
 		$(MAKE) -C $(regex_path) -e regex.o
+
+gnu_regex.o:	$(regex_path)/regex.o
 		mv $(regex_path)/regex.o gnu_regex.o
+
+.DUMMY: 	install
+
+install:	regex$(MEX_EXTN) regex.m
+		cp regex$(MEX_EXTN) $(install_path)
+		cp regex.m $(install_path)
+
+.DUMMY:		clean
+
+clean:		
+		-rm *.o *~ *.mexlx
 
