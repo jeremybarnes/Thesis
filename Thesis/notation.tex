@@ -2,24 +2,13 @@
 % Jeremy Barnes, 1999
 % $Id$
 
-\chapter{Acronyms and Notation}
+\chapter{Notation and Acronyms}
 
-\section*{Acronyms}
-
-\begin{tabular}{l l l}
-
-\bf{Acronym} & \bf{Meaning} & \bf{First introduced} \\ \hline \hline
-
-SLT	& Statistical Learning Theory 	& \ref{acr:slt} \\
-ERM	& Empirical Risk Minimisation 	& \ref{acr:erm} \\
-SRM	& Structural Risk Mininmisation & \ref{acr:srm} \\
-VC dimension & Vapnik-Chervonenkis dimension & \ref{acr:vcdim} \\
-\hline
-
-\end{tabular}
+\newcommand{\notationskip}{5mm}
+\newcommand{\notspace}{\vspace{\notationskip}}
 
 \section*{Notation}
-\newcommand{\longexp}[1]{\parbox[t]{3in}{#1}}
+\newcommand{\longexp}[1]{\parbox[t]{3in}{\raggedright #1}}
 \begin{tabular}{l l c}
 \bf{Symbols}		& \bf{Meaning}		& \bf{Section} \\
 \hline \hline
@@ -33,9 +22,9 @@ $X = ((\bfx_1, y_1), \ldots))$
 			& Labeled samples, length $m$ (training dataset)
 			& \ref{sec:formulation} \\
 
+\notspace
 $\calI, \calO$		& Domain and range (usually $\{\pm 1\}$) of problem
 			& \ref{sec:domain and range} \\
-\vspace{5mm}
 $h(\cdot) \in \calH : \calI \mapsto \calO$
 			& A hypothesis (classifier)
 			& \ref{sec:formulation} \\
@@ -52,10 +41,10 @@ $\calF$			& A set of possible hypotheses $f$
 			  ($\calH = \sign(\calF)$)
 			& " \\
 
+\notspace
 $\bbW : \calI^m \mapsto (\calI \mapsto \calO)$
  			& Learning machine ($\bbW(X) = h$)
 			& " \\
-\vspace{5mm}
 $q = Q(\bfx, y, \hat{y})$
 			& Loss function
 			& \ref{sec:loss function} \\
@@ -69,10 +58,10 @@ $R_{\emp}(h)$		& Empirical risk
 $R_{\emp}^w(h)$		& Weighted empirical risk (training error)
 			& \ref{sec:weighted empirical risk} \\
 
+\notspace
 $R_{\emp}^{\gamma}(h)$	& Margin risk
 			& \ref{sec:margin risk} \\
 
-\vspace{5mm}
 $\VCdim(\cdot)$		& VC dimension
 			& \ref{sec:vcdim} \\
 
@@ -88,10 +77,41 @@ $\covert{\calX}{\epsilon}{k}$ &
 			over length $k$}
 			& " \\
 
-$\co_{p}(\calX)$	& $p$-convex hull of set $\calX$
+\notspace
+$\co_{p}(\calX)$, $\co(\calX)$
+			& \longexp{$p$-convex hull of set $\calX$; $p=1$
+			 assumed if not specified}
 			& \ref{sec:p-convex} \\
+$\bbB$, $\trainboost$	& AdaBoost, action of AdaBoost
+			& \\
+$F(\bfx)$, $H(\bfx)$	& \longexp{Boosting hypothesis, nonthresholded
+			\& thresholded, $H(\cdot) = \sign(F(\cdot))$}
+			& \\
+
+$b_1, \ldots, b_t$	& AdaBoost classifier weights
+			& \\
+
+$w_1|_t, \ldots, w_m|_t$ & AdaBoost sample weights
+			& \\
+
 \hline
 \end{tabular}
 \par\par\noindent
 A hat ($\hat{\ \ }$) means ``estimate''.  An asterisk ($\ \ ^{\ast}$) means
 ``optimal'' in some sense.
+
+
+\section*{Acronyms}
+
+\begin{tabular}{l l l}
+
+\bf{Acronym} & \bf{Meaning} & \bf{First introduced} \\ \hline \hline
+
+SLT	& Statistical Learning Theory 	& \ref{acr:slt} \\
+ERM	& Empirical Risk Minimisation 	& \ref{acr:erm} \\
+SRM	& Structural Risk Mininmisation & \ref{acr:srm} \\
+VC dimension & Vapnik-Chervonenkis dimension & \ref{acr:vcdim} \\
+\hline
+
+\end{tabular}
+

@@ -8,29 +8,33 @@ function shattering
 
 global EPSFILENAME
 
+
+three_points_x = [0.2 0.8 0.3];
+three_points_y = [0.8 0.2 0.1];
+
+four_points_x = [0.2 0.8 0.4];
+four_points_y = [0.2 0.2 0.8];
+
 figure(1);  clf;
+setup_figure;
 
-two_points_x = [0.2 0.8];
-two_points_y = [0.8 0.2];
-
-three_points_x = [0.2 0.8 0.4];
-three_points_y = [0.2 0.2 0.8];
-
-figure(1);  clf;
-
-subplot(1, 2, 1);
-plot(two_points_x, two_points_y, 'k.', 'MarkerSize', 10);  hold on;
+subplot(1, 2, 1);  setup_axis;
+plot(three_points_x, three_points_y, 'k.', 'MarkerSize', 15);  hold on;
 plot([0 1], [0 1], 'k--');
-plot([0.2 1], [1 0.8], 'k--');
 plot([0 0.8], [0.8 0], 'k--');
 plot([0.5 0.5], [0 1], 'k--');
-title('(a)');
+title('(a) \bf{Three points}');
+set(gca, 'xtick', [], 'ytick', []);
+xlabel('\itx_1');  ylabel('\itx_2');
 axis square;
 
-subplot(1, 2, 2);
-plot(three_points_x, three_points_y, 'k.', 'MarkerSize', 10);
+subplot(1, 2, 2);  setup_axis;
+plot([0.3 0.7], [0.5 0.5], 'k.', 'markersize', 15);  hold on;
+plot([0.5 0.5], [0.3 0.7], 'ko');
 axis([0 1 0 1]);
-title('(b)');
+xlabel('\itx_1');  ylabel('\itx_2');
+set(gca, 'xtick', [], 'ytick', []);
+title('(b) \bf{Four points}');
 axis square;
 
 set(1, 'paperposition', [0 0 6 2.5]);

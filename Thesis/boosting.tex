@@ -5,6 +5,7 @@
 % The chapter of my thesis on Boosting
 
 \chapter{Boosting and similar algorithms}
+\label{chapter:boosting}
 
 The name ``Boosting'' is applied to many different machine learning
 algorithms, which combine many weak hypotheses to form a ``strong''
@@ -34,7 +35,7 @@ problem of overfitting in boosting.  Both practical and theoretical
 explanations for this phenomenon are given.
 
 
-\section{The original boosting algorithm: AdaBoost}
+\section{The AdaBoost algorithm}
 
 We first describe the AdaBoost algorithm, first published by Freund
 and Scahpire \cite{Freund96}.  In essence, this algorithm
@@ -55,74 +56,6 @@ or less equivalent when boosted) to the development of better
 We consider questions of how and why AdaBoost works; in
 particular how it chooses the optimal linear combination of
 classifiers from the very large set of possible linear combinations.
-But first we introduce our notation.
-
-\subsection{Notation}
-
-(refer to figure below?)
-
-* Denote training with double arrow
-* Define and denote equivalence of AdaBoost algorithms
-
-\begin{linefigure}
-\label{fig:boosting algorithm}
-\noindent{\bf Input:} $l$ examples $(\bfx_1, \bfy_1), \ldots, (\bfx_l,
-\bfy_l)$, a weak learning algorithm $\bbW : (\calI \times \calO)^l
-\mapsto (\calI \mapsto \calO)$.
-\par
-\noindent{\bf Initialisation:} $w_i|_{t=1} = 1/l$ for $i=1 \ldots l$
-\par
-\noindent {\bf Do for} $t=1 \ldots T$:
-
-
-\begin{enumerate}
-
-\item	Train weak learner on the weighted sample set 
-	$(\bfx_1, \bfy_1, w_1) \ldots (\bfx_l, \bfy_l, w_l)$
-	and obtain weak learner $f_t(\cdot) : \calI \mapsto \{\pm 1\}$
-
-\item	Calculate the training error $\epsilon_t$ of $f_t(\cdot)$:
-	%
-	\begin{equation}
-	\epsilon_t = \sum_{j=1}^l w_j |_t 
-	I \left( f_t(\bfx_j) \neq \bfy_j\right)
-	\end{equation}
-
-	If $\epsilon_t = 0$ (a single weak learner can correctly learn
-	the relationship) or $\epsilon_t \geq \phi - \Delta$ (where
-	$\Delta$ is a small positive constant; thus the weak
-	learner is performing as badly as random guessing) then abort
-	the training process.
-
-\item	Calculate our classifier weight $b_t$:
-	\begin{equation}
-	b_t = \log \frac{\epsilon_t}{1 - \epsilon_t}
-	\end{equation}
-
-\item	Update the weights $w_i$:
-	%
-	\begin{equation}
-	w_i|_{t+1} = \left\{
-	\begin{array}{cl}
-		w_i|_t / Z_t	&	\qquad \qquad \mbox{if
-		$f_t(x_i) = y_i$} \\
-		w_i|_t / Z_t \exp \left\{ -b_t \right\} & \qquad \qquad
-		\mbox{otherwise} \\
-	\end{array} \right.
-	\end{equation}
-
-	where $Z_t$ is a normalisation constant, such that
-	$\sum_{i=1}^{l} w_i|_{t+1} = 1$
-\end{enumerate}
-
-\par
-\noindent {\bf Output:} 
-\begin{equation}
-F'(\bfx) = \sign \left\{ \sum_{i=1}^T w_i f_i(\bfx) \right\}
-\end{equation}
-\caption{The AdaBoost algorithm}
-\end{linefigure}
-
 
 Figure \ref{fig:boosting algorithm} gives an explicit description of
 AdaBoost.  The key features are:
@@ -141,6 +74,93 @@ AdaBoost.  The key features are:
 	``hard'' that sample is to classify.  Section \ref{sec:sample
 	weights} describes these sample weights in more detail.
 \end{enumerate}
+%
+First, we explain our notation.
+
+
+\begin{linefigure}
+\label{fig:boosting algorithm}
+\noindent{\bf Input:} $m$ examples $X = ((\bfx_1, y_1), \ldots, (\bfx_l,
+y_m))$ and a weak learning algorithm $\bbW$
+\par
+\noindent{\bf Initialisation:} $F_0(\bfx) = 0$; $w_i|_0 = 1/m$ for
+$i=1 \ldots m$ 
+\par
+\noindent {\bf Do for} $t=1 \ldots T$:
+\par
+\noindent Update $F_t \trainboost F_{t+1}$: 
+\par
+\begin{enumerate}
+
+\item	Train weak learner $\bbW$ on the weighted sample set 
+	$(\bfx_1, y_1, w_1|_t) \ldots (\bfx_m, y_m, w_m)$
+	and obtain weak learner $h_t(\cdot) : \calI \mapsto \{\pm 1\}$
+
+\item	Calculate the weighted empirical risk (training error
+	$\epsilon_t$) of $f_t(\cdot)$: 
+	%
+	\begin{equation}
+	\epsilon_t = R_{\emp}^{w|_t}(h) = \sum_{j : h(\bfx_j) \neq
+	y_j} w_j|_t
+	\end{equation}
+
+	If $\epsilon_t = 0$ (a single weak learner can correctly learn
+	the relationship) or $\epsilon_t \geq 1/2$; thus the weak
+	learner is performing as badly as random guessing) then abort
+	the training process, with $\bbB_{t+1} = \bbB_{t}$.
+
+\item	Calculate our classifier weight $b_t$:
+	\begin{equation}
+	b_t = - 1/2 \log \frac{\epsilon_t}{1 - \epsilon_t}
+	\end{equation}
+
+\item	Update the sample weights $w_i$:
+	%
+	\begin{equation}
+	w_i|_{t+1} = \left\{
+	\begin{array}{cl}
+		w_i|_t / Z_t \exp \left{ b_t \right\}&	\qquad \qquad \mbox{if
+		$f_t(x_i) = y_i$} \\
+		w_i|_t / Z_t \exp \left\{ -b_t \right\} & \qquad \qquad
+		\mbox{otherwise} \\
+	\end{array} \right.
+	\label{eqn:sample weight update}
+	\end{equation}
+
+	where $Z_t$ is a normalisation constant, such that
+	$\sum_{i=1}^{l} w_i|_{t+1} = 1$
+\end{enumerate}
+
+\par
+\noindent {\bf Output:} 
+\begin{equation}
+H(\bfx) = \sign (F(\bfx)) = \sign \left\{ \sum_{i=1}^T w_i f_i(\bfx) \right\}
+\end{equation}
+\caption{The AdaBoost algorithm $\bbB$}
+\end{linefigure}
+
+
+\subsection{Notation}
+
+The notational conventions mentioned here refer to the algorithm
+printed in figure \ref{fig:boosting algorithm}.
+
+\begin{itemize}
+\item	The AdaBoost algorithm is given the symbol $\bbB$, and the
+	weaklearner $\bbW$.
+\item	The sample weights are denoted $w_i|_t$, where $i \in 1 \ldots
+	m$ is the sample number and $t$ the iteration number.
+\item	The classifier weights are denoted $b_1 \ldots b_t$.
+\item	The non-thresholded hypothesis is $F(\cdot)$; the output of
+	the algorithm is $H(\cdot) = \sign(F(\cdot))$ (similar
+	notation to the individual hypotheses).
+\item	The process of training AdaBoost for one iteration is denoted
+	$F_t \trainboost F_{t+1}$.
+\end{itemize}
+
+Two AdaBoost hypotheses are said to be \emph{equivalent} ($\equiv$) if
+they produce the same output for all input, even if their internal
+state ($b$ and $w$ values) are not identical.
 
 
 \subsection{Classifier weights}
@@ -148,15 +168,15 @@ AdaBoost.  The key features are:
 
 The AdaBoost algorithm combines a number of ``weak'' classifiers
 $h_1(\cdot), \ldots, h_n(\cdot)$ in a linear combination to produce a
-``stronger'' classifier $F(\cdot) = \sum_{i=1}^{n} b_i f_i(\cdot)$.
+``stronger'' classifier $F(\cdot) = \sum_{i=1}^{n} b_i h_i(\cdot)$.
 The coefficients $b_i$ are subject to the condition that they produce a
 convex combination where $\|b\|_1 = \sum_{i=1}^{t} b_i = 1$.
 
 AdaBoost's training process is divided into iterations.  On iteration
-$t$, one weak learner $f_t(\cdot)$ is added to the linear
-combination ($f_t$ is chosen by the weak learning algorithm).  The
-coefficient $b_t$ of $f_t$ is calculated from the 
-training error $\epsilon_t$ of $f_t$ as 
+$t$, one weak learner $h_t(\cdot)$ is added to the linear
+combination ($h_t$ is chosen by the weak learning algorithm).  The
+coefficient $b_t$ of $h_t$ is calculated from the 
+training error $\epsilon_t$ of $h_t$ as 
 %
 \begin{equation}
 b_t = - \log \frac{\epsilon_t}{1 - \epsilon_t}
@@ -185,7 +205,7 @@ those weak hypotheses that performed well on the training samples
 
 Each sample in the training set has a corresponding weight $w_j$ which
 is updated to reflect the difficulty of that sample.  On each iteration the
-weights of samples which $f_t$ classified incorrectly are increased
+weights of samples which $h_t$ classified incorrectly are increased
 (scaled by $\exp \{ -b_t \}$); the whole lot are then normalised.
 This function has the following effect on distribution of weights:
 
@@ -226,14 +246,13 @@ is not desirable. (clarify)
 \section{Boosting as gradient descent}
 \label{sec:theory:gradient descent}
 
-Recent work has shown boosting to be an implementation of gradient
-descent in an inner product space \cite{Mason99}\footnote{This
-discussion follows Mason et al. \cite{Mason99} rather closely with
-some changes in notation and omission of details such as stopping
-criteria.}.
-An inner product space requires both a universal set
-$\mathcal{X}$ and an inner product operator \ip{\cdot}{\cdot}.  We
-define
+Recent work has shown boosting to be an implementation of a gradient
+descent algorithm in an inner product space
+\cite{Mason99}\footnote{This discussion follows Mason et
+al. \cite{Mason99} rather closely with some changes in notation and
+omission of details such as stopping criteria.}.  An inner product
+space requires both a universal set $\mathcal{X}$ and an inner product
+operator \ip{\cdot}{\cdot}.  We define
 %
 \begin{equation}
 \calX = 
@@ -253,6 +272,7 @@ f_i : f_1, \ldots, f_n \in \calF,
 \begin{equation}
 \ip{F}{G} = \frac{1}{l} \sum_{i=1}^{l} F(\bfx_i)G(\bfx_i) \qquad
 F, G \in \calX
+\label{eqn:inner product definition}
 \end{equation}
 %
 We also choose the cost function
@@ -263,11 +283,11 @@ C(F) = \frac{1}{l} \sum_{i=1}^{l} \exp
 \label{eqn:theory:cost function}
 \end{equation}
 
-At iteration $t$ of gradient descent, we wish to choose a function $f_t$ and
-a weight $b_t$ such that $C(F + b_t f_t)$ decreases (the choice of
-$f_t$ is made indirectly through the choice of the sample weights
+At iteration $t$ of gradient descent, we wish to choose a hypothesis $h_t$ and
+a weight $b_t$ such that $C(F + b_t h_t)$ decreases (the choice of
+$h_t$ is made indirectly through the choice of the sample weights
 $w|_t$).  In other words, we are asking for sample weights $w|_t$ that
-choose a \emph{direction} $f_t \in \calF$ such that $C(F + b_t f_t)$
+choose a \emph{direction} $h_t \in \calH$ such that $C(F + b_t h_t)$
 decreases as fast as possible.  This direction is the negative of the
 functional derivative of $C$:
 %
@@ -279,11 +299,10 @@ f = -\nabla C(F)(\bfx) = \left. \frac{\partial C(F + \alpha
 %
 where $1_{\bfx}$ is the indicator function of $\bfx$; this is
 necessary as we can only evaluate \ref{eqn:functional derivative} at
-points where we have a sample.  Since the
-optimal $f_t$ will not necessarily be in $\calF$, we choose the
-$f \in \calF$ with the greatest inner product $\ip{-\nabla
-C(F)}{f}$.  Under the inner product space and cost functions we have
-chosen, this equation has the form
+points where we have a sample.  Since the optimal $h_t$ will not
+necessarily be in $\calH$, we choose the $h \in \calH$ with the
+greatest inner product $\ip{-\nabla C(F)}{h}$.  Under the inner
+product space and cost functions we have chosen, we are maximising
 %
 \begin{equation}
 - \ip{\nabla C(F)}{f} = - \frac{1}{m^2} \sum_{i=1}^{m} y_i f(\bfx_i)
@@ -300,7 +319,7 @@ Maximising (\ref{eqn:function to maximise}) is equivalent to
 minimising the weighted empirical risk
 %
 \begin{equation}
-R_{\emp}^{w_{|t}} = \sum_{i:y_i \neq f(\bfx_i)}^{m} w_{i|t}
+R_{\emp}^{w_{|t}} = \sum_{i:y_i \neq h(\bfx_i)}^{m} w_{i|t}
 \end{equation}
 %
 where $w_{|t}$ are the sample weights of boosting.
@@ -314,7 +333,7 @@ AdaBoost uses a line search for the minimum of the cost functional
 along the line
 %
 \begin{equation}
-b_t = \arg \min_{b_t} \sum_{i=1}^{l} C(y_i F(\bfx_i) + y_i b_t f_t(\bfx_i)
+b_t = \arg \min_{b_t} \sum_{i=1}^{m} C(y_i F(\bfx_i) + y_i b_t h_t(\bfx_i)
 \end{equation}
 %
 
@@ -328,11 +347,11 @@ illustrated in figure \ref{fig:gradient descent}.
 \includegraphics{figures/descent.epsg}
 \end{center}
 \begin{capt}{Schematic representation of gradient descent.}
-Points within the blue circle are in \calF, the height of the surface
+Points within the circle are in \calH, the height of the surface
 the value of (\ref{eqn:theory:cost function}) at that point.  (a) is a
-3D view, (b) is top view. Red lines show line searches; markers
-minimums.  Descent from $\circ$ to $\Box$ to $\Diamond$, where it
-terminates due to local minimum.
+3D view, (b) is top view. Lines show line searches; markers
+minimums.  We descend from $\circ$ through $\Box$ to $\Diamond$, where
+the algorithm terminates due to a local minima.
 \end{capt}
 \label{fig:gradient descent}
 \end{linefigure}
@@ -351,16 +370,17 @@ stopping conditions.  We will show that, given a state at iteration
 $t$, then boosting and gradient descent produce identical states at
 iteration $t+1$.
 
-Once we have chosen $f_{t+1}$, we need to choose $w_{t+1}$.  This is
-chosen to minimise the cost functional along the line given by the
-direction $f_{t+1}$.  We can write the value of this cost functional
-as
+Once we have chosen $f_{t+1}$ using weighted empirical risk
+minimisation, we need to choose $w_{t+1}$.  This is chosen to minimise
+the cost functional along the line given by the direction $f_{t+1}$.
+We can write the value of this cost functional as
 %
 \begin{equation}
 C = \sum_{i=1}^{m} c \left( y_i F_t(\bfx_i) + y_i w_{t+1}
 f_{t+1}(\bfx_i) \right)
 \end{equation}
-Substituting in $c(f(x)) = e^{-yf(x)}$, we obtain
+%
+Substituting in $c(F(\cdot)) = e^{-yF(\cdot)}$, we obtain
 %
 \begin{equation}
 C = \sum_{i=1}^{m} \exp \left\{ y_i F_t(\bfx_i) + y_i w_{t+1}
@@ -385,7 +405,7 @@ f_{t+1}(\bfx_i) \right\}
 From this result, we make several simplifications.  Noting that
 %
 \begin{equation}
-y_i f_{t+1}(\bfx_i) = \left{ 
+y_i f_{t+1}(\bfx_i) = \left\{ 
 	\begin{array}{ll}
 	1 &	\qquad \mbox{if $y_i = f_{t+1}(\bfx_i)$} \\
 	-1 &	\qquad \mbox{if $y_i \neq f_{t+1}(\bfx_i)$}
@@ -397,9 +417,11 @@ and that $w_{i | t} = k \exp \{ -y_i F_t(x_i) \}$ where $k$ is some
 constant, we can recast (\ref{eqn:differentiate}) into the form
 %
 \begin{equation}
-\underbar{\frac{\sum_{i : y_i = f_{t+1}(\bfx_i)} w_{i|t}}
-{\sum_{i : y_i = f_{t+1}(\bfx_i)} w_{i|t}}}{\epsilon_t} 
-= \exp \( 2 \alpha \}
+\underbrace{
+	\frac{\sum_{i : y_i = f_{t+1}(\bfx_i)} w_{i|t}}
+	     {\sum_{i : y_i \neq f_{t+1}(\bfx_i)} w_{i|t}}
+}_{\epsilon_t}
+= \exp \left\{ 2 \alpha \right\} 
 \end{equation}
 %
 from which it is a simple transformation to obtain
@@ -407,33 +429,82 @@ from which it is a simple transformation to obtain
 equivalent to boosting; thus boosting implements gradient descent.
 \end{theorem}
 
+The cost functional $c(\alpha) = e^{-\alpha}$ is an approximation to
+the misclassification risk (\ref{eqn:misclassification risk}) that is
+differentiable at all points and leads to a closed-form solution for
+the step size.  It is plotted in figure \ref{fig:cost functional
+approximation}.  Other approximations have been used; see Mason
+et. al. \cite{Mason99} for details.
+
+\begin{linefigure}
+\begin{center}
+\includegraphics{figures/cost_approx.epsg}
+\end{center}
+\begin{capt}{Approximation to the misclassification risk function}
+The misclassification risk is plotted in the dotted line, with the
+AdaBoost approximation plotted in the solid line.  It is clear that
+the effect of this cost function will be to maximise the margins of
+the samples.
+\end{capt}
+\label{fig:cost functional}
+\end{linefigure}
+
 \subsection{Summary}
 
+In this section, we have shown that the AdaBoost algorithm implements
+gradient descent.  There are four aspects of the gradient descent
+problem that need to be specified:
+%
+\begin{enumerate}
+\item	What is our universal set? (AdaBoost: $\co(\calH)$)
+\item	What is our inner product? (AdaBoost: equation (\ref{eqn:inner
+	product definition}))
+\item	What is our cost function? (AdaBoost: $c(\alpha) =
+	e^{-\alpha}$)
+\item	How do we choose a step size? (AdaBoost: line search).
+\end{enumerate}
+%
+In chapter \ref{chapter:development} we will consider changing some of
+these to implement algorithms with desirable properties.
+
+\section{AdaBoost and Boosting algorithms}
+
+Until this point we have only considered the AdaBoost algorithm.  We
+now extend our scope to other AdaBoost-like algorithms.  These
+algorithms are termed ``boosting algorithms''.
+
+There has recently been some debate over what constitutes a ``boosting
+algorithm''; see for example Duffy and Helmbold \cite{Duffy99} who
+adopt quite a restrictive definition.  In this thesis, we take a very
+broad definition:
+
+\begin{definition}[A boosting algorithm]
+Any learning machine that constructs a hypothesis that is a linear
+combination of base hypotheses by leveraging another learning machine
+in an interative manner is a boosting algorithm.
+\end{definition}
+
+In particular, we don't require that the training error be guaranteed
+to reach zero.  All algorithms considered in this thesis are,
+according to definition \ref{def:boosting}, boosting algorithms.
 
 
-\section{Properties of the boosting algorithm}
+\section{Properties of the AdaBoost and boosting algorithms}
 
-* Guaranteed convergence to zero training error
+We have covered the \emph{form} of the AdaBoost algorithm quite
+extensively.  We now cover the \emph{function} of the algorithm, so
+that we have a basis for comparison.
 
-  * It modifies the weights at each iteration so the previous had
-    $\epsilon_t = 1/2$
+\subsection{Convergence properties}
 
-  * So we must keep on getting better
+This theorem provides two results.  The first, applicable to any
+algorithm that implements gradient descent, shows that under certain
+conditions on the cost function and step sizes the 
+e main result of this section is a theorem that the empirical risk
+(training error) of boosting will converge to zero if the algorithm is
+trained for long enough.
 
-  * So we must converge
-
-* Scale invariance
-
-  * The sign makes it not matter
-
-  * If we multiply $F_t$ by $k$ to get $F*_t$, then we get $b*_{t+1} = 1/k
-    b_{t+1}$
-
-* Converges to the solution that has the minimum margin
-	
-\subsection{Convergence of boosting}
-
-\begin{theorem}
+\begin{theorem}[Boosting reaches zero training error]
 Given a weaklearner $\mathcal{L}$ and a training set $S$,
 then either:
 \begin{enumerate}
@@ -442,11 +513,11 @@ then either:
 	t_{zero}$ the training error $\epsilon_t = 0$.
 \end{enumerate}
 
-\proof If for any training iteration $t$ we have $\epsilon_t > 1/2$ then the
-boosting algorithm will terminate.  Assuming that this is not the
+\proof If for any training iteration $t$ we have $\epsilon_t \geq 1/2$
+then the boosting algorithm will terminate.  Assuming that this is not the
 case, let us look at $\|b\|$.  As $t \rightarrow \infty$, $\|b\|
 \rightarrow \infty$.  Thus, taking the normalised hypotheses $\bar{h}_i
-= b_i \frac{h}{\sum b}$ we get the cost function as
+= b_i \frac{h}{\sum b}$ we obtain
 \[
 C(F_{t+1}) = \sum_{i=1}^{m} \exp\left\{ -y_i b_i h_i(x_i)
 \right\}^{\|b\|}
@@ -480,28 +551,13 @@ I don't know!
 
 
 
-\subsection{Size of $b$}
+\subsection{AdaBoost maximises the minimum margin}
 
-The following theorem shows that the total weight of the boosting
-algorithm is unbounded as the number of iterations increases.  It is
-used to prove results on the minimum margin and final training error
-of boosting.
+This section introduces several theorems which together show that
+AdaBoost chooses the linear combination that maximises the minimum
+margin over its training samples.
 
-\begin{theorem}
-The size of the $b$ weight vector, $\|b\| \rightarrow \infty$
-as $t \rightarrow \infty$ (assuming the boosting algorithm doesn't
-terminate).
-
-\proof ?
-\end{theorem}
-
-
-\subsection{Minimum margin}
-
-The following proof shows that the solution that AdaBoost converges to
-is the one that maximises the minimum margin on the training samples.
-
-\begin{theorem}
+\begin{theorem}[AdaBoost maximises the minimum margin]
 Given a particular learning algorithm $F$ and a training
 set $S$, define the minimum margin as
 \[
@@ -530,18 +586,68 @@ maximising the minimum margin.
 \end{theorem}
 
 
-\subsection{Scale invariance of strong hypotheses}
+\subsection{Equivalences of AdaBoost}
+
+In this section we state two results that show scale independence of
+the AdaBoost algorithm.
+
 \begin{theorem}
-The hypothesis returned by the AdaBoost is independent of a linear
+The hypothesis returned by the AdaBoost is independent of a 
 scaling of the $b$ values.  In particular, for all $k > 0$, the
 scaled hypothesis $kF$ is equivalent to the unscaled hypothesis $F$.
 
-\proof In order to prove this equivalence, we show that for any
-training sample $\{x, y\}$ both $F$ and $kF$ return the same result.
-
-(Proof continues noting that the sign function is independent of
-scaling)
+\proof This follows from the fact that the sign function is
+independent of a scaling of the $b$ values.
 \end{theorem}
+
+
+
+
+* Guaranteed convergence to zero training error
+
+  * It modifies the weights at each iteration so the previous had
+    $\epsilon_t = 1/2$
+
+  * So we must keep on getting better
+
+  * So we must converge
+
+* Scale invariance
+
+  * The sign makes it not matter
+
+  * If we multiply $F_t$ by $k$ to get $F*_t$, then we get $b*_{t+1} = 1/k
+    b_{t+1}$
+
+* Converges to the solution that has the minimum margin
+	
+\subsection{Convergence of boosting}
+
+
+
+
+\subsection{Size of $b$}
+
+The following theorem shows that the total weight of the boosting
+algorithm is unbounded as the number of iterations increases.  It is
+used to prove results on the minimum margin and final training error
+of boosting.
+
+\begin{theorem}
+The size of the $b$ weight vector, $\|b\| \rightarrow \infty$
+as $t \rightarrow \infty$ (assuming the boosting algorithm doesn't
+terminate).
+
+\proof ?
+\end{theorem}
+
+
+\subsection{Minimum margin}
+
+The following proof shows that the solution that AdaBoost converges to
+is the one that maximises the minimum margin on the training samples.
+
+
 
 We denote this equivalence by writing
 \[
@@ -594,62 +700,55 @@ of $1/2$.
 
 
 \section{Performance bounds for Boosting}
-By proceeding I mean somewhere in Peter's book chapter
 
-I need to rewrite this section; it is copied verbatim
+The following theorem appears in Schapire et. al \cite{Schapire97}.
 
-The preceding ideas can be applied to the boosting algorithm.  Let us
-take in particular the boosted classifier of the form
+\begin{theorem}[Performance bound for boosting ($p$=1)]
+
+There is a constant $c$ such that a hypothesis $F$ generated by the
+AdaBoost algorithm, from a base class $\calH$ with VC dimension $d$,
+with probability at least $1 - \delta$ over $m$ independent training
+samples
 \begin{equation}
-x \mapsto \sign \left( \sum_{i=1}^{N} w_i f_i(x) \right)
+R(f) \leq R_{\emp}^{\gamma}(f) + \sqrt{\frac{c}{m} \left[ \frac{d
+\ln^2 (m/d)}{\gamma^2} + \ln(1/\gamma) \right] }
 \end{equation}
-that have large margins on the training examples, where $w_i > 0$,
-$\sum_i w_i = 1$, and $f_i$ are classifiers in some class $H$.  A
-VC-dimension analysis would suggest that the generalisation error
-would of these classifiers would increase with $N$, the number of base
-hypotheses $f_i$ that are combined.  The following result, which
-follows easily from techniques developed in \cite{Bartlett98}, shows
-that the fat-shattering dimension of the class of convex combinations
-of classifiers is independent of the number of base hypotheses.
+\end{theorem}
 
-\subsection{Bounds on fat-shattering dimension in boosting}
-
-* Can't state this directly.  Substitute in the bound on covering
-  numbers from eg. Peter's slides, and state that instead.
-
-There is a constant $c$ so that for all classes $H$ of functions
-mapping from $X$ to $\{-1, 1\}$, the class of convex combinations of
-functions from $H$ satisfies
-\begin{equation}
-\fat_{\calF} \leq c \frac{h}{\gamma^2} \ln (1/\gamma)
-\end{equation}
-
-where $h$ is the VC-dimension of the class $H$ of base hypotheses.
-
-\subsection{Bounds on error in boosting}
-
-* Again, make use of the covering numbers result from last time,
-  substitute in to get this.  If substituting directly gives a better
-  bound, then use that.
-
-There is a constant $c$ such that, for the class \calF\ of convex
-combinations of classifiers from a class $H$ with VC-dimension $h$,
-for all probability distributions, with probability at least
-$1-\delta$ over $l$ independently generated training examples, every
-classifier $\sign(f) \in \sign(\calF)$ has error no more than
-\begin{equation}
-b/l + \sqrt{\frac{c}{l} \left[ \frac{h \ln^2 (l/h)}{\gamma^2} +
-\ln(1/\gamma) \right] }
-\end{equation}
-where $b$ is the number of labelled training examples with margin less
-that $\gamma$.
 
 \subsection{Summary}
 
 \section{Overfitting}
 
+History of overfitting: looked like it didn't, then turned out to
+for high noise or lots of iterations.
+
+Explantion: maximising the minimum margin, thus the noisy points keep
+on getting wronger.
+
+This is why having an algorithm not ``maximising the minimum margin''
+is not necessarily a bad thing... talk about DOOM II, deliberately
+sacrafices minimum margin, gets better performance in some cases.
+Mason et al \cite{Mason99}.
 
 \section{Normed boosting algorithms}
+
+Already been looked at by Mason et al \cite{Mason99a}, for $p=1$ and
+$p=2$.  Different convergence results; converges to point in gradient
+space where slope = 0 (surprise surprise); show how this does not
+necessarily mean that training error is zero (because sum of
+$b$ is now bounded, we don't get exponential fast decreasing to zero
+of training error).
+
+Describe the key differences between normed and unnormed:
+\begin{itemize}
+\item	Normed: renormalise after each step; unnormed: don't
+\item	Normed: doesn't go to zero training error
+\end{itemize}
+
+Again, make the point that just because it doesn't minimise margins
+doesn't mean that it's not going to work well --> give an argument why
+it could work better (because not maximising minimum margin)
 
 
 \section{Chapter summary}

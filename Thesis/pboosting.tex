@@ -11,7 +11,11 @@ be more concrete as practical issues are considered.
 
 \section{Motivation: avoiding overfitting}
 
+
+
 \subsection{Qualitative arguments}
+
+Choo
 
 \subsection{Quantitative arguments}
 * By reducing covering numbers we get a better bound
@@ -23,13 +27,128 @@ be more concrete as practical issues are considered.
 
 \subsection{Summary}
 
+\section{Generalisation performance of hypotheses in $\co_p(\calH)$}
+
+Combining the covering-number generalisation performance bound
+(\ref{eqn:covering number bound}) with the approximate values of
+covering numbers for $p$-convex hulls (\ref{eqn:approx p-convex
+bound}), we obtain the following theorem
+
+\begin{theorem}[Approximate bound on generalisation performance]
+The generalisation error of a hypothesis $F \in \co_p(\calH)$ where
+$\calH$ has VC dimension???????? $d$ over a set of $m$ independent training
+samples with probability at least $1 - \delta$ can be approximated by
+%
+\begin{equation}
+R(F) \lesssim R_{\emp}^{\gamma}(F) + \sqrt{ \frac{8}{m} \left[ \log 2
++ c(p) \: d \: \left( \frac{2}{\gamma} \right)^{\frac{2p}{2-p}} \log
+\left( \frac{2}{\gamma} \right) - \log \delta \right]}
+\end{equation}
+where $c(p)$ is a constant that depends upon $p$. 
+%
+\end{theorem}
+
+This result is necessarily an approximation, due to the approximate
+nature of the theorems it is based upon.
+
 \section{Development of algorithms}
 
 \subsection{Naive algorithm}
 
+The naive algorithm (named with the benefit of hindsight) attempts to
+modify the $b$ values of AdaBoost in a manner that will produce a
+``$p$-convex like'' distribution of parameters on $p$.
+
+The key feature of the algorithm is the calculation of the classifier
+weights $b$.  Denoting the classifier weight that AdaBoost would have
+used as $b'_t$, we use the formula
+%
+\begin{equation}
+b_t = b'_t^\frac{1}{p} = \left[ - 1/2 \log \left( \frac{\epsilon_t}{1
+- \epsilon_t} \right) \right]^\frac{1}{p}
+\end{equation}
+%
+Thus, for $p < 1$ the hypotheses with low training error (and hence
+high classifier weights) have these weights ``stretched'' out.  The
+effect of $p$ is plotted figure \ref{fig:naive b values}.
+
+\begin{linefigure}
+\begin{center}
+\includegraphics{figures/naive.epsg}
+\end{center}
+\begin{capt}{Effect of $p$ on classifier weights for naive algorithm}
+The three lines show $b_t$ against $\epsilon_t$ for $p \in \{ 0.5,
+0.7. 1.0 \}$.
+\end{capt}
+\label{fig:naive b values}
+\end{linefigure}
+
+There are two options for updating the sample weights $w$: based upon
+the value of $b_t$, or based upon $b'_t$ (unchanged from AdaBoost).
+The first option yields the equation
+%
+\begin{equation}
+w_i|_{t+1} = \left\{
+\begin{array}{cl}
+	w_i|_t / Z_t \exp \left\{ b'_t^{1/p} \right\} & \qquad \qquad \mbox{if
+	$f_t(x_i) = y_i$} \\
+	w_i|_t / Z_t \exp \left\{ -b'_t^{1/p} \right\} 	& \qquad \qquad
+	\mbox{otherwise} \\
+\end{array} \right.
+\end{equation}
+%
+The important point to notice is that the $1/p$ power (which is
+greater than one for $p < 1$) is inside an exponential; this could
+(and does) lead to the exponential function getting extremely large
+(outside the limits of IEEE floating point numbers).  Thus we update
+our sample weights based upon $b'_t$; they are identical to those
+chosen by the boosting algorithm.
+
+The naivity of the algorithm becomes apparent when considered in
+the gradient descent framework.  As our sample weights are calculated
+the same as AdaBoost; thus given an identical initial state both
+algorithms would proceed in the same ``direction''.  However the step
+sizes are different: AdaBoost performs a line search for the minimum
+in this direction and moves to that point; whereas the naive algorithm
+also searches for that point \emph{and then purposely avoids it!}
+Experiments with this algorithm prove to have indifferent performance.
+
 \subsection{Strict algorithm}
 
+The strict algorithm is the purest of all $p$-boosting algorithms
+considered in this thesis.  It performs gradient descent, using the
+same cost function and inner product as AdaBoost, but uses the the
+universal set $\calX = \co_p(\calH)$.  It is called the ``strict''
+algorithm because it also performs its line searches along lines
+$\ell$ where each point $p$ on $\ell$, $p \in \calX$.  In other words,
+it confines its line search to the $p$-convex hull.  This idea is
+illustrated in figure \ref{fig:strict line search}.
+
+\begin{linefigure}
+\begin{center}
+\includegraphics{figures/strict_search.epsg}
+\end{center}
+\begin{capt}{Line search for strict $p$-boosting algorithm}
+The strict $p$-boosting algorithm confines its line search to the
+$p$-convex hull of points.
+\end{capt}
+\label{fig:strict line search}
+\end{linefigure}
+
+Algebraicaly, we are seeking a minimum of the expression
+%
+\begin{equation}
+C(F_{t+1}) = \sum_{i=1}^{m} \exp \left\{ -y_i F_{t+1}(\bfx_i) \right\}
+\end{equation}
+%
+subject to the constraint
+Attempting to obtain a closed form solution for the minimum along this
+line
+ 
+
 \subsection{Sloppy algorithm}
+
+
 
 \subsection{Gravity algorithm}
 

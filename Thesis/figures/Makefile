@@ -37,7 +37,8 @@ all:		b_func.epsg regression_problem.epsg \
 		fat_shattering.epsg vcdim_problems.epsg \
 		overfitting.epsg srm.epsg covering.epsg \
 		p_convex.epsg sample_weights.epsg \
-		classifier_weights.epsg
+		classifier_weights.epsg cost_approx.epsg \
+		naive.m
 
 clean:		
 		-rm *.epsg *.mscript *~
