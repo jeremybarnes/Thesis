@@ -79,10 +79,5 @@ obj.tree.incorrectweight = 0;
 
 
 % construct class and use superior/inferior relationship
-obj = class(obj, 'cart', parent);
+obj = class(obj, 'cart');
 superiorto('double', 'classifier');
-
-
-% POSTCONDITIONS
-check_invariants(obj);
-
