@@ -37,6 +37,8 @@ testy = y_values(testd);
 test_err = [];
 train_err = [];
 
+
+
 iter = 1;
 
 obj = trainfirst(obj, trainx, trainy);
