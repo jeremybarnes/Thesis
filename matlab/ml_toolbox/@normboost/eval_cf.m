@@ -54,16 +54,24 @@ b = 1 - a;
 
 % Calculate margins
 y = y_data*2-1;
-
-margins = beta .* obj.margins + y .* results .* alpha;
+%[(1:length(y))' y obj.margins results]
+margins = (1-a)^(1/p) .* obj.margins + y .* results .* a^(1/p);
 
 % Evaluate sample costs
 sample_costs = exp(-margins);
 
 % Evaluate derivative of sample costs
-d_sample_costs = (b.^(1/p - 1) .* obj.margins ...
-		  - y .* results .* a.^(1/p-1)) ...
-                 .* sample_costs;
+%d_sample_costs = (b.^(1/p - 1) .* obj.margins ...
+%		  - y .* results .* a.^(1/p-1)) ...
+%                 .* sample_costs;
+
+% This doesn't match up with the numerically calculated curve... use a
+% less simplified expression which will hopefully match the maple
+% expression a lot better...
+
+factor_1 = obj.margins .* b.^(1/p - 1)/p;
+factor_2 = y .* results .* a.^(1/p - 1)/p;
+d_sample_costs = (factor_1 - factor_2) .* sample_costs;
 
 % Second derivative of sample costs
 %d2_sample_costs = (b.^(1/p - 2) .* (p*(1 + b) - 1) .* obj.margins ...
@@ -86,8 +94,6 @@ d2_sample_costs = (factor_1 + factor_2 + factor_3) .* sample_costs;
 cost = sum(sample_costs);
 dcost = sum(d_sample_costs);
 d2cost = sum(d2_sample_costs); 
-
-
 
 
 
