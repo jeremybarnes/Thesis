@@ -17,25 +17,24 @@ if (nargin == 2)
 end
 
 % Set up our classifier
-b = category_list('binary');
 maxiterations = 100;
 
-wl = decision_stump(b, 2);
+wl = decision_stump(2, 2);
 
-boost1 = normboost2(wl, 0.9);
+boost1 = normboost(wl, 5);
 boost2 = boost(wl);
 
-d = dataset(b, 2);
+d = dataset(2, 2);
 d = datagen(d, datatype, numpoints, 0, 0.2);
 [x, y] = data(d);
 
-test_d = dataset(b, 2);
+test_d = dataset(2, 2);
 test_d = datagen(test_d, datatype, 5000, 0, 0);
 [xtest, ytest] = data(test_d);
 
 % Do the testing
 [trained, test_err, train_err] = test(boost1, d, test_d, num_iter, 'nosave');
-%[trained2, test_err2, train_err2] = test(boost1, d, test_d, num_iter, 'slow');
+[trained2, test_err2, train_err2] = test(boost1, d, test_d, num_iter, 'slow');
 
 %[trained, r_test_err, r_train_err] = test(boost2, d, test_d, num_iter, 'nosave');
 
@@ -45,8 +44,8 @@ figure(1);  clf;
 iter = 1:length(test_err);
 semilogx(iter, test_err, 'r-');  hold on;
 semilogx(iter, train_err, 'b-');
-%plot(iter, test_err2, 'c--');
-%plot(iter, train_err2, 'm--');
+plot(iter, test_err2, 'c--');
+plot(iter, train_err2, 'm--');
 %plot(iter, r_test_err, 'r.');
 %plot(iter, r_train_err, 'b.');
 

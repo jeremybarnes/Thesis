@@ -47,17 +47,16 @@ elseif (nargin == 3)
    noise = 0.1;
 end
 
-
-% Set up our classifiers
-b = category_list('binary');
 maxiterations = 100;
 
-wl = decision_stump(b, 2);
+% Set up our classifiers
+
+wl = decision_stump(2, 2);
 
 boost1 = boost(wl);
 boost2 = normboost(wl, p);
 
-d = dataset(b, 2);
+d = dataset(2, 2);
 d = datagen(d, datatype, numpoints, 0, noise);
 [x, y] = data(d);
 
@@ -68,7 +67,7 @@ boost2 = trainfirst(boost2, d);
 
 iter = 1;
 
-while (1)
+while (iter < maxiterations)
    disp(['Iteration ' num2str(iter)]);
 
    % Calculation phase
@@ -79,8 +78,6 @@ while (1)
    if (~aborted(boost2))
       boost2 = trainagain(boost2);
    end
-
-   pause;
       
    iter = iter + 1;
 end
