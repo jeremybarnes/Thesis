@@ -15,13 +15,4 @@ function n = categories(obj)
 % Jeremy Barnes, 4/4/1999
 % $Id$
 
-
-% PRECONDITIONS
-% none
-
-
 n = obj.categories;
-
-
-% POSTCONDITIONS
-check_invariants(obj);
