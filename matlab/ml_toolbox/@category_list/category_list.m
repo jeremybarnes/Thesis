@@ -33,12 +33,14 @@
 function obj = classlabel(labels)
 
 % PRECONDITIONS
-assert(labels, 'length(obj) > 0');
+if (length(labels) == 0)
+   error('You must specify at least one label.');
+end
 
 
 % initialisation of variables in obj
 obj.initialised = 1;
-obj.numlabels = size(labels);
+obj.numlabels = length(labels);
 obj.labels = labels;
 
 
