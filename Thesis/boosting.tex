@@ -246,6 +246,7 @@ upon a series of training samples $X = ((\bfx_1, y_1), \ldots,
 We furthermore define the \emph{cost functional}
 %
 \begin{equation}
+\label{eqn:gradient descent cost functional}
 C(F) = \frac{1}{m} \sum_{i=1}^{m} c(y_i F(\bfx_i))
 \end{equation}
 %
@@ -502,17 +503,13 @@ R_{\emp}(H_t) \leq \prod_{t=1}^{T} \sqrt{1 - 4 \beta_t^2} \leq \exp
 \cite{Freund97}.
 
 \begin{theorem}[Sum of AdaBoost classifier weights is unbounded]
-
+\label{thm:increasing classifier weights}
+\todo{Finish this theorem.  It must be published somewhere...}
 \end{theorem}
 
+\proof It suffices to show that, for a constant $\epsilon > 0$ that
+there is always an iteration $t + \delta t$ such that the weight...
 
-This is from \cite{Schapire97}.  We use it to prove a theorem below.
-
-\begin{theorem}[Weight update of AdaBoost]
-The weights $w_{i|t}$ in the $t$-th iteration are chosen such that the
-previous hypothesis has exactly a weighted training error $\epsilon$
-of $1/2$.
-\end{theorem}
 
 The following theorem shows that the total weight of the boosting
 algorithm is unbounded as the number of iterations increases.  It is
@@ -527,54 +524,6 @@ terminate).
 \proof ?
 \end{theorem}
 
-\begin{theorem}[Boosting reaches zero training error]
-Given a weaklearner $\mathcal{L}$ and a training set $S$,
-then either:
-\begin{enumerate}
-\item	The boosting algorithm will terminate; or
-\item	There exists an iteration $t_{zero}$ such that for all $t \geq
-	t_{zero}$ the training error $\epsilon_t = 0$.
-\end{enumerate}
-
-\proof If for any training iteration $t$ we have $\epsilon_t \geq 1/2$
-then the boosting algorithm will terminate.  Assuming that this is not the
-case, let us look at $\|b\|$.  As $t \rightarrow \infty$, $\|b\|
-\rightarrow \infty$.  Thus, taking the normalised hypotheses $\bar{h}_i
-= b_i \frac{h}{\sum b}$ we obtain
-\[
-C(F_{t+1}) = \sum_{i=1}^{m} \exp\left\{ -y_i b_i h_i(x_i)
-\right\}^{\|b\|}
-\]
-Now, we know from theorem (number?) that the boosting algorithm will
-always find the global minimum of the cost function.  Since all $b_i >
-0$, this is achieved when all training examples are classified
-correctly...
-
-Need a lot more work on this proof.  Do I want to show that since it
-gets steeper and steeper, the cost of a negative sample gets too
-large?  I don't think that the way I am doing it is going to work,
-really.  I need to show that because
-\begin{itemize}
-\item	The weights for wrong samples are increasing exponentially,
-	and
-\item	The power that the cost function is raised to makes the wrong
-	margin get worse and worse,
-\end{itemize}
-then the thingy gets minimised...
-
-I need to bring the training error < 1/2 into it somewhere.  I think
-that I can show that if
-\begin{itemize}
-\item	$\|b\|$ increases without bound; and
-\item	$\epsilon_t$ is always < 1/2, then we get there
-\end{itemize}
-
-I should look at Schapire's paper (I don't have it...); but I do want
-to prove this in a way which uses the fact that the weight vector
-grows to infinity (because I want to talk about that later).
-
-\end{theorem}
-
 
 
 \subsection{AdaBoost maximises the minimum margin}
@@ -584,6 +533,7 @@ AdaBoost chooses the linear combination that maximises the minimum
 margin over its training samples.
 
 \begin{theorem}[AdaBoost maximises the minimum margin]
+\todo{Rework this theorem!}
 Given a particular learning algorithm $F$ and a training
 set $S$, define the minimum margin as
 \[
@@ -612,54 +562,25 @@ maximising the minimum margin.
 \end{theorem}
 
 
-\subsection{Equivalences of AdaBoost}
+\subsection{Invariance of AdaBoost to uniform scaling of classifer
+weights}
 
-In this section we state two results that show scale independence of
-the AdaBoost algorithm.
+We present here an obvious theorem about the invariance of hypothesis
+weights.  It will be used in chapter \ref{chapter:results}.
 
 \begin{theorem}
 The hypothesis returned by the AdaBoost is independent of a 
-scaling of the $b$ values.  In particular, for all $k > 0$, the
-scaled hypothesis $kF$ is equivalent to the unscaled hypothesis $F$.
+scaling of the $b$ values.  Given an unthresholded hypothesis $F$ and
+a constant $\alpha > 0$,
+%
+\begin{equation}
+H = \sign(F) \equiv H' = \sign(\alpha F) 
+\end{equation}
+\end{theorem}
 
-\proof This follows from the fact that the sign function is
+\proof This follows easily from the fact that the sign function is
 independent of a scaling of the $b$ values.
-\end{theorem}
 
-Not only the output but the margins also are invariant to scaling:
-
-\begin{theorem}[Invariance of AdaBoost to margin scaling]
-If we scale the margins of AdaBoost by a particular constant amount
-$k$, it produces weights which are $1/k$ what they would be otherwise.
-\end{theorem}
-
-However, the size of the weights is important.
-
-\begin{theorem}[This theorem is not true -- I need to negate it
-(assume true, show contradiction)]
-Assume a strong hypothesis $F_t(\cdot) = b_1 f_1(\cdot) + \cdots + b_m
-f_m(\cdot)$.  Denote the training action of the AdaBoost algorithm as
-$F_t(\cdot) \Rightarrow F_{t+1}(\cdot) = F_t(\cdot) +
-b_{t+1}f_{t+1}(\cdot)$.  If
-\[
-	F_t(\cdot) \Rightarrow F_t(\cdot) + b_{t+1}f_{t+1}(\cdot)
-\]
-then
-\[
-	kF_t(\cdot) \Rightarrow k\left( F_t(\cdot) +
-	b_{t+1}f_{t+1}(\cdot) \right)
-\]
-and thus
-\[
-	kF_{t+1} \equiv F_{t+1}
-\]
-
-\proof We show that the minimum of the cost function occurs at
-$kb_{t+1}$ instead of $b_{t+1}$ (which it doesn't) --> contradiction
-\end{theorem}
-
-
-\subsection{Summary}
 
 
 \section{Performance bounds for Boosting}
@@ -668,10 +589,10 @@ The following theorem appears in Schapire et. al \cite{Schapire97}.
 
 \begin{theorem}[Performance bound for boosting ($p$=1)]
 
-There is a constant $c$ such that a hypothesis $F$ generated by the
-AdaBoost algorithm, from a base class $\calH$ with VC dimension $d$,
-with probability at least $1 - \delta$ over $m$ independent training
-samples
+There is a constant $c$ such that a combined hypothesis $H = \sign(F)$
+generated by the AdaBoost algorithm $\bbB$ from a base class $\calH$
+with VC dimension $d$, with probability at least $1 - \delta$ over $m$
+independent training samples has true risk bounded by 
 \begin{equation}
 R(F) \leq R_{\emp}^{\gamma}(F) + \sqrt{\frac{c}{m} \left[ \frac{d
 \ln^2 (m/d)}{\gamma^2} + \ln(1/\delta) \right] }
@@ -680,6 +601,7 @@ R(F) \leq R_{\emp}^{\gamma}(F) + \sqrt{\frac{c}{m} \left[ \frac{d
 
 
 \section{Overfitting}
+\label{sec:boost overfitting}
 
 Initial experiments with AdaBoost indicated that the algorithm was
 remarkably resistant to overfitting, despite the unlimited complexity
@@ -705,49 +627,59 @@ increases.
 \end{capt}
 \end{linefigure}
 
-History of overfitting: looked like it didn't, then turned out to
-for high noise or lots of iterations.
-
-Explantion: maximising the minimum margin, thus the noisy points keep
-on getting wronger.
-
-This is why having an algorithm not ``maximising the minimum margin''
-is not necessarily a bad thing... talk about DOOM II, deliberately
-sacrafices minimum margin, gets better performance in some cases.
-Mason et al \cite{Mason99}.
+That overfitting occurs in AdaBoost follows from the property that
+AdaBoost maximises the minimum margin (theorem
+\ref{thm:max-min-margin}).  Intuitively, this property causes the
+AdaBoost algorithm to concentrate on a few hard samples.
+Unfortunately, in a noisy dataset, these samples are usually all
+noisy.  Some algorithms are described in the next section that 
 
 \section{Previous work on regularising AdaBoost}
 
-
-
-This section describes some efforts which have already been made to
-avoid overfitting in AdaBoost.
-
-DOOM, DOOM II \cite{Mason99a, Mason99b}
-Soft Margins \cite{Ratsch98}
+Following the discovery that AdaBoost operated by maximising the
+minimum margin, several efforts were made to regularise AdaBoost to
+avoid overfitting.  Algorithms such as \emph{soft margins}
+\cite{Ratsch98} explicitly allow a certain number of training samples
+to have a small or negative margin; while algorithms such as DOOM and
+DOOM II \cite{Mason99a, Mason99b} do this implicitly by flattening out
+the cost function (figure \ref{fig:cost functional}) for low and
+negative margins.  These approaches have been quite successful, both
+outperforming AdaBoost under certain conditions (in particular on
+noisy data).
 
 
 \section{Normed boosting algorithms}
 
-Already been looked at by Mason et al \cite{Mason99a}, for $p=1$ and
-$p=2$.  Different convergence results; converges to point in gradient
-space where slope = 0 (surprise surprise); show how this does not
-necessarily mean that training error is zero (because sum of
-$b$ is now bounded, we don't get exponential fast decreasing to zero
-of training error).
+Mason et al. \cite{Mason99a} have studied another modification to
+AdaBoost, where theclassifier weights are \emph{normalised at each
+iteration}.  After $b_t$ is calculated for iteration $t$, the entire
+set of classifier weights $b$ are normalised:
+%
+\begin{equation}
+b_{i} \Leftarrow \frac{b_i}{\| \mathbf{b} \|_p} \qquad \mbox{for} i=1
+\ldots t
+\end{equation}
+%
+where the norm is chosen via the $p$ parameter.%
+\footnote{Mason et. al. considered mainly $p \in \{ 1,2 \}$ in
+\cite{Mason99a}.}
 
-Describe the key differences between normed and unnormed:
-\begin{itemize}
-\item	Normed: renormalise after each step; unnormed: don't
-\item	Normed: doesn't go to zero training error
-\end{itemize}
+While it can be shown that these algorithms converge to the global
+minimum of the gradient descent cost functional (\ref{eqn:gradient
+descent cost functional}), they do \emph{not} have the property of
+guaranteed convergence to zero training error (theorem
+\ref{thm:AdaBoost training error convergence}); the reason being that 
+$\sum_{i=1}^t b'_{t,i}$ is bounded above (theorem \ref{thm:increasing
+classifier weights} does not hold).  As results in chapter
+\ref{chapter:results} and the discussion in section \ref{sec:boost
+overfitting} indicate, an algorithm does not have to converge to zero
+training error to generalise well.
 
-Again, make the point that just because it doesn't minimise margins
-doesn't mean that it's not going to work well --> give an argument why
-it could work better (because not maximising minimum margin)
+One of the algorithms developed in chapter \ref{chapter:pboosting} is
+a generalisation of the normed boosting algorithm described in this
+section, where the value of $p$ is unrestricted.
 
 
-\section{Chapter summary}
 
 
 

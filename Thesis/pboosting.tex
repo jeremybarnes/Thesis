@@ -89,9 +89,12 @@ bound}), to obtain the following theorem on the generalisation
 performance of classifiers over $p$-convex hulls.
 
 \begin{theorem}[Generalisation performance over $p$-convex hulls]
-The generalisation error of a hypothesis $F \in \co_p(\calH)$ where
-$\calH$ has VC dimension???????? $d$ over a set of $m$ independent training
-samples with probability at least $1 - \delta$ can be approximated by
+Consider a a hypothesis $F \in \co_p(\calH)$ where the covering
+numbers of $\calH$ grow as $\cover{\calH}{\epsilon} \approx \left
+( \frac{1}{\epsilon} \right) ^d$.% 
+\footnote{See theorem \ref{thm:p convex bound}.}
+Then the generalisation error over a set of $m$ independent training
+samples with probability at least $1 - \delta$ can be approximated by 
 %
 \begin{equation}
 R(F) \lesssim R_{\emp}^{\gamma}(F) + \sqrt{ \frac{8}{m} \left[ \log 2
@@ -105,7 +108,8 @@ where $c(p)$ is a constant that depends upon $p$.
 This result is necessarily an approximation, due to the approximate
 nature of the theorems it is based upon.  However, it is clear from
 the formulation that the confidence interval will decrease as $p
-\rightarrow 0$.
+\rightarrow 0$; and thus we can use the $p$ parameter as an explicit
+parameter for capacity control.
 
 
 \section{Development of algorithms}
@@ -129,9 +133,9 @@ descent) that uses regularisation to achieve $\calX \approx
 algorithm''.
 
 
-\subsection{Naive algorithm}
+\subsection{Na\"{\i}ve algorithm}
 
-The naive algorithm (named with the benefit of hindsight) attempts to
+The na\"{\i}ve algorithm (named with the benefit of hindsight) attempts to
 modify the $b$ values of AdaBoost in a manner that will produce a
 ``$p$-convex like'' distribution of parameters on $p$.
 
@@ -172,15 +176,15 @@ w_i|_{t+1} = \left\{
 \end{array} \right.
 \end{equation}
 %
-The important point to notice is that the $1/p$ power (which is
-greater than one for $p < 1$) is inside an exponential; this could
+When using this first option, the $1/p$ power (which is
+greater than one for $p < 1$) is inside an exponential; and could
 (and does) lead to the exponential function getting extremely large
-(outside the limits of IEEE floating point numbers).  Thus we update
-our sample weights based upon $b'_t$; they are identical to those
+(outside the limits of IEEE floating point numbers).  Thus the sample
+weights are updated based upon $b'_t$; they are identical to those
 chosen by the boosting algorithm.
 
-The naivity of the algorithm becomes apparent when considered in
-the gradient descent framework.  As our sample weights are calculated
+The na\"{\i}vity of the algorithm becomes apparent when considered in
+the gradient descent framework.  The sample weights are calculated
 the same as AdaBoost; thus given an identical initial state both
 algorithms would proceed in the same ``direction''.  However the step
 sizes are different: AdaBoost performs a line search for the minimum
@@ -243,30 +247,19 @@ for AdaBoost; we instead have to be content with a numerical
 optimisation.  The method chosen is Newton-Raphson iteration, which
 searches for $\partial C(F) / \partial \alpha = 0$ by repeatedly
 approximating it with a parabola until a tolerance is reached.
+Several technical points concerned with making the Netwon-Raphson
+method robust are addressed in appendix \ref{appendix:newton-raphson}
+and \cite{Heath97}.
 
-What we have \emph{not} done is to consider whether or not a solution
-to (\ref{eqn:strict minimise function}) exists.  The following theorem
-does so.
+As we shall see in chapter \ref{chapter:results}, when $p < 1$ the
+strict $p$-boosting algorithm suffers from a cost surface that is in
+many cases strictly increasing along the $p$-convex hull after a
+handfull of iterations.  The problem with a strictly increasing cost
+function is that it results in $F_{t+1} = F_t$, and the algorithm must
+be aborted (or continue in steady state endlessly).  Thus, a
+simplification of the optimisation goal (\ref{eqn:strict minimise
+function}) was required.
 
-\begin{theorem}[Existance of a minimum for strict boost cost]
-I sure hope that I can come up with something.  I know that it always
-finds a minimum for $p \geq 1$ (from observations); it sometimes works
-for $p < 1$; the cutoff seems to be at approximately $p = 0.8$.
-Whether this is dependent upon the data or the weaklearner I don't
-know; I suspect that it has something to do with how well the
-weaklearner works.
-
-The reason a solution doesn't exist is that it is for $\alpha < 0$,
-which means we are trying to optimise a hill instead of a valley (so
-we get to the top).
-\end{theorem}
-
-
-
-
-Finally, we need to consider the sample weight updates.  The gradient
-descent theory gives us the sample weights (\ref{eqn:gradient sample
-weights}).
 
 \subsection{Sloppy algorithm}
 
@@ -275,9 +268,14 @@ to consider using an algorithm with a similar effect but a simpler
 form for the cost function (in particular, one for which a minimum is
 guaranteed to exist).
 
-The \emph{sloppy $p$-boosting algorithm} is one such algorithm.  It 
-
-L1 and L2 algorithms are special cases of this algorithm.
+The \emph{sloppy $p$-boosting algorithm} is one such algorithm.  The
+simplification involves searching along the same line as AdaBoost, and
+then normalising to the $p$-convex hull \emph{after} a suitable point
+has been found.  In this way, the hypothesis $F_t$ returned after
+round $t$ is still $F_t \in \co_P(\calH)$, and the strictly increasing
+cost functions that affect the strict algorithm are avoided.  Figure
+\ref{fig:sloppy line search} illustrates the differences in the line
+search between the sloppy and strict algorithms.
 
 \begin{linefigure}
 \begin{center}
@@ -292,11 +290,18 @@ $p$-convex hull.
 \end{capt}
 \end{linefigure}
 
+It should be noted that the sloppy algorithm is a straightforward
+generalisation of the normed boosting algorithms surveyed in chapter
+\ref{chapter:boosting}.
+
 
 \subsection{Gravity algorithm}
 
-  Another possibility is to adjust the cost function
-(\ref{eqn:theory:cost function}) to be of the form
+The final variant of $p$-boosting considered in this thesis is
+somewhat different to the other two.  This algorithm is less direct in
+its approach: rather than restricting the gradient descent algorithm
+to operate on a $p$-convex hull, it modifies the cost functional to
+``pull'' the solution towards a low $p$-norm:
 %
 \begin{equation}
 C(F) = \frac{1}{l} \sum_{i=1}^{l} \exp
@@ -304,21 +309,24 @@ C(F) = \frac{1}{l} \sum_{i=1}^{l} \exp
 \label{eqn:regularisation}
 \end{equation}
 %
-where $\lambda$ indicates how important a small $p$-norm is.  One
-obvious problem with this method is that there are now \emph{two}
-parameters to optimise ($p$ and $\lambda$).  The sharp ``corners'' of a
-$p$-convex hull with $p \rightarrow 0$ may also introduce practical
-problems with gradient descent (it may get stuck in a corner).
+where $\lambda$ indicates how important a small $p$-norm is.  This
+formulation also allows some latitude in the universal set $\calX$
+that is chosen: it would be sensible to choose $\calX = \co_2(\calH)$
+or even $\calX = \lin(\calH)$ to ensure that no problems with gradient
+descent occur.
 
-A further refinement of this solution would be to choose a much larger
-universe \calX\ (such as $\|\mathbf{b}\|_2 < 1$) without the corners,
-and again use the cost function (\ref{eqn:regularisation}).
+There are several problems with this algorithm.  The most obvious is that
+there are now \emph{two} parameters to optimise ($p$ and $\lambda$).
+A less obvious problem is that rightmost term of
+(\ref{eqn:regularisation}) in its written form will be strictly
+increasing as $t \rightarrow \infty$, discounting the use of any
+standard optimisation method.
 
-Problems with this algorithm
+This algorithm was only briefly considered during the course of this
+project, due to the difficulties described above and lack of time.  As
+a result, no experiments were performed using this algorithm; and it
+will not be considered further.
 
-\subsection{Summary}
-
-\section{Chapter summary}
 
 
 

@@ -1,0 +1,232 @@
+% method.tex
+% Jeremy Barnes, 22/9/1999
+% $Id$
+
+% Method baby...
+
+\chapter{Experiments}
+\label{chapter:method}
+
+The experiments were performed by running extensive simulations on a
+microcomputer.  This chapter describes the experimental setup (including a
+brief description of the software developed) and the testing
+methodology to a level of detail sufficient to repeat the
+experiments.
+
+\section{Experimental setup}
+
+In this section a summary of the equipment and computer software used
+to perform the experiments is given.  The full source code, datasets
+and test results are available on the CD-ROM attached inside the back
+cover of this thesis.  Appendix \ref{appendix:cdrom} describes the
+contents of this CD-ROM in more detail.
+
+The simulations were run on three microcomputers.  The first was a
+400MHz Celeron system with 256MB of memory, running RedHat Linux
+version 6.0 and \MATLAB\ version 5.3.0.10183 (Release 11).  The second
+was a 300MHz Celeron system with 128MB of memory, running RedHat Linux
+version 5.2 and the same version of \MATLAB.  The third was a 233MHz
+Cyrix M3 machine with 64MB of memory running Windows 95 version
+4.00.1111 and \MATLAB\ version 5.0.0.4073 (Student version).
+
+\section{Software}
+
+Although an incidental part of the project, the software package that
+was developed in order to perform the simulations is a significant
+piece of work in its own right.  It was written from scratch to
+provide an accessible and efficient entry into the project area--which
+was not available previously.  In particular, it includes many
+functions that allow visualisation of the algorithms.  Use of this
+package will significantly lower the difficulty of beginning similar
+research or extending the ideas developed in this project.
+
+The software was written as a \MATLAB toolbox.  Two weak learning
+algorithms (decision stumps and CART), several versions of the
+Boosting algorithm (including all mentioned in this thesis), an
+implementation of a Neural Network algorithm, an automated test
+harness, and assorted analysis and visualisation functions are
+included.
+
+What follows is a brief description of the software package as a
+whole.  For details of individual components, please see appendixes
+\ref{appendix:user-guide} and \ref{appendix:programmers-guide}.
+
+\subsection{Optimisation and numerical issues}
+
+The code was profiled extensively using \MATLAB's inbuilt profiler,
+and the most efficient algorithms possible selected for the
+frequently executed sections.  Tight sections of code, and certain
+data and code structures (for example, {\tt for} loops) that \MATLAB
+is inefficient at executing were recoded in \C to further save time.
+(Details of how to interface this code were obtained from
+\cite{MathWorks96} and \cite{MathWorks96a}.)
+As the code was optimised, it was tested to ensure equivalence with
+the previous version of the code.
+
+The net effect of these optimisations was that simulations which would
+have required several years to run as initially coded were able to be
+run in a matter of days.
+
+The computer code was designed with the goal of minimising numerical
+errors in mind.  Several sections of code incorporate safeguards (such
+as periodic full recalculations in loops that are optimised by
+calculating incrementally) to minimise the effect of numerical
+errors.  In addition, 64 bit IEEE double precision floating point
+numbers are used exclusively.
+
+In total, the source code was 250KB in size, comprising 215KB of
+\MATLAB code and 35KB of \C code.  There are 9000 lines in 176 \MATLAB
+{\tt .m} files and 1500 lines in 6 \C source files.\todo{Update code
+statistics.} 
+
+\section{Datasets}
+
+A total of seven datasets were used in the experiments.  Four
+(\ds{ring0}, \ds{ring10}, \ds{ring20} and \ds{ring30}) were
+synthetic datasets, randomly generated from a known distribution with
+noise added artificially.  Two other datasets (\ds{sonar} and
+\ds{wpbc}%
+\footnote{Wisconsin Prognostic Breast Cancer.}
+) were obtained from the UCI repository \cite{UCI}, and the
+final dataset (\ds{acacia}) was used in a PhD thesis.\todo{Get the
+reference to Karen's thesis}.
+
+A summary of the features of each dataset appears in table
+\ref{tbl:dataset features}.  Appendix \ref{appendix:datasets}
+describes these datasets in more detail.
+
+\begin{table}
+\label{tbl:experiments}
+\begin{center}
+\begin{tabular}{r l l r r c}\hline
+\newcommand{\allp}{$\frac{1}{2} \leq p \leq 2; 10p \in \bbN$}
+\newcommand{\lowp}{$\frac{1}{2} \leq p \leq 1; 10p \in \bbN$}
+{\bf Number} & {\bf Algorithm} & {\bf Dataset} & {\bf Trials} &
+{\bf Iterations} & {\bf $p$ values} \\
+\hline\hline
+1-4  & AdaBoost & \ds{ring*}   & 100 &  1000 & - \\
+5    & AdaBoost & \ds{sonar}   &  30 &  1000 & - \\
+6    & AdaBoost & \ds{wpbc}    &  50 & 10000 & - \\
+7    & AdaBoost & \ds{acacia}  &  50 & 10000 & - \\
+\hline
+8-11 & Na\"{\i}ve & \ds{ring*} &  50 &  1000 & \allp \\
+12   & Na\"{\i}ve & \ds{sonar} &  30 &  1000 & \allp \\
+\hline
+13-16 & Strict & \ds{ring*}    &  30 &  1000 & \allp \\
+17    & Strict & \ds{sonar}    &  30 &  1000 & \allp \\
+18    & Strict & \ds{wpbc}     &  20 &  5000 & \allp \\
+19    & Strict & \ds{acacia}   &  20 & 10000 & \allp \\
+\hline
+21-24 & Sloppy & \ds{ring*}    &  30 &  1000 & \allp \\
+25-28 & Sloppy & \ds{ring*}    &  30 & 10000 & \lowp \\
+29    & Sloppy & \ds{sonar}    &  30 &  1000 & \allp \\
+30    & Sloppy & \ds{wpbc}     &  20 &  5000 & \allp \\
+31    & Sloppy & \ds{acacia}   &  20 & 10000 & \allp \\
+\hline  
+\end{tabular}
+\end{center}
+\caption{Summary of experiments conducted}
+\end{table}
+
+\section{Testing}
+
+\subsection{Aims}
+
+\subsubsection{Generalisation performance}
+
+* Which ones perform the best for which datasets?
+* Do they all reach the best value quickly?  What effect on overall generalisation performance does $p$ have?
+
+\subsubsection{Resistance to overfitting}
+
+* As we train for ridiculously long times, does $p < 1$ reduce overfitting?
+
+\subsubsection{Optimal $p$ values}
+
+* Do we get the same optimal $p$ value for different algorithms?
+* What is the effect of too low or too high?
+
+\subsubsection{Margin distributions}
+
+* How do these compare to normal boosting?
+* Are we getting a few important classifiers or lots of small ones?
+
+\subsubsection{Training time}
+
+* Which algorithms terminate early; why?
+* Which ones reach the optimal value earliest?
+
+\subsection{Method}
+
+
+\begin{table}
+\label{tbl:testing}
+\begin{center}
+\begin{tabular}{l c c r r r r}\hline
+{\bf Dataset} & $\calI$ & $\calO$ & {\bf Artificial noise} & {\bf
+Size} & {\bf Training samples} & {\bf Test samples} \\
+\hline \hline
+\ds{ring0} & $[0,1]^2$ & $\{\pm 1\}$ & 0\% & $\infty$ & 50 & 5000 \\
+\ds{ring10} & $[0,1]^2$ & $\{\pm 1\}$ & 10\% & $\infty$ & 50 & 5000 \\
+\ds{ring20} & $[0,1]^2$ & $\{\pm 1\}$ & 20\% & $\infty$ & 50 & 5000 \\
+\ds{ring30} & $[0,1]^2$ & $\{\pm 1\}$ & 30\% & $\infty$ & 50 & 5000 \\
+\hline
+\ds{sonar} & $[0,1]^60$ & $\{\pm 1\}$ & 0\% & 208 & 70 & 138 \\
+\ds{wpbc} & $\subset \bbR^32$ & $\{\pm 1\}$ & 0\% & 194 & 97 & 97 \\
+\ds{acacia} & $\subset \bbR^16$ & $\{\pm 1\}$ & 0\% & 204 & 102 & 102 \\
+\hline
+\end{tabular}
+\end{center}
+\caption{Summary of dataset attributes}
+\end{table}
+
+Each \emph{trial} consisted of running a specified number of
+iterations on 
+
+Each dataset was tested with each algorithm a total of thir
+
+Testing was performed by an automated system running on up to three
+computers in parallel.
+
+\section{Analysis}
+
+
+
+
+Several tests were run.  These were each given a character string
+identifier within the \MATLAB system, and are identified in this
+document by the same identifier.
+
+To repeat one of the experiments, one may use the matlab command
+\begin{alltt}
+runtest {\it identifier}
+\end{alltt}
+
+\subsection{Generalisation performance}
+
+* Which ones perform the best for which datasets?
+* Do they all reach the best value quickly?  What effect on overall generalisation performance does $p$ have?
+
+\subsection{Resistance to overfitting}
+
+* As we train for ridiculously long times, does $p < 1$ reduce overfitting?
+
+\subsection{Optimal $p$ values}
+
+* Do we get the same optimal $p$ value for different algorithms?
+* What is the effect of too low or too high?
+
+\subsection{Margin distributions}
+
+* How do these compare to normal boosting?
+* Are we getting a few important classifiers or lots of small ones?
+
+\subsection{Training time}
+
+* Which algorithms terminate early; why?
+* Which ones reach the optimal value earliest?
+
+
+
+
+
