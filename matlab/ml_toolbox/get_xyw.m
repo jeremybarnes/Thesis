@@ -64,7 +64,7 @@ elseif (length(args) == 3)
    
    x = args{1};
    y = args{2};
-   z = args{3};
+   w = args{3};
    
    check_x(obj, s, x);
    check_y(obj, s, x, y);
@@ -111,14 +111,11 @@ if (~isa(x, 'double'))
 end
 
 sx = size(x);
-sy = size(y);
 
 if (length(sx) ~= 2)
    error([s ': x vector must be a two-dimensional matrix']);
-elseif (sx(2) ~= obj.dimensions)
+elseif (sx(2) ~= dimensions(obj))
    error([s ': dimensionality of x and classifier don''t match']);
-elseif (sy(2) ~= 1)
-   error([s ': y vector must have one column only']);
 end
 
 
