@@ -34,21 +34,8 @@ function obj = decision_stump(categories, dimensions)
 % Jeremy Barnes, 4/4/1999
 % $Id$
 
-% PRECONDITIONS
-if (dimensions < 1)
-   error('decision_stump: DIMENSIONS must be >= 1');
-elseif (~isa(categories, 'category_list'))
-   error('decision_stump: CATEGORIES must be of the CATEGORY_LIST type');
-end
-
-
 % ancestor relationship
 parent = classifier(categories, dimensions);
-obj = struct(parent);
-
-% initialisation of variables in obj
-obj.dimensions = dimensions;
-obj.categories = categories;
 
 % Our default split, which splits on the first variable at 0.500
 obj.splitvar = 1;
