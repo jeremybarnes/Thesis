@@ -111,4 +111,6 @@ obj_r = obj;
 
 context.wl_y = new_y;
 context.wl_instance = new_c;
+context.b = new_b;
 context.alpha = alpha;
+context.first_iter = (iterations(obj) == 1);
