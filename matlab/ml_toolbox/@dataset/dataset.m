@@ -11,6 +11,12 @@ function obj = dataset(numcategories, dimensions)
 % Generates an empty dataset, with the specified NUMCATEGORIES, and the
 % specified number of DIMENSIONS.
 %
+% d = dataset('filename')
+%
+% Generates a dataset from a MAT file.  The global variable DATASET_PATH
+% is prepended to filename if that file is not found.  The mat file must
+% have four variables: X, Y, DIMENSIONS and NUMCATEGORIES.
+% 
 % RETURNS:
 %
 % A DATASET object in D, initialised as required.
@@ -20,13 +26,18 @@ function obj = dataset(numcategories, dimensions)
 % $Id$
 
 % One dataset argument: make a copy
-if ((nargin == 1) & (isa(categories, 'dataset')))
-   obj = categories;
+if ((nargin == 1) & (isa(numcategories, 'dataset')))
+   obj = numcategories;
    return;
 end
 
-% Default values
-if (nargin == 0)
+filename = [];
+if ((nargin == 1) & (isa(numcategories, 'char')))
+   % Load a file -- use dummy values for now to stop complaints
+   filename = numcategories;
+   numcategories = 2;
+   dimensions = 2;
+elseif (nargin == 0)
    numcategories = 2;
    dimensions = 2;
 elseif (nargin == 1)
@@ -34,7 +45,7 @@ elseif (nargin == 1)
 end
 
 if (dimensions < 1)
-   error('dataset: Data must be at least one dimensional');
+   error('dataset: Data must be at least one dimensional!');
 end
 
 % Set up our variables
@@ -48,3 +59,8 @@ obj.numsamples = 0;
 
 obj = class(obj, 'dataset');
 superiorto('double');
+
+% Populate with data
+if (~isempty(filename))
+   obj = load(obj, filename);
+end

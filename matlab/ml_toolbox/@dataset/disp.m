@@ -7,6 +7,6 @@ function disp(obj)
 % $Id$
 
 disp(['    dataset object:']);
-disp(['      dimensions = ' int2str(obj.dimensions)]);
-disp(['      categories = ' int2str(numcategories(obj.categories))]);
-disp(['      numsamples = ' int2str(obj.numsamples)]);
+disp(['      dimensions    = ' int2str(obj.dimensions)]);
+disp(['      numcategories = ' int2str(obj.numcategories)]);
+disp(['      numsamples    = ' int2str(obj.numsamples)]);
