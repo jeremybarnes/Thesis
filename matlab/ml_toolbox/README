@@ -1,0 +1,24 @@
+README for Machine Learning Toolbox
+
+Copyright Jeremy Barnes <jeremyb@poboxes.com> 1999.
+
+Released under the Gnu General Public License, version 2.
+
+
+
+
+If you have trouble making the MEX files:
+
+* Ensure that $MATLAB/bin is in your path
+
+* Set $MEX_EXTN to whatever the extension for MEX files is on
+  your platform, INCLUDING the period (.mexlx for Linux, .dll
+  for Windows, etc).  To find this, have a look in the 
+  $MATLAB/toolbox/matlab/elfun directory.  There should be a
+  file called complex.<something> there, where <something> is
+  not "m".  The extension of this file is the MEX_EXTN
+  environment variable.
+
+Otherwise, drop me a line.
+
+  
