@@ -32,10 +32,10 @@ x_data = x(obj);
 y_data = y(obj);
 w_data = w(obj);
 
-new_c = train(weaklearner(obj), x_data, y_data, w_data)
+new_c = train(weaklearner(obj), x_data, y_data, w_data);
 
 % find the training error
-new_error = training_error(new_c)
+new_error = training_error(new_c);
 
 % see what this algorithm does to our data
 new_y = classify(new_c, x_data);
@@ -48,7 +48,7 @@ end
 
 
 % Update classifier weights
-bt = - 0.5 * log(new_error / (1 - new_error))
+bt = - 0.5 * log(new_error / (1 - new_error));
 
 % Update sample weights
 new_w = w_data .* exp(-bt .* ((new_y == y_data)*2-1));
