@@ -37,9 +37,9 @@ void split_data(double *x, int data_len, int splitvar, double splitval,
 		double **p_left_x, int **p_left_index, int *p_left_len,
 		double **p_right_x, int **p_right_index, int *p_right_len);
 
-void merge_data(double *x, int *y, int dim, 
-		double *left_x, int *left_y, int *left_index, int left_len,
-		double *right_x, int *right_y, int *right_index,int right_len);
+void merge_data(int *y, int dim, 
+		int *left_y, int *left_index, int left_len,
+		int *right_y, int *right_index,int right_len);
 
 void recursive_classify(mxArray *tree, double *x, int data_len, int *y,
 			int dim);
@@ -139,8 +139,8 @@ void recursive_classify(mxArray *tree, double *x, int data_len, int *y,
 	recursive_classify(right, right_x, right_len, right_y, dim);
 
 	/* Put the data back together */
-	merge_data(x, y, dim, left_x, left_y, left_index, left_len,
-		   right_x, right_y, right_index, right_len);
+	merge_data(y, dim, left_y, left_index, left_len,
+		   right_y, right_index, right_len);
 
 	/* Deallocate our storage */
 	mxFree(left_x);
@@ -249,9 +249,9 @@ void split_data(double *x, int data_len, int splitvar, double splitval,
 }
 
 
-void merge_data(double *x, int *y, int dim, 
-		double *left_x, int *left_y, int *left_index, int left_len,
-		double *right_x, int *right_y, int *right_index, int right_len)
+void merge_data(int *y, int dim, 
+		int *left_y, int *left_index, int left_len,
+		int *right_y, int *right_index, int right_len)
 {
     /* MERGE_DATA merge together a dataset split using SPLIT_DATA */
 
@@ -265,10 +265,6 @@ void merge_data(double *x, int *y, int dim,
     for (i=0; i<left_len; i++) {
 	this_index = *pi++;
 	y[this_index] = *py++;
-	
-	/* I don't think this is necessary... */
-	for (j=0; j<dim; j++)
-	    x[this_index+j*data_len] = left_x[i+j*left_len];
     }
 
 
@@ -278,10 +274,6 @@ void merge_data(double *x, int *y, int dim,
     for (i=0; i<right_len; i++) {
 	this_index = *pi++;
 	y[this_index] = *py++;
-	
-	/* I don't think this is necessary... */
-	for (j=0; j<dim; j++)
-	    x[this_index+j*data_len] = right_x[i+j*right_len];
     }
 }
 
