@@ -190,6 +190,9 @@ void main(int argc, char **argv)
     int rows, cols;
     mxArray_t *x, *y, *dimensions, *numcategories;
 
+    printf("Text file to MAT file converter version $Version$.\n");
+    printf("Copyright Jeremy Barnes, 24/8/1999\n");
+
     argv0 = argv[0];
 
     /* Check that we have the right number of arguments... */
@@ -201,11 +204,11 @@ void main(int argc, char **argv)
 	exit(1);
     }
 
-
     /* Get our filenames */
     in_filename = argv[1];
     out_filename = argv[2];
 
+    printf("Converting %s ==> %s...", in_filename, out_filename);
 
     /* Check that we can open our input and output files */
     in_file = fopen(in_filename, "r");
@@ -277,6 +280,7 @@ void main(int argc, char **argv)
     matPutArray(out_file, dimensions);
     matPutArray(out_file, numcategories);
 
+    printf(" done.\n");
 
     /* Clean up */
     mxDestroyArray(x);
