@@ -29,7 +29,7 @@ if (length(range) == 0)
 else
    for i=1:length(range)
       instance = range(i);
-      wl(i) = obj.classifiers{instance}.classifier;
+      wl(i) = obj.classifiers{instance};
    end
 end
 
