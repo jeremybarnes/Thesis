@@ -24,6 +24,12 @@ function [obj_r, context] = trainagain(obj)
 boost_obj = as_boost(obj);
 [boost_obj, context] = trainagain(boost_obj);
 
+% Abort if the boost object aborted
+if (aborted(boost_obj))
+   obj_r = abort(obj);
+   context.aborted = 1;
+end
+
 p = get_p(obj);
 
 % Update the bt value based on p
