@@ -1,4 +1,4 @@
-function obj_r = trainagain(obj)
+function [obj_r, wl_y] = trainagain(obj)
 
 % TRAINAGAIN perform another training iteration of the boosting algorithm
 %
@@ -10,6 +10,10 @@ function obj_r = trainagain(obj)
 % {X, Y} or the dataset DATASET.  If specified, the weight vector W is
 % used to determine the initial relative importance of each training
 % sample in the dataset.
+%
+% [obj_r, wl_y] = trainagain(obj)
+% This form also returns the results of the weaklearner's classification
+% of the training samples in wl_y.
 %
 % RETURNS:
 %
@@ -58,3 +62,4 @@ new_w = new_w ./ sum(new_w);
 obj = add_iteration(obj, new_c, [obj.b bt], new_w);
 
 obj_r = obj;
+wl_y = new_y;

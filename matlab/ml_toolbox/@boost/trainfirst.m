@@ -1,4 +1,4 @@
-function obj_r = trainfirst(obj, varargin)
+function [obj_r, wl_y] = trainfirst(obj, varargin)
 
 % TRAINFIRST perform first training iteration of the boosting algorithm
 %
@@ -11,6 +11,12 @@ function obj_r = trainfirst(obj, varargin)
 % {X, Y} or the dataset DATASET.  If specified, the weight vector W is
 % used to determine the initial relative importance of each training
 % sample in the dataset.
+%
+% [obj_r, wl_y] = trainfirst(...)
+%
+% This form, intended primarily for internal use, returns the
+% weaklearner's classification of the training samples in the wl_y
+% variable.
 %
 % RETURNS:
 %
@@ -25,7 +31,7 @@ function obj_r = trainfirst(obj, varargin)
 % Normalise our w vector
 obj.w = w ./ sum(w);
 
-obj = trainagain(obj);
+[obj, wl_y] = trainagain(obj);
 
 obj_r = obj;
 
