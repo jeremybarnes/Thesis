@@ -1,4 +1,129 @@
+% intro.tex
+% Jeremy Barnes, 21/9/1999
+% $Id$
+
 \chapter{Introduction}
 
-Here is the intro...
+The subject of this thesis is an investigation of a method of
+overcoming a known problem (\emph{overfitting}) of a particular
+machine learning algorithm (the \emph{Boosting} algorithm).  The
+result is a series of machine learning algorithms called
+\emph{$p$-boosting algorithms}.  These algorithms are developed,
+analysed and tested in the later part of this thesis.
 
+\section{Overview}
+
+This introduction covers the bigger picture,
+describing the field of machine learning and its applications to
+practical problems.
+
+\paragraph{Part I: Background}
+
+The next few chapters rapidly narrow the focus.  Chapter
+\ref{chapter:slt} describes the field of \emph{Statistical learning
+theory} (SLT)\footnote{A table of acronyms is provided in appendix
+\ref{appendix:acronyms}}, which provides much of the theoretical
+foundations of, but does not encompass, the entire field of machine
+learning.  Assumptions of \emph{binary problems} and
+\emph{classification problems} also further restrict the scope of the
+investigation.
+
+Chapter \ref{chapter:stumps} provides a description of, and proves
+some properties of, a very simple learning algorithm called
+\emph{decision stumps} which fits within this restricted scope imposed
+by the assumptions in the first two chapters.  This learning algorithm
+is used as a base for the more powerful Boosting algorithms described
+later.
+
+With the necessary background in place, the \emph{Boosting} algorithm
+is described in chapter \ref{chapter:boosting}.  This algorithm forms
+the starting point for the original work that is considered in further
+chapters.  A formal definition of what it means for an algorithm to
+``boost'' is given, and many properties of the Boosting algorithm are
+given.  Finally the problem of overfitting in boosting is
+investigatied, as a prelude to the possible solutions investigated
+throughout the remainder of the thesis.
+
+\paragraph{Part 2: Theoretical investigation}
+
+The work contained in part 2 onwards is original work.
+
+The key inventive step of the work described in this thesis is the use of a
+\emph{$p$-convex hull} to reduce the problem of overfitting.  Chapter
+\ref{chapter:pboosting} investigates the theoretical justification
+behind this line of reasoning in some detail.
+
+Chapter \ref{chapter:development} develops these abstract ideas into
+concrete algorithms, and describes some properties of these
+algorithms.
+
+\paragraph{Part 3: Testing}
+
+Chapter \ref{chapter:method} describes how these algorithms were
+tested.  Chapter \ref{chapter:results} details the results of the
+investigations.
+
+\paragraph{Part 4: Discussions}
+
+The chapters in this part evaluate the project.
+
+\section{The scheme of things}
+
+\subsection{Artificial intelligence}
+
+The broadest possible subject area in which this work is contained is
+often described as \emph{artificial intelligence}.  This field
+essentially contains our efforts to make computers act in a similar
+manner to humans.
+
+This field encompasses a large body of history, philosophy and
+knowledge (see, for example \ref{Penrose89}).  We will ignore much
+of this, and concentrate on efforts to make a computer ``think'' like
+a human.
+
+Early work in this field (from the 1950s to the 1980s) was based on
+the idea that intelligence can be emulated with a large set of rules.
+The systems generated as a result, known as \emph{expert systems},
+were huge databases of human-generated rules that were meant to
+represent the complete knowledge of a human expert on a particular
+domain.  These systems were reasonably successful at first, but became
+unwieldy as the number of rules increased (a large amount of effort is
+required to generate even the 1000 rules that were used in large
+expert systems in 1980). 
+
+The problem was more practical than theoretical: systems with large
+numbers of rules can theoretically learn any learnable problem; it is
+\emph{generating} the rules that is hard.  The next step, obvious in
+hindsight, was to invent machines that could generate their own
+rules; machines that could \emph{learn}.
+
+\subsection{Machine learning}
+
+These machines came in two flavours.  \emph{Supervised learners} are
+shown examples of some kind of relationship, along with the ``right''
+answers (from some form of supervisor) and attempt to learn a
+relationship such that their answer always matches that of the
+supervisor.  An example is trying to learn who is likely to default on
+loan payments from the credit history of previous customers (the
+``supervisor'' is simply the information on whether the previous
+customer defaulted on their loan).  All algorithms discussed in the
+body of this thesis are supervised algorithms.
+
+\emph{Unsupervised learners} are given a set of data and asked to
+learn a pattern in the data (for example, identifying interesting
+clumps of stars from telescope images).
+
+\subsection{Statistical learning theory}
+
+Statistical learning theory provides the theoretical foundation upon
+which machine learning rests.  It provides a body of knowledge that
+allows bounds on the performance of learning algorithms to be
+generated.  Much of this theory can be attributed to V.M.Vapnik
+\ref{Vapnik95}.
+
+\subsection{Voting methods}
+
+Boosting and $p$-boosting are both examples of \emph{voting methods},
+a relatively new class of algorithms which operate in a bootstrap-like
+manner by combining many ``weak'' algorithms to generate a higher
+performing algorithm.
