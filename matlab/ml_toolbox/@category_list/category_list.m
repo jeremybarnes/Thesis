@@ -1,65 +1,69 @@
-% @class/class.m
-% Jeremy Barnes, 3/4/1999
-% $Id$
+function obj = category_list(categories)
+
+% CATEGORY_LIST list of categories for classification
 %
-% CLASSLABEL - label used to classify a set of classes
-%
-% This is the constructor for the class CLASSLABEL
+% This is the constructor for the class CATEGORY_LIST
 %
 % SYNTAX:
 %
-% obj = classlabel({'label0', 'label1', ...})
-%     - this abstract data type holds information about the labels of
-%       classes us used in a classifier.  You pass it a list of textual
-%       labels, which correspond to the classes of your data.  They are
-%       mapped onto the numbers 0, 1, 2,...
+% obj = category_list({'label0', 'label1', ...})
+%
+% This type holds information about the labels of classes us used in a
+% classifier.  You pass it a list of textual labels, which correspond to
+% the classes of your data.  They are mapped onto the numbers 0, 1,
+% 2,...
 %
 % obj = classlabel('binary')
-%     - a simple way to create binary classlabels.
+%
+% This is equivalent to obj=classlabel({'false', 'true'})
 %
 % RETURNS:
 %
-% A classlabel object with the specified labels.
+% A CATEGORY_LIST object with the specified labels.
 %
 % METHODS:
 %
-% numlabels(obj)
-%    - returns the number of labels stored
+% numcategories(obj)
+%    - returns the number of categories
 %
-% labels(obj)
-%    - returns a cell array of the labels stored
+% categories(obj)
+%    - returns a cell array of the category labels
 %
-% labelnum(obj, i)
-%    - returns label number i
+% categorynum(obj, i)
+%    - returns the label for category number i
 
-function obj = classlabel(labels)
+% @category_list/category_list.m
+% Jeremy Barnes, 3/4/1999
+% $Id$
+
 
 % PRECONDITIONS
-if (length(labels) == 0)
-   error('You must specify at least one label.');
+if (length(categories) == 0)
+   error('You must specify at least one category');
 end
 
-if (labels == 'binary')
-   labels = {'false', 'true'};
+if (isa(categories, 'double') | isa(categories, 'char'))
+   switch categories
+      case 'binary'
+	 categories = {'false', 'true'};
+      otherwise,
+	 error(['classlabel: unknown class type "' categories '"']);
+   end
 end
 
 % initialisation of variables in obj
 obj.initialised = 1;
-obj.numlabels = length(labels);
-obj.labels = labels;
+obj.numcategories = length(categories);
+obj.categories = categories;
 
 
 % construct class and define superior/inferior relationship
-obj = class(obj, 'classlabel');
+obj = class(obj, 'category_list');
 superiorto('double');
 
 
 
 % POSTCONDITIONS
 check_invariants(obj);
-
-return;
-
-
 
 

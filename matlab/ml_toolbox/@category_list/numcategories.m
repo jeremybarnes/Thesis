@@ -1,25 +1,26 @@
-% @classlabel/numlabels.m
-% Jeremy Barnes, 3/4/1999
-% $Id$
+function n = numcategories(obj)
+
+% NUMCATEGORIES number of categories in a CATEGORY_LIST
 %
 % SYNTAX:
 %
-% n = numlabels(obj)
+% n = numcategories(obj)
 %
 % RETURNS:
 %
-% Number of labels stored in this class.
-%
+% N is the number of labels stored in OBJ.
 
-function n = numlabels(obj)
+% @category_list/numcategories.m
+% Jeremy Barnes, 3/4/1999
+% $Id$
+
 
 % PRECONDITIONS
 % none
 
-n = obj.numlabels;
+
+n = obj.numcategories;
+
 
 % POSTCONDITIONS
 check_invariants(obj);
-
-return;
-

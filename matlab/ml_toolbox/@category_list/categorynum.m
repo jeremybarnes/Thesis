@@ -1,6 +1,6 @@
-% @classlabel/labelnum.m
-% Jeremy Barnes, 3/4/1999
-% $Id$
+function label = categorynum(obj, n)
+
+% CATEGORYNUM return a particular category label
 %
 % SYNTAX:
 %
@@ -8,13 +8,14 @@
 %
 % RETURNS:
 %
-% Label number n from the classlabel object.  Note that labels are
+% Label number N from the category_list object OBJ.  Note that labels are
 % indexed from 0 (this is in order to make porting to C easier).
 %
-% Out of range values of n cause an error.
-%
 
-function label = labelnum(obj, n)
+% @category_list/categorynum.m
+% Jeremy Barnes, 3/4/1999
+% $Id$
+
 
 % PRECONDITIONS
 if ((n < 0) | (n > numlabels(obj)-1))
@@ -24,7 +25,6 @@ end
 
 label = obj.labels{n+1};
 
+
 % POSTCONDITIONS
 check_invariants(obj);
-
-return;

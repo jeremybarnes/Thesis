@@ -1,24 +1,26 @@
-% @classlabel/labels.m
-% Jeremy Barnes, 3/4/1999
-% $Id$
+function arr = categories(obj)
+
+% CATEGORIES return cell array of all categories
 %
 % SYNTAX:
 %
-% arr = labels(obj)
+% arr = categories(obj)
 %
 % RETURNS:
 %
-% arr is a cell array, containing one string for each class label.
-%
+% ARR is a cell array, containing one string for each category in OBJ.
 
-function arr = labels(obj)
+% @category_list/numcategories.m
+% Jeremy Barnes, 3/4/1999
+% $Id$
+
 
 % PRECONDITIONS:
 % none
 
-arr = obj.labels;
+
+arr = obj.categories;
+
 
 % POSTCONDITIONS:
 check_invariants(obj)
-
-return;
