@@ -15,5 +15,6 @@ function b = classifier_weights(obj)
 % Jeremy Barnes, 6/8/1999
 % $Id$
 
-b = boost(obj).b;
+obj = boost(obj);
+b = obj.b;
 
