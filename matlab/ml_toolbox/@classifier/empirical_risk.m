@@ -19,7 +19,7 @@ function Pe = empirical_risk(obj, x, y)
 % Jeremy Barnes, 4/4/1999
 % $Id$
 
-this_y = classify(obj, y);
+this_y = classify(obj, x);
 errors = (this_y ~= y);
 
 Pe = sum(errors) ./ length(y);
