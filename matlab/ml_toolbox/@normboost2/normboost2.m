@@ -38,6 +38,7 @@ else
 end
 
 obj.dummy = 1; % Dummy field to stop complaints
+obj.margins = []; % Replaced when we know what our training data is
 
 % construct class and define superior/inferior relationship
 obj = class(obj, 'normboost2', parent);
