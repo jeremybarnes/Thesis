@@ -10,6 +10,8 @@
 \usepackage{amssymb}
 \usepackage{alltt}
 \usepackage{times}
+\usepackage{todo}
+
 
 % Times new roman font: smaller so less pages
 %\usepackage{times}
@@ -45,6 +47,7 @@
 \tableofcontents
 \listoffigures
 \listoftables
+\todolist
 
 % According to the thesis rules, spacing must be at least 1.2 times normal
 \renewcommand{\baselinestretch}{1.0}
@@ -58,17 +61,14 @@
 
 \include{intro}
 
-\thispagestyle{empty}\part{Background}\thispagestyle{empty}
 \include{slt}
 \include{stumps}
 \include{boosting}
 
-\thispagestyle{empty}\part{Investigation}\thispagestyle{empty}
 \include{pboosting}
 \include{method}
 \include{results}
 
-\thispagestyle{empty}\part{Evaluation}\thispagestyle{empty}
 \include{discussion}
 \include{conclusion}
 

@@ -1,6 +1,7 @@
 TEXFILES 	= $(wildcard *.tex)
 EPSFILES 	= $(wildcard figures/*.eps)
 EPSGFILES 	= $(wildcard figures/*.epsg)
+STYFILES	= $(wildcard *.sty)
 
 bibliography	= ../Bibliography/biblio.bib
 
@@ -22,7 +23,7 @@ all:		thesis.ps
 
 # This rule is so that we can make a document that consists of a single
 # chapter, rather than the whole thing
-%.dvi:		%-input.tex %.tex $(tex_includes)
+%.dvi:		%-input.tex %.tex $(tex_includes) $(STYFILES)
 		make -C figures all
 		latex $<
 		-bibtex $(basename $<)
@@ -32,7 +33,7 @@ all:		thesis.ps
 		mv $(subst .tex,.dvi,$<) $@
 
 # The thesis is special, so we make it with a special command
-thesis.dvi:	$(TEXFILES) $(BIBLIOGRAPHY)
+thesis.dvi:	$(TEXFILES) $(BIBLIOGRAPHY) $(STYFILES)
 		make -C figures
 		latex thesis.tex
 		bibtex thesis

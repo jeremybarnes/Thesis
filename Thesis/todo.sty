@@ -1,0 +1,9 @@
+\ProvidesPackage{todo}
+[1999/10/06 TODO v.0.0.1
+Todo list entries
+: Jeremy Barnes]
+% Command to typeset a todo list
+\newcommand{\todolist}{\chapter*{Todo}\addcontentsline{toc}{chapter}{Todo}\@starttoc{todo}}
+\newcommand{\todo}[1]{\addcontentsline{todo}{todo}{#1}\marginpar{{\bf Todo:} {#1}}}
+\newcommand{\l@todo}[2]{\par\noindent#1 {\itshape #2}}
+\endinput

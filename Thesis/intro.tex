@@ -4,66 +4,63 @@
 
 \chapter{Introduction}
 
-This thesis is an investigation of a method of
+The project undertaken was an investigation of a method of
 overcoming a known problem (\emph{overfitting}) of a particular
 machine learning algorithm (the \emph{Boosting} algorithm).  The
 result is a series of machine learning algorithms called
 \emph{$p$-boosting algorithms}.  These algorithms are developed,
-analysed and tested in the later part of this thesis.
+analysed and tested in later chapters.
 
 
 \section{Overview}
 
 This introduction provides an overview of the rest of the thesis, and
 covers the bigger picture, describing the field of machine learning
-and its applications to practical problems.  The rest of the thesis is
-composed of four parts.
+and its applications to practical problems.  The rest of the thesis
+may is composed of three four parts.
 
 \subsection*{Part I: Background}
 
-The next few chapters rapidly narrow the focus.  Chapter
+The next three chapters rapidly narrow the focus.  Chapter
 \ref{chapter:slt} describes the field of \emph{Statistical learning
-theory} (SLT)\footnote{A table of acronyms is provided in appendix
-\ref{appendix:acronyms}}, which provides much of the theoretical
-foundations of, but does not encompass, the entire field of machine
+theory} (SLT)\footnote{A table of acronyms is provided in the
+preface.}, which provides much of the theoretical
+foundations of (but by no means encompasses) the field of machine
 learning.  Assumptions of \emph{binary problems} and
-\emph{classification problems} also further restrict the scope of the
+\emph{classification problems} further restrict the scope of the
 investigation.
 
 Chapter \ref{chapter:stumps} provides a description of, and proves
 some properties of, a very simple learning algorithm called
-\emph{decision stumps} which fits within this restricted scope imposed
-by the assumptions in the first two chapters.  This learning algorithm
-is used as a base for the more powerful Boosting algorithms described
+\emph{decision stumps} which fits within the restricted scope imposed
+by the first two chapters.  This learning algorithm
+is used as a basis for the more powerful Boosting algorithms described
 later.
 
 With the necessary background in place, the \emph{Boosting} algorithm
-is described in chapter \ref{chapter:boosting}.  This algorithm forms
-the starting point for the original work that is considered in further
-chapters.  A formal definition of what it means for an algorithm to
-``boost'' is given, and many properties of the Boosting algorithm are
-given.  Finally the problem of overfitting in boosting is
-investigatied, as a prelude to the possible solutions investigated
-throughout the remainder of the thesis.
+itself is the subject of chapter \ref{chapter:boosting}.  This
+algorithm forms the starting point for the original work that is
+considered in further chapters.  We consider what it means to
+``boost'', adopting a broad definition, and many properties of the
+Boosting algorithm are given.  Finally the \emph{problem} of overfitting in
+boosting is investigatied, as a prelude to the \emph{solutions}
+investigated in the second part of the thesis.
+
 
 \subsection*{Part 2: Theoretical investigation}
 
-The key inventive step of the work described in this thesis is the use of a
-\emph{$p$-convex hull} to reduce the problem of overfitting.  Chapter
+The key inventive step of the project thesis is the use of a
+\emph{$p$-convex hull} to reduce the problem of overfitting.  Chapter 
 \ref{chapter:pboosting} investigates the theoretical justification
-behind this line of reasoning in some detail.
-
-Chapter \ref{chapter:development} develops these abstract ideas into
-concrete algorithms, and describes some properties of these
-algorithms.
-
-\subsection*{Part 3: Testing}
+behind this line of reasoning in some detail.  These abstract ideas
+are then developed into concrete algorithms, and properties of these
+algorithms are considered.
 
 Chapter \ref{chapter:method} describes how these algorithms were
 tested.  Chapter \ref{chapter:results} details the results of the
 investigations.
 
-\subsection*{Part 4: Discussions}
+\subsection*{Part 3: Discussions and conclusion}
 
 The chapters in this part evaluate the project.  (I'll fill this in
 when I've done it...)
@@ -99,27 +96,25 @@ required to generate even the 1000 rules that were used in large
 expert systems in 1980). 
 
 The problem was more practical than theoretical: systems with large
-numbers of rules can theoretically learn any learnable problem; it is
-\emph{generating} the rules that is hard.  The next step, obvious in
-hindsight, was to invent machines that could generate their own
-rules; machines that could \emph{learn}.
+numbers of rules can theoretically learn any learnable problem to a
+desired accuracy; it is \emph{generating} the rules that is hard.  The
+next step, obvious in hindsight, was to invent machines that could
+generate their own rules; machines that could \emph{learn}.
 
 
 \subsection{Machine learning}
 
-These machines came in two flavours.  \emph{Supervised learners} are
+Learning machines came in two flavours.  \emph{Supervised learners} are
 shown examples of some kind of relationship, along with the ``right''
-answers (from some form of supervisor) and attempt to learn a
+answers (generated from some form of supervisor) and attempt to learn a
 relationship such that their answer always matches that of the
-supervisor.  An example is trying to learn who is likely to default on
-loan payments from the credit history of previous customers (the
-``supervisor'' is simply the information on whether the previous
-customer defaulted on their loan).  All algorithms discussed in the
-body of this thesis are supervised algorithms.
-
-\emph{Unsupervised learners} are given a set of data and asked to
-learn a pattern in the data (for example, identifying interesting
-clumps of stars from telescope images).
+supervisor.  An example is trying to learn the likely outcome of a
+court case based upon details of similar cases (the ``supervisor''
+here is the information on the outcomes of cases on file).  All
+algorithms discussed in this thesis are supervised algorithms.
+\footnote{\emph{Unsupervised algorithms} are given a set of data and
+asked to learn a pattern in the data (for example, identifying
+interesting clumps of stars from telescope images).}
 
 
 \subsection{Statistical learning theory}
@@ -128,36 +123,88 @@ Statistical learning theory provides the theoretical foundation upon
 which machine learning rests.  It provides a body of knowledge that
 allows bounds on the performance of learning algorithms to be
 generated.  Much of this theory can be attributed to V.M.Vapnik
-\ref{Vapnik95}.
-
-Results from statistical learning theory enable us to design learning
-machines which we can be sure will learn a function that is close to
-the optimal.
+\cite{Vapnik95}.  Results from statistical learning theory enable us
+to design learning machines which we can be sure will learn a function
+that is close to the optimal.
 
 \subsection{Voting methods}
 
+\todo{Explain hypothesis vs algorithm (one sentence).}
 Boosting and $p$-boosting are both examples of \emph{voting methods},
-a relatively new class of algorithms which operate in a bootstrap-like
-manner by combining many ``weak'' algorithms to generate a composite
-algorithm.  The success of these algorithms has been remarkable; to
-such an extent that the focus of machine learning research has in
-recent years shifted away from the classical algorithms (all of which
-are more or less equal when boosted) and on to developments in voting
-methods.
+a relatively new class of algorithm which operates in a bootstrap-like
+manner by combining many ``weak''\footnote{A definition of a weak
+algorithm appears in chapter \ref{chapter:boosting}; as a rough guide any
+algorithm that is not a combination of other algorithms may be
+considered weak.} hypotheses to generate a composite hypothesis.  The
+success of these algorithms has been remarkable; as a result of these
+algorithms the focus of machine learning research in recent years to
+shifted away from the classical algorithms (all of which are more or
+less equal when boosted) and on to developments in voting methods.
 
-These algorithms were initially thought to be immune to many of the
-problems of overfitting.  Recent research has indicated that this is
-not the case, however.
+These algorithms were initially observed to be immune to many of the
+problems of overfitting.  Recent results have indicated that this is
+unfortunately not the case.
+
+\subsection{A real-world machine learning problem}
+
+Consider a telephone company that is interested in predicting whether
+its customers are likely to ``churn'' (change telephone companies) in
+the near future.  Such a telephone company may have a dataset with
+the data shown in table \ref{table:churn attributes} for several
+customers.
+
+The machine learning problem is to generate a machine that can
+accurately predict whether current and future customers are likely to
+churn, given this training data.  This problem will be revisited
+throughout the thesis.
+
+\begin{table}
+\newcommand{\szo}{\{0,1\}}
+\begin{tabular}{r l l l}
+\hline
+{\bf No.} & {\bf Name} & {\bf Range} & {\bf Description} \\
+\hline\hline
+ 1 & length      & $\bbR$ & Weeks customer has been with telco \\
+ 2 & area        & $\bbN$ & Telephone area code \\
+ 3 & intnlp      & $\szo$ & Whether customer has international plan \\
+ 4 & mailp       & $\szo$ & Whether customer has mail plan \\
+ 5 & messages    & $\bbN$ & Number of voice mail messages \\
+ 6 & daymin      & $\bbR$ & Number of day minutes \\
+ 7 & daycalls    & $\bbN$ & Number of day calls \\
+ 8 & daycost     & $\bbR$ & Total cost of day calls \\
+ 9 & evemin      & $\bbR$ & Number of evening minutes \\
+10 & evecalls    & $\bbN$ & Number of evening calls \\
+$\vdots$ & $\vdots$ & $\vdots$ & $\vdots$ \\
+
+11 & evecost     & $\bbR$ & Total cost of evening calls \\
+12 & nightmin    & $\bbR$ & Number of night minutes \\
+13 & nightcalls  & $\bbN$ & Number of night calls \\
+14 & nightcost   & $\bbR$ & Total cost of night calls \\
+15 & intlmin     & $\bbR$ & Number of inernational minutes \\
+16 & intlcalls   & $\bbN$ & Number of international calls \\
+17 & intlcost    & $\bbR$ & Total cost of international calls \\
+18 & servicecalls& $\bbN$ & Number of service calls \\
+19 & churn       & $\szo$ & {\bf Whether customer ``churned''} \\
+\hline
+\end{tabular}
+\caption{Attributes of a telephone company ``churn'' dataset}
+\label{table:churn attributes}
+\end{table}
 
 \section{Overfitting}
 
 Overfitting, simply put, is learning the specifics of a process too
 well to be able to apply the knowledge to a more general problem.
-A familiar example for many people would be driving a familiar route
-on ``auto-pilot'' and almost coming to grief on a new obstacle.
+A familiar example for many people would be driving a well-known route
+on ``auto-pilot'' and almost coming to grief on a new obstacle.  In
+the context of machine learning, overfitting occurs when the learning
+machine adapts to peculiarities or noise in the input data, to the
+detriment of generalisation ability.  \todo{Better expression!}
 
 Statistical learning theory gives us a theoretical reason for
-overfitting, and also an insight into how it may be avoided.  
+overfitting, and also an insight into how it may be avoided.  In
+particular, by limiting the complexity of the \emph{set} of hypotheses
+that the learning machine may generate we can avoid overfitting.
 
 
 \section{Original work}
@@ -168,6 +215,8 @@ reducing overfitting in the boosting algorithm.  This theory is first
 developed into several practical algorithms; these algorithms are then
 tested against the original AdaBoost algorithm and for compliance with
 the theory behind them.
+
+
 
 
 
