@@ -31,8 +31,8 @@ if (isempty(DATA_SAVE_PATH))
 end
 
 % Test file name
-testfile = [DATA_SAVE_PATH '/' test '.mat'];
-progfile = [DATA_SAVE_PATH '/' test '-progress.mat'];
+testfile = [DATA_SAVE_PATH '/' test '/' test '.mat'];
+progfile = [DATA_SAVE_PATH '/' test '/' test '-progress.mat'];
 
 dist = 'frog';
 
@@ -93,9 +93,9 @@ while (noisevalue <= length(noise))
 	 end
 	 
 	 % Save the results
-	 save_filename = [DATA_SAVE_PATH '/' test '-trial' int2str(trial) ...
-			  '-pvalue' int2str(pvalue) '-noisevalue' ...
-			  int2str(noisevalue)];
+	 save_filename = [DATA_SAVE_PATH '/' test '/' test '-trial' ...
+			  int2str(trial) '-pvalue' int2str(pvalue) ...
+			  '-noisevalue'  int2str(noisevalue)];
 	 
 	 save(save_filename, 'train_d', 'test_d', 'train_alg', 'teste', ...
 	      'traine');

@@ -46,7 +46,11 @@ if (isempty(DATA_SAVE_PATH))
    error('maketest: must set DATA_SAVE_PATH global variable');
 end
 
-filename = [DATA_SAVE_PATH '/' name '.mat'];
+% Try to create a directory for the test
+dirname = [DATA_SAVE_PATH '/' name];
+exec(['!mkdir ' dirname], 'disp(''mkdir failed'';)');
+
+filename = [DATA_SAVE_PATH '/' name '/' name '.mat'];
 
 save(filename, 'name', 'algorithm', 'p', 'dist', 'samples', 'noise', ...
      'numiterations', 'trials');

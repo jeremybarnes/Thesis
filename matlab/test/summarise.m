@@ -30,8 +30,8 @@ if (isempty(DATA_SAVE_PATH))
 end
 
 % Test file name
-testfile = [DATA_SAVE_PATH '/' test '.mat'];
-progfile = [DATA_SAVE_PATH '/' test '-progress.mat'];
+testfile = [DATA_SAVE_PATH '/' test '/' test '.mat'];
+progfile = [DATA_SAVE_PATH '/' test '/' test '-progress.mat'];
 
 % Load in our test
 load_error = 0;
@@ -86,9 +86,9 @@ for noisevalue=1:num_noise_values
 	       ' noise=' num2str(noise(noisevalue))]);
 	 
 	 % Save the results
-	 load_filename = [DATA_SAVE_PATH '/' test '-trial' int2str(trial) ...
-			  '-pvalue' int2str(pvalue) '-noisevalue' ...
-			  int2str(noisevalue)];
+	 load_filename = [DATA_SAVE_PATH '/' test '/' test '-trial' ...
+			  int2str(trial) '-pvalue' int2str(pvalue) ...
+			  '-noisevalue' int2str(noisevalue)];
 	 
 	 load(load_filename, 'teste', 'traine');
 	 
@@ -179,7 +179,7 @@ end
 disp('Saving...');
 
 % Save the file
-savefile = [DATA_SAVE_PATH '/' test '-summary.mat'];
+savefile = [DATA_SAVE_PATH '/' test '/' test '-summary.mat'];
 
 save(savefile, 'test_mean', 'test_std', 'train_mean', 'train_std', ...
      'count_res', 'name', 'algorithm', 'p', 'dist', 'samples', ...

@@ -55,3 +55,75 @@ function h = plot_results(test, type, varargin)
 % Jeremy Barnes, 9/10/1999
 % $Id$
 
+
+info = get_test_info(test);
+
+figure(1);  clf;
+
+best_err = get_test_results(test, 'best_err');
+best_iter = get_test_results(test, 'best_iter');
+
+% row = noise, col = p, d3 = errors
+
+
+
+% Make into one big matrix
+
+pvalues = zeros(1, length(info.p) .* info.trials);
+err_results = zeros(length(info.noise), length(info.p) .* info.trials);
+iter_results = zeros(length(info.noise), length(info.p) .* info.trials);
+
+for i=1:length(info.noise)
+   
+   this_part_err = best_err(i, :, :);
+   this_part_iter = best_iter(i, :, :);
+   
+   these_p_results = [];
+   these_err_results = [];
+   these_iter_results = [];
+   
+   for j=1:length(info.p)
+      
+      these_p_results = [these_p_results; ...
+			 ones(1, info.trials) .* info.p(j)];
+      these_err_results = [these_err_results; ...
+		    permute(this_part_err(1, j, :), [1 3 2])];
+      these_iter_results = [these_iter_results; ...
+		    permute(this_part_iter(1, j, :), [1 3 2])];
+   end
+   
+   err_results(i, :) = these_err_results;
+   iter_results(i, :) = these_iter_results;
+   pvalues = these_p_results;
+end
+
+
+% Draw graphs
+
+fignum = 1;
+
+% Graphs of p vs best error
+for i=1:length(info.noise)
+   figure(fignum);  clf;
+   plot(pvalues, these_err_results(i, :), 'rx');
+   title(['Noise = ' int2str(info.noise)]);
+   xlabel('p');
+   ylabel('Best test error');
+   fignum = fignum + 1;
+end
+
+
+% Graphs of p vs best iteration
+for i=1:length(info.noise)
+   figure(fignum);  clf;
+   plot(pvalues, these_iter_results(i, :), 'rx');
+   title(['Noise = ' int2str(info.noise)]);
+   xlabel('p');
+   ylabel('Best test iteration');
+   fignum = fignum + 1;
+end
+
+
+% Done
+
+

@@ -32,12 +32,12 @@ if (isempty(DATA_SAVE_PATH))
 end
 
 % Summary file name
-summaryfile = [DATA_SAVE_PATH '/' test '-summary.mat'];
+summaryfile = [DATA_SAVE_PATH '/' test '/' test '-summary.mat'];
 
 % Try to load in the 'noise' and 'p' records
 load_error = 0;
-eval('load(summaryfile, ''name'', ''numiterations'', ''noise'', ''p'');', ...
-     'load_error = 1;'); 
+eval(['load(summaryfile, ''name'', ''numiterations'', ''noise'', ''p'',' ...
+      ' ''trials'');'], 'load_error = 1;');
 
 % If we can't load it, it doesn't exist
 if (load_error)
@@ -49,5 +49,5 @@ info.exists = 1;
 info.numiterations = numiterations;
 info.noise = noise;
 info.p = p;
+info.trials = trials;
 info.type = 'testtrain';
-
