@@ -66,5 +66,5 @@ obj_r = obj;
 context.wl_y = new_y;
 context.wl_instance = new_c;
 context.bt = bt;
-context.b = [obj.b bt];
+context.b = obj.b;
 context.w = new_w;
