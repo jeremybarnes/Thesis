@@ -25,6 +25,8 @@ function [var, val, no_optimal] = ...
 % Jeremy Barnes, 17/5/1999
 % $Id$
 
+obj = cart(obj);
+
 s = size(x);
 dimensions = s(2);
 

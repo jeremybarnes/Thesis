@@ -24,6 +24,7 @@ function plottree(obj, domain)
 
 
 % This is done in a recursive manner, in the routine below.
+obj = cart(obj);
 recursive_plot(obj.tree, domain);
 
 

@@ -23,6 +23,7 @@ function printtree(obj)
 % $Id$
 
 % Do it recursively...
+obj = cart(obj);
 recursive_print(obj.tree, 0);
 
 
