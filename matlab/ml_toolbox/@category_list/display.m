@@ -1,7 +1,8 @@
 function display(obj)
-% DISPLAY method for classlabel
 
-% @classlabel/display.m
+% DISPLAY method for CATEGORY_LIST
+
+% @category_list/display.m
 % Jeremy Barnes, 4/4/1999
 % $Id$
 
