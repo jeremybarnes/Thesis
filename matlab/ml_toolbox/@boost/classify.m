@@ -35,6 +35,11 @@ xs = size(x);
 votes = zeros(xs(1), numcategories(obj.categories));
 y = zeros(xs(1), 1);
 
+% Normalise our voting weights.  This is particularly important, as these
+% may be negative, which would result in an incorrect classification.
+
+b = obj.b ./ sum(obj.b);
+
 % Go through each classifier, finding out how it classified the data and
 % adding its votes up for each datapoint.
 
@@ -44,7 +49,7 @@ for i = 1:obj.iterations
    this_y = classify(this_classifier, x) + 1; % +1 converts cat to col
 
    for j=1:xs(1)
-      votes(j, this_y(j)) = votes(j, this_y(i)) + obj.b(i);
+      votes(j, this_y(j)) = votes(j, this_y(j)) + b(i);
    end
 end
 
@@ -58,7 +63,6 @@ for i=1:xs(1)
 
    y(i) = max_index - 1; % -1 because categories go from 0 to n-1
 end
-
 
 % POSTCONDITIONS
 check_invariants(obj);
