@@ -35,6 +35,3 @@ weightwrong = sum(ywrong .* w);
 
 % Find the proportion of wrong weight
 e = weightwrong / sum(w);
-
-% POSTCONDITIONS:
-check_invariants(obj);
