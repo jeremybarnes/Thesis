@@ -12,19 +12,10 @@ function cat = categories(obj)
 % categories that can appear in the dataset.
 %
 
-% labels.m
+% @dataset/categories.m
 % Jeremy Barnes, 3/4/1999
 % $Id$
 
-
-% PRECONDITIONS:
-% none
-
-
 cat = obj.categories;
-
-
-% POSTCONDITIONS:
-check_invariants(obj);
 
 
