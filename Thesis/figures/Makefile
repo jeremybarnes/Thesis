@@ -27,7 +27,10 @@ working_dir 	= $(shell pwd)
 
 all:		bfunc.epsg regression_problem.epsg \
 		classification_problem.epsg dichotomy.epsg \
-		margin_illustration.epsg descent.epsg
+		margin_illustration.epsg descent.epsg \
+		stumpdiagram.epsg stumpcandidates.epsg \
+		stumpvcdim.epsg shattering.epsg \
+		fat_shattering.epsg
 
 clean:		
 		-rm *.epsg *.mscript *~
