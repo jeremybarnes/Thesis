@@ -8,8 +8,12 @@ function plot_region(category, domain)
 %
 % This function draws a box with a big cross inside within the domain
 % specified.  The colour of the box depends upon the value of the
-% CATEGORY variable: 1=blue, 2=red, 3=green, 4=black, 5=magenta,
-% 6=yellow, 7=cyan, 8=white.
+% CATEGORY variable: 0=blue, 1=red, 2=green, 3=black, 4=magenta,
+% 5=yellow, 6=cyan, 7=white.
+%
+% RESTRICTIONS:
+%
+% * CATEGORY must be less than 8.
 
 % plot_region.m
 % Jeremy Barnes, 9/5/1999
@@ -37,7 +41,7 @@ y(1, 6) = ydomain(2);
 y(1, 7) = ydomain(1);
 y(1, 8) = ydomain(2);
 
-colors = 'brgkmycw';
+colors = 'rbgkmycw';
 
 color = [colors(category + 1) '-'];
 
