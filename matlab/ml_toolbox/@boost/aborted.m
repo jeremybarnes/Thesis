@@ -6,4 +6,5 @@ function a = aborted(obj)
 % Jeremy Barnes, 25/4/1999
 % $Id$
 
+obj = boost(obj);
 a = obj.aborted;
