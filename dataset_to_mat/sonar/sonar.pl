@@ -8,7 +8,7 @@
 # can then be converted to a mat file by the text_to_mat program.
 # By sonar files, I mean the "sonar" dataset of the UCI ML repository.
 
-$data_path = "f:/Datasets/";
+$data_path = $ARGV[0];
 
 $sonar_path = "undocumented/connectionist-bench/sonar/";
 
@@ -16,7 +16,7 @@ $mines_file = "sonar.mines";
 $rocks_file = "sonar.rocks";
 
 parse_file("$data_path$sonar_path$mines_file", 1);
-parse_file("$data_path$sonar_path$rocks_file", -1);
+parse_file("$data_path$sonar_path$rocks_file", 0);
 
 sub parse_file {
     $name = $_[0];
