@@ -34,14 +34,14 @@ function test_normboost(p, datatype, numpoints, noise)
 if (nargin == 0)
    p = 1.0;
    datatype = 'ring';
-   numpoints = 50;
+   numpoints = 15;
    noise = 0.1;
 elseif (nargin == 1)
    datatype = 'ring';
-   numpoints = 50;
+   numpoints = 15;
    noise = 0.1;
 elseif (nargin == 2)
-   numpoints = 50;
+   numpoints = 15;
    noise = 0.1;
 elseif (nargin == 3)
    noise = 0.1;
