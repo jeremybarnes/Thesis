@@ -19,9 +19,6 @@ function obj_r = trainagain(obj)
 % Jeremy Barnes, 17/8/1999
 % $Id$
 
-% PRECONDITIONS
-% none
-
 if (aborted(obj))
    obj_r = obj;
    warning('trainagain: attempt to train when training is aborted');
@@ -88,7 +85,7 @@ else
    % END DEBUGGING
 
    % Initialisation
-   new_alpha = 0.5;
+   new_alpha = 0.5 / iterations(obj);
    d = 1;
 
    % Iterate
@@ -115,6 +112,7 @@ else
 
    old_b = classifier_weights(obj);
    new_b = [(1 - alpha.^p).^(1/p) * old_b alpha];
+   pnorm(new_b, p)
 
 end
 
