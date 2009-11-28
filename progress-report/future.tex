@@ -1,0 +1,181 @@
+\chapter{Plans for future progress}
+\label{chapter:future}
+
+There are five tasks to be performed to bring this project to
+completion:
+
+\begin{enumerate}
+\item	Develop a $p$-boosting algorithm that correctly performs
+	gradient descent;
+\item	Produce computer code that implements this algorithm;
+\item	Test the performance of this algorithm;
+\item	Develop theory to bound the performance of this algorithm;
+\item	Produce a seminar, thesis, poster and demonstration.
+\end{enumerate}
+
+
+\section{Development of a ``correct'' $p$-boosting algorithm}
+
+The ideas in section \ref{sec:current:gradient descent} need to be
+developed to the point where an algorithm similar to that in appendix
+\ref{chapter:boosting details} can be given.  A nice side effect of
+attacking this using theoretical tools will be that the algorithm will
+easily be proven to be implementing gradient descent.
+
+This step is also the most risky; it may turn out that there are
+problems with this approach (for example, problems with gradients or
+``corners'' as $p \rightarrow 0$).  In the worst case, the original
+algorithm may need to be retained.
+
+
+\section{Implementing this algorithm in computer code}
+
+This step should be straightforward as the supporting code (weak
+learners, datasets, visualisation) already exists as well as an
+implementation of boosting.
+
+The main difficulty will be in devising a method to keep track of
+which weak hypotheses have already been used (and their weights---see
+section \ref{sec:duplicate hypotheses}).
+These changes will also have follow-through effects on optimisations
+made in the testing code (which was also written under the assumption
+that all weak learners are disjoint).
+
+
+\section{Experimental performance analysis}
+
+The purpose of these experiments will be to test and refine the
+following hypotheses:
+
+\begin{itemize}
+\item	That lower values of $p$ work better for noisier datasets;
+\item	That each \{dataset, weaklearner\} combination has an optimal
+	value of $p = \hat{p}$, in that the test error performance using
+	$p = \hat{p} + \Delta p$ will be worse for $\Delta p > 0$;
+\item	The tendancy towards overfitting is reduced as $p \rightarrow
+	0$;
+\item	The training time (number of iterations to reach minimum test
+	error) is increased as $p \rightarrow 0$.
+\end{itemize}
+
+In order to obtain useful results, changes will have to be made to the
+experimental technique.  In particular, the statistical confidence in
+the results is currrently low due to the small number of test samples
+and single trials.
+Table \ref{table:experimental technique} details the adjustments to be
+made.
+
+\newcommand{\trialfn}{\footnote{Number of independent trials to be
+statistically averaged}}
+\newcommand{\sourcefn}{\footnote{``Toy'' datasets are generated from a
+simple distribution; ``real'' are from (for example) the UC Irvine
+repository \cite{UCI}.}}
+
+\begin{table}\begin{center}
+% We need to use a minipage so that the footnotes get displayed
+% properly.  Basically a hack.
+\begin{minipage}{\linewidth}\begin{center}
+\renewcommand{\thefootnote}{\thempfootnote} % Use minipage footnotes
+\begin{tabular}{l l l}
+\textbf{Parameter}			& \textbf{Current} & \textbf{Future} \\
+\hline \hline
+\emph{Training dataset:} & & \\
+size					& 50-500	& 20-100 \\
+attribute noise				& 0-1\%		& 0 \\
+classification noise			& 0		& 0-20\% \\
+dimensions				& 2		& 2-5 \\
+source\sourcefn				& toy		& toy, real \\
+\hline
+\emph{Testing dataset:} & & \\
+size					& 50-500	& 10000 \\
+generation				& once		& often \\
+\hline
+\emph{Boosting:} & & \\
+iterations				& 50-1000	& 10000 \\
+trials\trialfn				& 1		& 100 \\
+weaklearner				& stumps, CART	& stumps \\
+\hline
+\end{tabular}\end{center}
+\end{minipage}
+\caption{Experimental parameters}
+\label{table:experimental technique}
+\end{center}\end{table}
+
+These changes are expected to have the following effect:
+\begin{itemize}
+\item	The statistical averaging will allow a high confidence to be
+	placed in the results obtained.
+\item	The use of more realistic datasets and noise levels should
+	generate training samples on which the $p$-boosting algorithm
+	is likely to perform better than AdaBoost.
+\item	Using $10^5$ rounds of boosting should train until overfitting
+	occurs, allowing the capacity control of the $p$ parameter to
+	be investigated.
+\end{itemize}
+
+
+\section{Theoretical performance analysis}
+
+As described in section \ref{sec:current:generalisation performance},
+the aim of this work is to produce a bound on the generalisation
+performance of the $p$-boosting algorithm, such that with high
+probability $1 - \delta$ 
+%
+\begin{equation}
+\Pr (\mbox{error}) < {\Pr} _T(\mbox{error}) + \epsilon(l, \delta, p)
+\end{equation}
+%
+where ${\Pr}_T$ denotes the probability over the $l$ training samples.
+The important part is $\epsilon$, which is the width of the ``gap''
+between training and test error.
+
+Generating this bound should be fairly straightforward, if an
+algorithm is generated that uses a $p$-convex combination (a result
+from \cite{Williamson99} can then be used).  Otherwise it may not be
+possible to generate this bound.
+
+
+\section{Production of deliverables}
+
+Approximately half of the time remaining will be devoted to producing
+the thesis, seiminar, poster and demonstration.
+
+
+\section{Timeline}
+
+A month-by-month description of the work to be completed on the
+project is given in table \ref{table:new timeline}.  The main
+difference between this timeline and that in the proposal (see
+appendix \ref{chapter:proposal}) is the lack of a two week slack
+period at the end of August.  This period is now being used to run
+simulations---they were not run earlier due to the deficiencies in the
+implemented $p$-boosting algorithm described in section
+\ref{sec:current:gradient descent}.
+
+
+\begin{table}\begin{center}
+\begin{tabular}{r l}
+\textbf{Month}		& \textbf{Tasks} \\ \hline \hline
+July			& \textbf{19th Progress report due} \\
+			& Preparing for seminar \\
+			& \textbf{26th Seminar} \\ \hline
+August			& Development of ``correct'' $p$-boosting algorithm \\
+			& Implementation of ``correct'' algorithm \\
+			& Running simulations \\ \hline
+September		& Running simulations \\
+			& \textbf{13th Sufficient work done to
+			  complete thesis} \\
+			& Writing thesis \\
+			& \textbf{29th Draft thesis due} \\
+			& Demonstration and poster \\ \hline
+October			& \textbf{6th Draft thesis returned} \\
+			& Revising thesis \\
+			& \textbf{27th Thesis due} \\
+			& \textbf{28th Demonstration} \\
+\hline
+\end{tabular}
+\caption{Project timeline to completion}
+\label{table:new timeline}
+\end{center}\end{table}
+
+

@@ -1,0 +1,412 @@
+
+
+There are two directions in which this project can move.  The
+first to complete exhaustive testing of the $p$-boosting algorithm
+in its current form, 
+concentrating on \emph{measuring} and possibly \emph{explaining}, but
+not \emph{improving} its performance.  This would involve running many
+trials unver varying conditions, and using statistical techniques to
+analyse performance.  It is a narrowly focused but deep option.
+
+The second possibility is to concentrate on the theoretical
+formulation of the algorithm, working on incorporating the $p$-convex
+combination into the gradient descent framework.  This would have the
+unfortunate side effect of leaving significantly less time for
+testing.  It is a broad but shallow investigation.
+
+The available evidence is not sufficient to make this decision.  Some
+time needs to be invested in determining whether or not the original
+$p$-boosting algorithm is worth investigating.  At a minimum, this
+will involve running a few carefully designed tests from which
+conclusions can be drawn.
+
+On the available evidence (which is admittedly scant), the second
+option seems preferable.  This is for the following reasons:
+
+\begin{itemize}
+
+\item	The $p$ parameter does not currently seem to have much effect
+	on the performance of the algorithm (although it is unclear
+	under what conditions this is true).
+
+\item	The original $p$-boosting algorithm is something of a hack,
+	and is probably not actually performing a sensible gradient
+	descent.
+
+\item	The outcome of the second option (an improved algorithm with a
+	theoretical justification) is preferable to the first (a
+	thorough investigation of the performance of an algorithm).
+
+\item	A structured theoretical approach seems a more elegant way to
+	tackle a problem than throwing a lot of computer time at it.
+
+\end{itemize}
+
+The intended plan of action can be summarised as follows:
+
+\begin{enumerate}
+
+\item	Perform theoretical verification of the 
+
+
+\item	Perform carefully designed tests to determine if the original
+	$p$-boosting algorithm has significantly improved performance
+	over the boosting algorithm in any circumstance.
+
+\item	Make a decision on which direction to take, contingent on
+
+\end{enumerate}
+
+Thus, the 
+
+
+
+\section{Development of a suitable algorithm}
+
+\section{Analysis of the optimal $p$-convex boosting algorithm}
+
+\subsection{Practical analysis}
+
+\subsection{Theoretical analysis}
+
+\section{Production of thesis}
+
+The final outcome of this project is a thesis to be submitted for
+marking.  This section describes those tasks which must be performed
+in order to complete a thesis.
+
+
+\footnote{(\ref{eqn:theory:cost
+function}) is a crude approximation to the threshold function 
+\[ g(x) = \left\{ \begin{array}{ll}
+1 \qquad \qquad & \mbox{if $x<0$} \\
+0		& \mbox{otherwise} \\
+\end{array} \right. \]
+that is easy to work with theoretically.}
+
+
+
+ \footnote{To first order in $b$, $C(F+bf) = C(F) +
+b \ip{\nabla C(F)}{f}$}.
+
+
+
+\input{commands}
+
+\chapter{Details of the boosting algorithm}
+\label{chapter:boosting details}
+
+This chapter provides an explicit description of the boosting
+algorithm as a complement to the implicit description in chpter
+\ref{chapter:theory}.
+
+\par
+
+\noindent{\bf Input:} $l$ examples $(\bfx_1, \bfy_1), \ldots, (\bfx_l,
+\bfy_l)$
+\par
+\noindent{\bf Initialisation:} $w_i|_{t=1} = 1/l$ for $i=1 \ldots l$
+\par
+\noindent {\bf Do for} $t=1 \ldots T$:
+
+
+\begin{enumerate}
+
+\item	Train weak learner on the weighted sample set 
+	$(\bfx_1, \bfy_1, w_1) \ldots (\bfx_l, \bfy_l, w_l)$
+	and obtain weak learner $f_t(\cdot) : \calI \mapsto \{\pm 1\}$
+
+\item	Calculate the training error $\epsilon_t$ of $f_t(\cdot)$:
+	%
+	\begin{equation}
+	\epsilon_t = \sum_{j=1}^l w_j |_t 
+	I \left( f_t(\bfx_j) \neq \bfy_j\right)
+	\end{equation}
+
+	If $\epsilon_t = 0$ (a single weak learner can correctly learn
+	the relationship) or $\epsilon_t \geq \phi - \Delta$ (where
+	$\Delta$ is a small positive constant; thus the weak
+	learner is performing as badly as random guessing) then abort
+	the training process.
+
+\item	Calculate our classifier weight $b_t$:
+	\begin{equation}
+	b_t = \log \frac{\epsilon_t}{1 - \epsilon_t}
+	\end{equation}
+
+\item	Update the weights $w_i$:
+	%
+	\begin{equation}
+	w_i|_{t+1} = \left\{
+	\begin{array}{cl}
+		w_i|_t / Z_t	&	\qquad \qquad \mbox{if
+		$f_t(x_i) = y_i$} \\
+		w_i|_t / Z_t \exp \left\{ -b_t \right\} & \qquad \qquad
+		\mbox{otherwise} \\
+	\end{array} \right.
+	\end{equation}
+
+	where $Z_t$ is a normalisation constant, such that
+	$\sum_{i=1}^{l} w_i|_{t+1} = 1$
+\end{enumerate}
+
+\par
+\noindent {\bf Output:} 
+\begin{equation}
+F'(\bfx) = \sign \left\{ \sum_{i=1}^T w_i f_i(\bfx) \right\}
+\tag{\ref{eqn:output}}
+\end{equation}
+
+
+\chapter{Background theory}
+
+This chapter contains a brief summary of the main theoretical results
+necessary to understand the rest of the report.  Familiarity with the
+field of statistical learning theory is assumed.
+
+Which works does it follow?
+
+%Note that none of these results are original work.  They are merely
+%a summary of other author's work.  References are given for the
+%source of the results.
+
+
+\section{Notation}
+
+We begin with some notation.  A classifier is characterised by a
+function $f(\cdot) : \mathcal{I} \mapsto \mathcal {O}$.  \calI\
+(the \emph{input set}) is the domain of the classifier, and
+$\calI \subseteq \mathbb{R}^n$.  For a classifier, \calO\ (the \emph{output set}) is a finite subset of the real numbers.  We will restrict our attention to
+$\calI = [0,1] \times [0,1]$ (two dimensional) and $\calO = \{-1,1\}$
+(binary) for simplicity.\footnote{Generalisation to other situations is not
+usually difficult (see for example \cite{Freund96} and
+\cite{Cherkassky98}).}
+
+Samples are notated $\{\bfx, \bfy\}$ where $\bfx \in \calI$ is the
+attribute vector and $\bfy \in \calO$ the class.  The classification
+process (performed by a learning algorithm when given a sequence of
+attributes $\bfx_1, \ldots, \bfx_l$ produces classes \bfyh\ (where
+$\bfyh = f(\bfx)$).  The hat distinguishes the \emph{estimates} made
+by the learning algorithm from the ``true'' samples.
+
+The ``weak'' learning algorithms decision stumps and CART are
+described in appendix \ref{chapter:weak learners}.  Weak learning
+algorithms are notated in lowercase $f_i(\cdot)$, where $i$ is an
+index and each $f_i$ is an element of \calF, which is the set of all
+appropriate instances of a learning algorithm (for example, all
+decision stump classifiers that operate in two dimensions on a binary
+problem). 
+
+\section{Boosting}
+
+Boosting is a learning algorithm that uses a linear combination of
+many ``weak'' learning algorithms to generate a combined hypothesis
+that is usually significantly better than that of any weak learning algorithm.
+Even the simplest of weak algorithms, when boosted, will usually
+outperform the best unboosted algorithms.
+\footnote{As a result, the focus of recent research effort has shifted from the
+development of \emph{weak learning} algorithms (which are all more
+or less equivalent when boosted) to the development of better \emph{boosting}
+algorithms.}
+
+Boosting builds a strong classifier from a linear combination of
+weak classifiers.  The weight of a weak classifier (the
+\emph{classifier weight}) depends upon the performance of that
+classifier on the training dataset.  Section \ref{sec:classifier
+weights} describes these classifier weights in more detail.
+
+Samples in the training dataset are given weights (\emph{sample
+weights}) which are modified depending upon how ``hard'' that
+datapoint is to classify.  Section \ref{sec:sample weights} describes
+these sample weights in more detail.
+
+A more thorough description of boosting is available in appendix
+\ref{chapter:boosting details} and in \cite{Freund96}.
+
+
+\subsection{Classifier weights}
+\label{sec:classifier weights}
+
+The boosting algorithm combines a number of ``weak'' classifiers
+$f_1(\cdot), \ldots, f_n(\cdot)$ in a linear combination to produce a
+``stronger'' classifier $F(\cdot) = \sum_{i=1}^{n} b_i f_i(\cdot)$.
+The coefficients $b_i$ are subject to the condition that they produce a
+\emph{convex} combination:
+%
+\begin{equation}
+\label{eqn:p=1}
+\|b\|_1 = \sum_{i=1}^{t} b_i = 1
+\end{equation}
+%
+
+The training process of boosting may be conveniently divided into
+iterations.  On iteration $t$, one
+weak learner $f_t(\cdot)$ is added to the linear combination.
+The coefficient $b_t$ is calculated from the training error $\epsilon_t$ 
+%
+\begin{equation}
+\epsilon_t = \sum_{j=1}^l w_j |_t 
+I \left( f_t(\bfx_j) \neq \bfy_j\right)
+\label{eqn:training error}
+\end{equation}
+%
+where $l$ is the number of training samples.  (The notation $w_j|_t$
+means the value of $w_j$ at iteration $t$.  The role of these weights
+is discussed in section \ref{sec:sample weights} below).
+
+The coefficient $b_t$ is generated from
+%
+\begin{equation}
+b_t = \log \frac{\epsilon_t}{1 - \epsilon_t}
+\label{eqn:bt}
+\end{equation}
+%
+When $\epsilon_t = 1/2$, the classifier only does as
+well as random guessing; thus it has a weight of zero.  As
+$\epsilon_t$ approaches zero, the weight increases, and
+the more influence this classifier has on $F$.
+\footnote{Training is halted if the classification error reaches
+zero.}  A plot of $b_t$ against $\epsilon_t$ is given in appendix
+\ref{chapter:proposal}.
+
+
+\subsection{Sample weights}
+\label{sec:sample weights}
+
+Each sample in the training set has a corresponding weight $w_j$ which
+describes the difficulty of that sample.  These weights are
+initialised to $w_i|_{t=1} = 1/l$, and are updated each iteration
+according to
+%
+\begin{equation}
+w_i|_{t+1} = \left\{
+\begin{array}{ll}
+	\frac{w_i|_t}{Z_t}	&	\qquad \qquad \mbox{if
+	$f_t(x_i) = y_i$} \\
+	\frac{w_i|_t}{Z_t} \exp \left\{ -b_t \right\} & \qquad \qquad
+	\mbox{otherwise} \\
+\end{array} \right.
+\label{eqn:sample weight update}
+\end{equation}
+%
+where $Z_t$ is a normalisation constant, such that
+$\sum{i=1}{l} w_i|_{t+1} = 1$.  This function has the following effect
+on the weights:
+
+\begin{itemize}
+
+\item	Training samples which are misclassified often, or are one of 
+	few points to get misclassified, increase their proportion of
+	the weight (are identified as ``hard samples'';
+
+\item	Other samples decrease their proportion of the weight, and are
+	identified as ``easy'' samples.
+
+\end{itemize}
+
+The overall effect is for those samples near the decision boundary to
+increase in weight, and those far from it to decrease.  This forces
+the algorithm to concentrate on the hard samples, and is one reason
+why it works well.  Unfortunately, those samples corrupted by noise
+are usually hard also, and concentrating on those is not desirable.
+
+
+\subsection{Classification}
+The final output $F'(\bfx)$ of the boosting algorithm is determined by
+the sign of $F(\bfx)$:
+\begin{equation}
+F'(\bfx) = \sign \left\{ F(\bfx) \right\} = \sign \left\{ \sum_{i=1}^T
+w_i f_i(\bfx) \right\}
+\label{eqn:output}
+\end{equation}
+
+\section{Margins}
+
+The margin of a classifier $F(\cdot) : \calI \mapsto \{\pm 1\}$ on a
+sample $(\bfx, y)$ is defined as
+%
+\begin{equation}
+m_F(\bfx, y) \doteq y F(\bfx)
+\end{equation}
+%
+The margin is a measure of how confidently the classifier was able to
+predict the correct result.  It will be positive if the classification
+was correct and negative otherwise.
+
+\section{Boosting as gradient descent}
+\label{sec:theory:gradient descent}
+
+Recent work has
+shown boosting to be an implementation of gradient descent in an inner
+product space \cite{Mason99}\footnote{This discussion follows
+\cite{Mason99} rather closely.}.
+Noting that an inner product space requires both a universe
+$\mathcal{X}$ and an inner product operator \ip{\cdot}{\cdot}, we
+define
+%
+\begin{equation}
+\calX = 
+\mathrm{co} (\calF) \doteq
+ \bigcup _{n \in \mathbb{N}}
+\left\{
+ \sum_{i=1}^{n}
+ \alpha _i
+f_i : f_1, \ldots, f_n \in \calF,
+ \alpha _1, \ldots, \alpha _n \in \mathbb{R},
+ \sum_{i=1}^{n} | a_i | = 1
+\right\} \cup \emptyset
+\end{equation}
+%
+(which is the convex hull of \calF), and
+%
+\begin{equation}
+\ip{F}{G} = \frac{1}{l} \sum_{i=1}^{l} F(\bfx_i)G(\bfx_i)
+\end{equation}
+%
+We also choose the cost function\footnote{(\ref{eqn:theory:cost
+function}) is a crude approximation to the threshold function 
+\[ g(x) = \left\{ \begin{array}{ll}
+1 \qquad \qquad & \mbox{if $x<0$} \\
+0		& \mbox{otherwise} \\
+\end{array} \right. \]
+that is easy to work with theoretically.}
+%
+\begin{equation}
+C(F) = \frac{1}{l} \sum_{i=1}^{l} \exp
+\left\{ -y_i F(\bfx_i) \right\}
+\label{eqn:theory:cost function}
+\end{equation}
+
+At iteration $t$ of gradient descent, we wish to choose a function $f_t$ and
+a weight $b_t$ such that $C(F + b_t f_t)$ decreases (the choice of
+$f_t$ is made indirectly through the choice of the sample weights
+$w|_t$).  In other words, we are asking for sample weights $w|_t$ that
+choose a \emph{direction} $f_t \in \calF$ such that $C(F + b_t f_t)$
+decreases as fast as possible.  This direction is the negative of the
+functional derivative of $C$:
+%
+\begin{equation}
+f = -\nabla C(F)(x) = \left. \frac{\partial C(F + \alpha
+1_x)}{\partial \alpha} \right|_{\alpha = 0}
+\end{equation}
+%
+where $1_x$ is the indicator function of $x$.  Since the
+optimal $f_t$ will not necessarily be in $\calF$, we instead choose the
+$f \in \calF$ with the greatest inner product $\ip{-\nabla
+C(F)}{f}$ \footnote{To first order in $b$, $C(F+bf) = C(F) +
+b \ip{\nabla C(F)}{f}$}.  Solving for $w_i|_t$, $i=1 \ldots l$, we
+obtain (\ref{eqn:sample weight update}).
+
+Having chosen our direction, we now choose a step size $b_t$.
+There are many schemes for choosing this step size; boosting uses a
+line search for the minimum of the cost functional along this line
+%
+\begin{equation}
+\sum_{i=1}^{l} C(y_i F(\bfx_i) + y_i b_t f_t(\bfx_i)
+\end{equation}
+%
+which (for the choice of cost function (\ref{eqn:theory:cost
+function})) has a closed-form solution (\ref{eqn:bt}).  Thus, the
+boosting algorithm implements gradient descent.  (Some details, such
+as the stopping criteria, have been glossed over; the result still
+holds).

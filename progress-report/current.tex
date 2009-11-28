@@ -1,0 +1,183 @@
+\chapter{Current status of the project}
+\label{chapter:current}
+
+This chapter describes the progress made to date.  It begins with a
+description of the tools (computer software and hardware) that have
+been developed or obtained; describes the main results of the
+(limited) experimentation that has been performed; and describes
+relevant theoretical results.  Chapter \ref{chapter:future}
+extrapolates this current status into a plan of action.
+
+
+\section{Tools}
+
+The bulk of the time spent to date has been on the construction of
+suitable tools with which to gain experimental results on the
+performance of the $p$-boosting algorithm.  These tools include a set
+of optimised, well documented MATLAB and C functions to perform
+simulations with, and a Pentium class machine with a large RAM and all
+software installed on which to run these simulations.
+
+A modification has been made to the implemented $p$-boosting
+algorithm to avoid instability of the classifier weights.  This
+modification ensures that the sample weights $w_i$ are updated in the
+same manner as the AdaBoost algorithm (only the classifier weights
+$b_i$ are affected by $p$).  This change modifies the
+sample weight update equation for correct samples from 
+\begin{equation}
+w_i|_{t+1} = \frac{w_i|_t}{Z_t} \exp \left\{ (-b_t)^{1/p} \right\}
+\label{eqn:old sample weight update}
+\end{equation}
+to
+\begin{equation}
+w_i|_{t+1} = \frac{w_i|_t}{Z_t} \exp \left\{ -b_t \right\}
+\label{eqn:new sample weight update}
+\end{equation}
+in order to avoid instability as $p \rightarrow 0$.  (The instability
+was due to the numbers returned by (\ref{eqn:old sample weight update})
+getting very large for small $p$ and causing numeric overflow). 
+
+
+\section{Experimental results}
+
+Results obtained to this point have used two-dimensional binary datasets with
+little or no attribute noise, zero classification noise and 50-500
+samples.  Boosting has been performed over 50 to 1000 iterations.
+These trials have been performed only once, and use small test
+datasets (the same size as the sample datasets).
+
+The results that have been obtained using these tools indicate that
+the implemented $p$-boosting algorithm is not an
+improvement over the standard boosting algorithm under the test
+conditions that have been used.  In particular, there is evidence to
+tentatively state the following results:
+
+\begin{itemize}
+
+\item	The implemented $p$-boosting algorithm does appear to modify its
+	distribution of weights as $p$ changes.  Density plots of
+	$b_i$ for different values of $p$ show that those with smaller
+	$p$ values produce distributions with more weight in the
+	higher $b$ values, as expected.
+
+\item	The implemented $p$-boosting algorithm performs poorly when
+	the value of 
+	$p$ is too low (less than about 0.4 for the datasets used).
+	Specifically, the generalisation performance is worse and the
+	training takes longer.  This behaviour seems reasonable: as $p
+	\rightarrow 0$, the class $\calF$ gets small and may not contain a
+	suitable candidate.
+
+\item	Above this threshold, all values of $p$ have performance that
+	is roughly equal.  In particular, the performance does not
+	degrade as $p \rightarrow \infty$ (all classifier weights
+	$b_i$ are approximately equal).  This suggests that under the
+	test conditions used, the key feature of the boosting
+	algorithm is the modification of the sample weights $w_i$,
+	with the classifier weights $b_i$ being almost irrelevant.
+
+\item	Little evidence of overfitting on the test error graphs has
+	been observed, despite decision boundaries showing obvious
+	overfitting.  The small amount of noise present may account
+	for this behaviour (noiseless samples are somewhat immune to
+	overfitting).
+
+\end{itemize}
+
+\subsection{Duplicate hypotheses}
+\label{sec:duplicate hypotheses}
+
+One explanation for this behaviour involves an error in the
+implementation of the $p$-boosting algorithm when $p \neq 1$.
+Currently the algorithm assumes that the weak learner $f_t$ for each
+iteration $t = 1 \ldots T$ is unique.  In most cases this assumption
+is patently untrue; for example when decision stumps are boosted with
+a two dimensional dataset containing 101 samples there are around
+400 possible weak learners ($\|\calF\| = 400$).  If boosting is
+performed for 10000
+iterations, then there will be an $f \in \calF$ that is chosen at
+least 25 times!
+
+These duplicates interfere with the normalisation process.  Let us
+assume that hypothesis $f_i = f_j$ has been returned twice by the weak
+learning algorithm (on iterations $i$ and $j$), and thus has two
+weights $b_i$ and $b_j$.  When $p \neq 1$, we have 
+%
+\begin{equation}
+(b_i^p + b_j^p) \neq (b_i + b_j)^p
+\end{equation}
+%
+and thus the value of $\|\mathbf{b}\|_p$ will be calculated
+incorrectly.  For $p < 1$, this leads to $f_i$ being over-weighted;
+the opposite occurs for $p > 1$.  Obviously, the implementation needs
+to be modified to detect and deal with duplicate hypotheses.
+
+This situation will also have ramifications on theory concerning the
+``richness'' of \calF, as once all
+hypotheses $f \in \calF$ have been chosen, the boosted hypothesis $F$
+doesn't get any richer.
+
+
+\section{Theoretical results}
+
+The theoretical work to date has been focused along two directions:
+validatation of the $p$-boosting algorithm under the framework of
+gradient descent, and determining the generalisation performance of
+the $p$-boosting algorithm.
+
+
+\subsection{Gradient descent}
+\label{sec:current:gradient descent}
+
+The gradient-descent viewpoint of boosting described in section
+\ref{sec:theory:gradient descent} is relevant to the
+$p$-boosting algorithm, although little work on exploring this
+connection has been done at this stage.
+
+One preliminary observation is that the implemented $p$-boosting algorithm
+is unlikely to perform a sensible gradient
+descent.  This is due to the direction being calculated under the
+assumption that $p=1$ (unchanged from normal boosting), but the step
+size (which is chosen by a line search) is modified by our desired
+$p$ value.  The outcome is an overshoot or undershoot depending upon
+the value of $p$ and $\epsilon_t$ at each step.
+
+It is anticipated that an optimal gradient descent algorithm for
+$p$-boosting may be generated by working through the theory of the
+gradient descent.  Another possibility is to adjust the cost function
+(\ref{eqn:theory:cost function}) to be of the form
+%
+\begin{equation}
+C(F) = \frac{1}{l} \sum_{i=1}^{l} \exp
+\left\{ -\bfy_iF(\bfx_i) \right\} \quad + \quad \lambda \|b\|_p
+\label{eqn:regularisation}
+\end{equation}
+%
+where $\lambda$ indicates how important a small $p$-norm is.  One
+obvious problem with this method is that there are now \emph{two}
+parameters to optimise ($p$ and $\lambda$).  The sharp ``corners'' of a
+$p$-convex hull with $p \rightarrow 0$ may also introduce practical
+problems with gradient descent (it may get stuck in a corner).
+
+A further refinement of this solution would be to choose a much larger
+universe \calX\ (such as $\|\mathbf{b}\|_2 < 1$) without the corners,
+and again use the cost function (\ref{eqn:regularisation}).
+
+
+\subsection{Generalisation performance}
+\label{sec:current:generalisation performance}
+
+No thorough investigation of the generalisation performance of the
+$p$-boosting algorithm has been completed, as the form of the
+algorithm is not yet finalised.  The aim is to obtain a bound on
+generalisation performance using the results from \cite{Williamson99}
+to compute covering numbers for $p$-convex hulls.
+
+
+\section{Thesis}
+
+The deliverable for this project is a thesis.  Currently a skeleton of
+this thesis exists (including chapter and section headings), and most
+of the Theory chapter.  A detailed description of the method and
+results has been kept in a notebook, but has not yet been transferred
+to the thesis itself.

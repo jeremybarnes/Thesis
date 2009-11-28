@@ -1,0 +1,64 @@
+\input{commands}
+
+\chapter{Details of the boosting algorithm}
+\label{chapter:boosting details}
+
+This chapter provides an explicit and detailed description of the
+boosting algorithm as a complement to the implicit description in
+chapter \ref{chapter:theory}.
+
+\par
+
+\noindent{\bf Input:} $l$ examples $(\bfx_1, \bfy_1), \ldots, (\bfx_l,
+\bfy_l)$
+\par
+\noindent{\bf Initialisation:} $w_i|_{t=1} = 1/l$ for $i=1 \ldots l$
+\par
+\noindent {\bf Do for} $t=1 \ldots T$:
+
+
+\begin{enumerate}
+
+\item	Train weak learner on the weighted sample set 
+	$(\bfx_1, \bfy_1, w_1) \ldots (\bfx_l, \bfy_l, w_l)$
+	and obtain weak learner $f_t(\cdot) : \calI \mapsto \{\pm 1\}$
+
+\item	Calculate the training error $\epsilon_t$ of $f_t(\cdot)$:
+	%
+	\begin{equation}
+	\epsilon_t = \sum_{j=1}^l w_j |_t 
+	I \left( f_t(\bfx_j) \neq \bfy_j\right)
+	\end{equation}
+
+	If $\epsilon_t = 0$ (a single weak learner can correctly learn
+	the relationship) or $\epsilon_t \geq \phi - \Delta$ (where
+	$\Delta$ is a small positive constant; thus the weak
+	learner is performing as badly as random guessing) then abort
+	the training process.
+
+\item	Calculate our classifier weight $b_t$:
+	\begin{equation}
+	b_t = \log \frac{\epsilon_t}{1 - \epsilon_t}
+	\end{equation}
+
+\item	Update the weights $w_i$:
+	%
+	\begin{equation}
+	w_i|_{t+1} = \left\{
+	\begin{array}{cl}
+		w_i|_t / Z_t	&	\qquad \qquad \mbox{if
+		$f_t(x_i) = y_i$} \\
+		w_i|_t / Z_t \exp \left\{ -b_t \right\} & \qquad \qquad
+		\mbox{otherwise} \\
+	\end{array} \right.
+	\end{equation}
+
+	where $Z_t$ is a normalisation constant, such that
+	$\sum_{i=1}^{l} w_i|_{t+1} = 1$
+\end{enumerate}
+
+\par
+\noindent {\bf Output:} 
+\begin{equation}
+F'(\bfx) = \sign \left\{ \sum_{i=1}^T w_i f_i(\bfx) \right\}
+\end{equation}

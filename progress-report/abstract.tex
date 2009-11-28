@@ -1,0 +1,41 @@
+\begin{abstract}
+This report describes the progress made on an investigation of
+modifying Freund and Schapire's AdaBoost algorithm to generate
+hypotheses that are $p$-convex combinations of the ``weak''
+hypotheses.  It is anticipated that adjusting $p$ will allow for
+improved capacity control over AdaBoost.
+
+A software package capable of efficiently simulating two weak learning
+algorithms and AdaBoost has been produced.  The AdaBoost algorithm has
+been modified to incorporate the $p$ parameter in a manner expected to
+give similar results to using a $p$-convex hull.  A small number of
+simulations have been run to verify that the code works as expected.
+
+It appears that the modification originally made to the algorithm has
+a deleterious effect on performance as $p \rightarrow 0$, and little
+effect otherwise (although insufficient data has been collected at
+this stage to draw a firm conclusion).  Theoretical investigation of
+AdaBoost as an implementation of gradient descent has revealed the
+modification made to be somewhat naive.  In particular the step size
+(which is chosen in AdaBoost by a line search) is being
+moved away from the optimum, and linearity assumptions
+implicit in the AdaBoost algorithm are being broken for $p \neq 1$.
+
+Future work will first concentrate on addressing these shortcomings,
+producing a theoretically sound boosting algorithm for all
+$p \in (0,\infty)$.  Other methods of capacity control
+will also be considered.  The software package will then be
+modified to implement these new algorithm/s.  
+
+In order to test these algorithms, datasets will be produced that are
+hypothesised to have a significant performance variation for different
+values of $p$.  These hypotheses will be tested via extensive
+simulation, with each test being repeated 100 times to allow a high
+measure of confidence in the results.
+
+Time permitting, the algorithms will then be tested on real world
+datasets (for example, some of those from the UC Irvine repository) to
+enable comparison with other algorithms in the literature.
+\end{abstract}
+
+
