@@ -9,7 +9,7 @@ TEX_INCLUDES	= commands.tex
 
 .DUMMY :	all
 
-all:		thesis.ps
+all:		thesis.pdf
 
 # Cancel the old implicit rule which screws things around
 %.dvi:		%.tex
@@ -33,22 +33,25 @@ all:		thesis.ps
 		mv $(subst .tex,.dvi,$<) $@
 
 # The thesis is special, so we make it with a special command
+thesis.pdf:	$(TEXFILES) $(BIBLIOGRAPHY) $(STYFILES)
+		make -C figures
+		make -C graphs
+		pdflatex thesis.tex
+		bibtex thesis
+		pdflatex thesis.tex
+		pdflatex thesis.tex
+
+# The thesis is special, so we make it with a special command
 thesis.dvi:	$(TEXFILES) $(BIBLIOGRAPHY) $(STYFILES)
 		make -C figures
-		latex thesis.tex
+		pdflatex thesis.tex
 		bibtex thesis
-		latex thesis.tex
-		latex thesis.tex
-
-# Make a DVI file into a postscript one
-%.ps:		%.dvi
-		dvips -o $@ $<
-
-
+		pdflatex thesis.tex
+		pdflatex thesis.tex
 .DUMMY: 	clean
 
 # Remove all of our files that can be generated from others
 clean:
 		make -C figures clean
 		-rm *~ *.aux *.toc *.log *.dvi *.ps *.lot *.lof *.bbl *.blg \
-			*.input.tex *.todo
+			*.input.tex *.todo *.pdf
